@@ -62,19 +62,19 @@ try {
       result.packs.push(u.pathname);
   });
   await page.evaluateOnNewDocument(() =>
-    sessionStorage.setItem('gev:first-run-mission-session:v1', 'dismissed'),
+    sessionStorage.setItem('ce:first-run-mission-session:v1', 'dismissed'),
   );
   await page.goto(url + (url.includes('?') ? '&' : '?') + 'welcome=0', {
     waitUntil: 'domcontentloaded',
   });
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.dataManager &&
+      window.__cameraEye?.dataManager &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 120000 },
   );
   await page.evaluate(
-    () => window.__godsEyeView.styleManager.initialRestorePromise,
+    () => window.__cameraEye.styleManager.initialRestorePromise,
   );
   await page.keyboard.press('Escape');
   result.page = await page.evaluate(() => ({
@@ -88,7 +88,7 @@ try {
     result.page.title && result.page.canvas && !result.page.errorOverlay,
   );
   await page.evaluate(async () => {
-    const g = window.__godsEyeView;
+    const g = window.__cameraEye;
     for (const [id] of g.dataManager.layers)
       await g.dataManager.setEnabled(id, false);
     g.styleManager.setDetection({ enabled: false });
@@ -96,7 +96,7 @@ try {
   });
   assert.equal(result.packs.length, 0, 'names pack stays unloaded at startup');
   result.renderer = await page.evaluate(() => {
-    const gl = window.__godsEyeView.viewer.scene.context._gl;
+    const gl = window.__cameraEye.viewer.scene.context._gl;
     const ext = gl.getExtension('WEBGL_debug_renderer_info');
     return ext
       ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)
@@ -106,7 +106,7 @@ try {
   await installFrameProbe(page);
   const stats = () =>
     page.evaluate(() =>
-      window.__godsEyeView.dataManager.layers
+      window.__cameraEye.dataManager.layers
         .get('military-installations')
         .module.getStats(),
     );
@@ -114,7 +114,7 @@ try {
     await sleep(500);
     await page.waitForFunction(
       () => {
-        const s = window.__godsEyeView.dataManager.layers
+        const s = window.__cameraEye.dataManager.layers
           .get('military-installations')
           .module.getStats();
         return !s.loading && s.count > 0 && s.status === 'ready';
@@ -126,7 +126,7 @@ try {
   const us = { lon: -100, lat: 39, height: 6500000, pitch: -90 };
   await moveCamera(page, us, 0);
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('military-installations', true),
+    window.__cameraEye.dataManager.setEnabled('military-installations', true),
   );
   await settle();
   result.credit = await page.evaluate(() => {
@@ -154,7 +154,7 @@ try {
     const overlaps = await page.evaluate(async () => {
       const { getOverlayPaintRect } =
         await import('/src/overlays/worldOverlay.js');
-      const layer = window.__godsEyeView.dataManager.layers.get(
+      const layer = window.__cameraEye.dataManager.layers.get(
         'military-installations',
       ).module;
       const rects = [];
@@ -210,7 +210,7 @@ try {
     assert.ok(fps >= 55, `${name} fps ${fps.toFixed(1)} < 55`);
   }
   await page.evaluate(() =>
-    window.__godsEyeView.styleManager.setCleanView(true),
+    window.__cameraEye.styleManager.setCleanView(true),
   );
   await sleep(300);
   result.cleanUi = await page.evaluate(async () => {
@@ -235,10 +235,10 @@ try {
   );
   await page.screenshot({ path: `${dir}/clean-ui.png` });
   await page.evaluate(() =>
-    window.__godsEyeView.styleManager.setCleanView(false),
+    window.__cameraEye.styleManager.setCleanView(false),
   );
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled(
+    window.__cameraEye.dataManager.setEnabled(
       'military-installations',
       false,
     ),
@@ -251,7 +251,7 @@ try {
   });
   assert.equal(result.disabled, 0);
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('military-installations', true),
+    window.__cameraEye.dataManager.setEnabled('military-installations', true),
   );
   await moveCamera(page, us, 1);
   await settle();
@@ -268,7 +268,7 @@ try {
     const C = await import('/node_modules/cesium/Build/Cesium/index.js');
     const { getOverlayPaintRect } =
       await import('/src/overlays/worldOverlay.js');
-    const g = window.__godsEyeView;
+    const g = window.__cameraEye;
     const layer = g.dataManager.layers.get('military-installations').module;
     const overlay = document.createElement('div');
     overlay.id = 'installation-label-probe';
@@ -383,7 +383,7 @@ try {
     await settle();
     const snapshot = await page.evaluate(
       (lat, lon) => {
-        const g = window.__godsEyeView;
+        const g = window.__cameraEye;
         const layer = g.dataManager.layers.get('military-installations').module;
         const position = g.viewer.scene.globe.ellipsoid.cartographicToCartesian(
           {
@@ -438,13 +438,13 @@ try {
   });
   await page.waitForFunction(
     () => {
-      const state = window.__godsEyeView.styleManager.getContextModeState();
+      const state = window.__cameraEye.styleManager.getContextModeState();
       return state.mode === 'flights' && !state.changing;
     },
     { timeout: 60000 },
   );
   result.card = await page.evaluate(() => {
-    const g = window.__godsEyeView;
+    const g = window.__cameraEye;
     return g.dataManager.layers
       .get('military-installations')
       .module.focusById('osm:military:r13529728');

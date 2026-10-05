@@ -85,7 +85,7 @@ test('root config retains existing named exports and standalone provider order',
     config.plugins.slice(3, -4).map((plugin) => plugin.name),
     providers.localProviderPlugins().map((plugin) => plugin.name),
   );
-  assert.equal(config.plugins.at(-5).name, 'gev-key-setup');
+  assert.equal(config.plugins.at(-5).name, 'ce-key-setup');
   // The local MCP route follows every provider and precedes the API fallback.
   assert.equal(config.plugins.at(-4).name, 'local-mcp');
   assert.equal(config.plugins.at(-3).name, 'api-not-found');
@@ -94,7 +94,7 @@ test('root config retains existing named exports and standalone provider order',
 });
 
 test('build export resolves in Node and has no browser fallback', async () => {
-  const exported = await import('gods-eye-view/build/vite');
+  const exported = await import('camera-eye/build/vite');
   assert.equal(exported.createBrowserViteConfig, createBrowserViteConfig);
   const pkg = JSON.parse(
     readFileSync(new URL('../../package.json', import.meta.url)),

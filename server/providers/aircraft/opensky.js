@@ -291,7 +291,7 @@ async function fetchAdsbLolPointFallback(req) {
           {
             headers: {
               Accept: 'application/json',
-              'User-Agent': 'gods-eye-view-adsblol-regional-fallback/1.0',
+              'User-Agent': 'camera-eye-adsblol-regional-fallback/1.0',
             },
             signal: controller.signal,
           },

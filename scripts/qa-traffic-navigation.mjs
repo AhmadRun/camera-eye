@@ -41,13 +41,13 @@ try {
       return response ? request.respond(response) : request.continue();
     });
     await page.goto(`${url}/?welcome=0`, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.__godsEyeView?.dataManager, {
+    await page.waitForFunction(() => window.__cameraEye?.dataManager, {
       timeout: 60000,
     });
     await sleep(5000);
     await page.keyboard.press('Escape');
     await page.evaluate(async (withCctv) => {
-      const { viewer, dataManager } = window.__godsEyeView;
+      const { viewer, dataManager } = window.__cameraEye;
       const C = await import('/node_modules/.vite/deps/cesium.js');
       for (const id of ['satellites', 'flights', 'military'])
         await dataManager.setEnabled(id, false);
@@ -60,7 +60,7 @@ try {
       if (withCctv) await dataManager.setEnabled('cctv', true);
     }, cctv);
     const ready = () => {
-      const stats = window.__godsEyeView.dataManager.layers
+      const stats = window.__cameraEye.dataManager.layers
         .get('traffic')
         .module.getStats();
       return stats.count > 0 && !stats.loading;
@@ -71,7 +71,7 @@ try {
       console.log(
         'Traffic timeout state',
         await page.evaluate(() => {
-          const { viewer, dataManager } = window.__godsEyeView;
+          const { viewer, dataManager } = window.__cameraEye;
           return {
             stats: dataManager.layers.get('traffic').module.getStats(),
             camera: viewer.camera.positionCartographic,
@@ -82,7 +82,7 @@ try {
     }
     await sleep(2500);
     await page.evaluate(async () => {
-      const { viewer } = window.__godsEyeView;
+      const { viewer } = window.__cameraEye;
       const C = await import('/node_modules/.vite/deps/cesium.js');
       viewer.camera.flyTo({
         destination: C.Cartesian3.fromDegrees(-0.1276, 51.5072, 3200),
@@ -98,7 +98,7 @@ try {
     );
     await page.waitForFunction(ready, { timeout: 45000 });
     const stats = await page.evaluate(() =>
-      window.__godsEyeView.dataManager.layers.get('traffic').module.getStats(),
+      window.__cameraEye.dataManager.layers.get('traffic').module.getStats(),
     );
     assert.equal(stats.error, null);
     assert.deepEqual(errors, []);
@@ -107,14 +107,13 @@ try {
       { cctv, londonRequests, count: stats.count },
     );
     await page.evaluate(() =>
-      window.__godsEyeView.dataManager.setEnabled('traffic', false),
+      window.__cameraEye.dataManager.setEnabled('traffic', false),
     );
     assert.equal(
       await page.evaluate(
         () =>
-          window.__godsEyeView.dataManager.layers
-            .get('traffic')
-            .module.getStats().loading,
+          window.__cameraEye.dataManager.layers.get('traffic').module.getStats()
+            .loading,
       ),
       false,
     );

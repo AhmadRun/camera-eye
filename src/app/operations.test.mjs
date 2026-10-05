@@ -48,7 +48,7 @@ test('surface cache and stack listeners belong to the supplied application lifet
   assert.equal(first.surface.groundFloor.cachedGroundFloor(30, -97), 123);
   assert.equal(second.surface.groundFloor.cachedGroundFloor(30, -97), 456);
   target.dispatchEvent(
-    new CustomEvent('gev:map-stack-changed', {
+    new CustomEvent('ce:map-stack-changed', {
       detail: { activeId: 'esri-imagery' },
     }),
   );
@@ -56,7 +56,7 @@ test('surface cache and stack listeners belong to the supplied application lifet
   a.abort();
   assert.equal(first.surface.terrain.cachedEllipsoidalGround(30, -97), null);
   target.dispatchEvent(
-    new CustomEvent('gev:map-stack-changed', {
+    new CustomEvent('ce:map-stack-changed', {
       detail: { activeId: 'photoreal' },
     }),
   );

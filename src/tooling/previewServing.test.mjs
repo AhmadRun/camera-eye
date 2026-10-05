@@ -11,7 +11,7 @@ test('data providers have both hooks; credential editing stays development-only'
   const plugins = localProviderPlugins();
   assert.ok(plugins.some(({ name }) => name === 'fire-perimeters'));
   for (const plugin of plugins) {
-    if (plugin.name === 'gev-key-setup') {
+    if (plugin.name === 'ce-key-setup') {
       assert.equal(plugin.configurePreviewServer, undefined);
       assert.equal(
         plugin.apply({}, { command: 'serve', isPreview: true }),
@@ -31,7 +31,7 @@ test('data providers have both hooks; credential editing stays development-only'
 test('real dev and built-preview servers serve provider JSON and terminate unknown APIs', async (t) => {
   // Physical path: Vite's root and the files written under it must agree on one
   // spelling, and macOS reaches the temp directory through a symlink.
-  const root = await makeFixtureRoot('gev-preview-');
+  const root = await makeFixtureRoot('ce-preview-');
   t.after(() => rm(root, { recursive: true, force: true }));
   await writeFile(
     path.join(root, 'index.html'),

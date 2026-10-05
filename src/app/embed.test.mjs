@@ -131,22 +131,22 @@ test('an embedded page takes views only from its parent and answers it', async (
   });
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(shell.clean, true);
-  assert.deepEqual(posted, [{ type: 'gev:ready' }]);
+  assert.deepEqual(posted, [{ type: 'ce:ready' }]);
   const send = (source, data, origin = 'https://host.example') => {
     const event = new Event('message');
     Object.assign(event, { source, data, origin });
     windowRef.dispatchEvent(event);
   };
-  send({}, { type: 'gev:view', id: 1, view: { camera: { lat: 1, lon: 2 } } });
-  send(parent, { type: 'gev:view', id: 2, view: { camera: {} } });
+  send({}, { type: 'ce:view', id: 1, view: { camera: { lat: 1, lon: 2 } } });
+  send(parent, { type: 'ce:view', id: 2, view: { camera: {} } });
   send(parent, {
-    type: 'gev:view',
+    type: 'ce:view',
     id: 3,
     view: { camera: { lat: 1, lon: 2 }, layers: ['flights'] },
   });
   await new Promise((resolve) => setTimeout(resolve, 10));
   assert.deepEqual(posted[1], {
-    type: 'gev:view-applied',
+    type: 'ce:view-applied',
     id: 2,
     ok: false,
     error: 'A view needs a camera lat and lon',
@@ -183,7 +183,7 @@ test('an app loaded inline into a panel page talks through its own window', asyn
     setInterval: () => 1,
     clearInterval() {},
   });
-  globalThis.GEV_EMBED_INLINE = true;
+  globalThis.CE_EMBED_INLINE = true;
   try {
     assert.equal(isEmbedded({ search: '' }), true);
     const remove = installViews({
@@ -195,11 +195,11 @@ test('an app loaded inline into a panel page talks through its own window', asyn
       windowRef,
     });
     await new Promise((resolve) => setTimeout(resolve, 0));
-    assert.deepEqual(posted, [{ type: 'gev:ready' }]);
+    assert.deepEqual(posted, [{ type: 'ce:ready' }]);
     const event = new Event('message');
     Object.assign(event, {
       source: windowRef,
-      data: { type: 'gev:view', id: 7, view: { camera: { lat: 1, lon: 2 } } },
+      data: { type: 'ce:view', id: 7, view: { camera: { lat: 1, lon: 2 } } },
     });
     windowRef.dispatchEvent(event);
     await new Promise((resolve) => setTimeout(resolve, 10));
@@ -207,7 +207,7 @@ test('an app loaded inline into a panel page talks through its own window', asyn
     assert.equal(posted[1].ok, true);
     remove();
   } finally {
-    delete globalThis.GEV_EMBED_INLINE;
+    delete globalThis.CE_EMBED_INLINE;
   }
 });
 

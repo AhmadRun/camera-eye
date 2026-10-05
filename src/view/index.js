@@ -1,5 +1,5 @@
 /**
- * A view: what God's Eye View shows, independent of how it is shown. Camera,
+ * A view: what Camera Eye shows, independent of how it is shown. Camera,
  * data layers, visual style, map imagery and an entity to follow. Views are
  * written in the share-link format, so the app restores them when a link
  * opens and every surface that produces one agrees on its meaning.

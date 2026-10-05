@@ -117,7 +117,7 @@ for (const layerId of ['flights', 'military', 'satellites']) {
       const subject = { id: 'other', layerId, origin: 'programmatic' };
       if (publishBeforeEvent) context.selectTrackedSubjectContext(subject);
       window.dispatchEvent(
-        new CustomEvent('gev:awareness-subject-selected', { detail: subject }),
+        new CustomEvent('ce:awareness-subject-selected', { detail: subject }),
       );
       h.assertSelected(false);
       if (!publishBeforeEvent) context.selectTrackedSubjectContext(subject);
@@ -143,9 +143,9 @@ test('destroy removes all installation context listeners', (t) => {
   h.selection.destroy();
   context.selectTrackedSubjectContext({ id: 'other', layerId: 'flights' });
   for (const type of [
-    'gev:entity-selected',
-    'gev:entity-selection-cleared',
-    'gev:awareness-subject-selected',
+    'ce:entity-selected',
+    'ce:entity-selection-cleared',
+    'ce:awareness-subject-selected',
   ]) {
     window.dispatchEvent(
       new CustomEvent(type, { detail: { id: 'other', layerId: 'flights' } }),

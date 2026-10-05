@@ -211,7 +211,7 @@ export const getHudCaption = defineTool({
   name: 'get_hud_caption',
   title: 'Heads-up display caption',
   description:
-    "The short heads-up display caption God's Eye View would show for an " +
+    'The short heads-up display caption Camera Eye would show for an ' +
     'area, written by the app from the same overview situation_brief gives.',
   inputSchema: {
     type: 'object',

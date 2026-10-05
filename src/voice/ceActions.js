@@ -1160,7 +1160,7 @@ export function createGevActionRunner({
       return clearAnnotations(annotations);
     }
 
-    throw new Error(`Unknown GEV tool: ${name}`);
+    throw new Error(`Unknown CE tool: ${name}`);
   };
 }
 
@@ -2523,8 +2523,8 @@ export async function getBasemapLabelContext(
 }
 
 function installViewTargetPrewarm(viewer) {
-  if (viewer.__gevViewTargetPrewarmInstalled) return;
-  viewer.__gevViewTargetPrewarmInstalled = true;
+  if (viewer.__ceViewTargetPrewarmInstalled) return;
+  viewer.__ceViewTargetPrewarmInstalled = true;
   let timer = null;
   let reportedPrewarmFailure = false;
   viewer.camera.moveEnd.addEventListener(() => {
@@ -2870,10 +2870,10 @@ function focusDataLayerRow(layerId) {
   );
   if (!row) return null;
   row.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  row.classList.remove('gev-voice-focus');
+  row.classList.remove('ce-voice-focus');
   void row.offsetWidth;
-  row.classList.add('gev-voice-focus');
-  window.setTimeout(() => row.classList.remove('gev-voice-focus'), 3000);
+  row.classList.add('ce-voice-focus');
+  window.setTimeout(() => row.classList.remove('ce-voice-focus'), 3000);
   const name = row.querySelector('.data-name')?.textContent?.trim() || layerId;
   return { id: layerId, name };
 }
@@ -3471,7 +3471,7 @@ async function getBasemapContext(
     );
     return {
       source: 'Google Photorealistic 3D Tiles / Cesium basemap',
-      hasGoogle3DTiles: Boolean(window.__godsEyeView?.tileset),
+      hasGoogle3DTiles: Boolean(window.__cameraEye?.tileset),
       viewScale,
       viewportSamples: samples,
       viewportPlaces,
@@ -3536,7 +3536,7 @@ async function getBasemapContext(
   const nearbyPlaces = resolvedNearbyPlaces || [];
   return {
     source: 'Google Photorealistic 3D Tiles / Cesium basemap',
-    hasGoogle3DTiles: Boolean(window.__godsEyeView?.tileset),
+    hasGoogle3DTiles: Boolean(window.__cameraEye?.tileset),
     viewScale,
     viewportSamples: samples,
     viewportPlaces,
@@ -4039,7 +4039,7 @@ function logSlowContext(startedAt, scope) {
   const durationMs = Math.round(performance.now() - startedAt);
   if (durationMs >= 500) {
     console.info(
-      `[GEV Voice] ${scope} scene context completed in ${durationMs}ms`,
+      `[CE Voice] ${scope} scene context completed in ${durationMs}ms`,
     );
   }
 }
@@ -4058,9 +4058,9 @@ function dominantValue(values) {
 
 function summarizeEntity(viewer, entity, { includeProperties = false } = {}) {
   const now = Cesium.JulianDate.now();
-  if (entity.__gevContextId) {
-    const store = window.__gevContextStore;
-    const record = store?.entities?.get(entity.__gevContextId);
+  if (entity.__ceContextId) {
+    const store = window.__ceContextStore;
+    const record = store?.entities?.get(entity.__ceContextId);
     if (record) return summarizeContextRecord(record, { includeProperties });
   }
   const props = propertyObject(entity);

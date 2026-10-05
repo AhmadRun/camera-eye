@@ -189,10 +189,10 @@ export function createMeshFloorSampler({
     const id = event?.detail?.activeId;
     if (id) setMeshFloorPreferred(id === 'photoreal');
   };
-  eventTarget?.addEventListener('gev:map-stack-changed', onStack);
+  eventTarget?.addEventListener('ce:map-stack-changed', onStack);
   signal?.addEventListener(
     'abort',
-    () => eventTarget?.removeEventListener('gev:map-stack-changed', onStack),
+    () => eventTarget?.removeEventListener('ce:map-stack-changed', onStack),
     { once: true },
   );
   return { sampleMeshFloorCells, cachedGroundFloor };

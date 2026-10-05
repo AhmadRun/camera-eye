@@ -152,28 +152,28 @@ try {
     failures.clear();
   };
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !!window.__godsEyeView?.viewer, {
+  await page.waitForFunction(() => !!window.__cameraEye?.viewer, {
     timeout: 120_000,
   });
   await sleep(15_000);
 
   if (scale !== 1)
     await page.evaluate((scale) => {
-      window.__godsEyeView.viewer.resolutionScale = scale;
-      window.__godsEyeView.viewer.scene.requestRender();
+      window.__cameraEye.viewer.resolutionScale = scale;
+      window.__cameraEye.viewer.scene.requestRender();
     }, scale);
   const env = await page.evaluate(() => {
-    const gev = window.__godsEyeView;
-    const scene = gev.viewer.scene;
+    const ce = window.__cameraEye;
+    const scene = ce.viewer.scene;
     return {
-      basemap: gev.tileset ? 'google-3d' : 'keyless-globe',
+      basemap: ce.tileset ? 'google-3d' : 'keyless-globe',
       globeShown: scene.globe.show,
       canvas: `${scene.canvas.width}x${scene.canvas.height}`,
       dpr: devicePixelRatio,
       ua:
         navigator.userAgent.match(/Chrome\/[\d.]+/)?.[0] || navigator.userAgent,
       msaa: scene.msaaSamples,
-      resolutionScale: gev.viewer.resolutionScale,
+      resolutionScale: ce.viewer.resolutionScale,
     };
   });
   console.log(`\nqa-weather-perf · ${label}\n  url=${url}`);
@@ -181,18 +181,18 @@ try {
 
   // Park deterministically, disable every layer, and instrument once.
   await page.evaluate(async () => {
-    const gev = window.__godsEyeView;
-    const v = gev.viewer;
+    const ce = window.__cameraEye;
+    const v = ce.viewer;
     v.camera.cancelFlight();
-    for (const [id, entry] of gev.dataManager.layers)
+    for (const [id, entry] of ce.dataManager.layers)
       if (entry.enabled) {
         try {
-          await gev.dataManager.setEnabled(id, false, { origin: 'user' });
+          await ce.dataManager.setEnabled(id, false, { origin: 'user' });
         } catch {
           /* counted through the layer, not here */
         }
       }
-    const P = (window.__gevWeatherPerf = {
+    const P = (window.__ceWeatherPerf = {
       renders: 0,
       longTasks: 0,
       longTaskMs: 0,
@@ -227,7 +227,7 @@ try {
     page.evaluate(
       ({ which, AUSTIN }) => {
         const C = window.Cesium || null;
-        const v = window.__godsEyeView.viewer;
+        const v = window.__cameraEye.viewer;
         v.camera.cancelFlight();
         v.camera.lookAtTransform?.(
           (C || v.camera.constructor).Matrix4?.IDENTITY ??
@@ -260,7 +260,7 @@ try {
   const fly = (which) =>
     page.evaluate(
       ({ which, AUSTIN }) => {
-        const v = window.__godsEyeView.viewer;
+        const v = window.__cameraEye.viewer;
         const ell = v.scene.ellipsoid || v.scene.globe.ellipsoid;
         const d2r = Math.PI / 180;
         v.camera.flyTo({
@@ -283,7 +283,7 @@ try {
   const orbit = () =>
     page.evaluate(
       ({ AUSTIN }) => {
-        const v = window.__godsEyeView.viewer;
+        const v = window.__cameraEye.viewer;
         const camera = v.camera;
         const ell = v.scene.ellipsoid || v.scene.globe.ellipsoid;
         const d2r = Math.PI / 180;
@@ -317,9 +317,9 @@ try {
     page.evaluate(
       ({ ms, hold }) =>
         new Promise((resolve) => {
-          const gev = window.__godsEyeView;
-          const scene = gev.viewer.scene;
-          const P = window.__gevWeatherPerf;
+          const ce = window.__cameraEye;
+          const scene = ce.viewer.scene;
+          const P = window.__ceWeatherPerf;
           const canvas = scene.canvas;
           const w0 = canvas.width;
           const h0 = canvas.height;
@@ -384,7 +384,7 @@ try {
   const diagnostics = () =>
     page.evaluate(
       ({ WEATHER }) => {
-        const dm = window.__godsEyeView.dataManager;
+        const dm = window.__cameraEye.dataManager;
         const out = {};
         for (const id of ['wind', ...WEATHER]) {
           const entry = dm.layers.get(id);
@@ -427,7 +427,7 @@ try {
     const started = Date.now();
     await page.evaluate(
       async ({ wantWind, wantHistory, WEATHER }) => {
-        const dm = window.__godsEyeView.dataManager;
+        const dm = window.__cameraEye.dataManager;
         const set = async (id, on) => {
           const entry = dm.layers.get(id);
           if (!entry || Boolean(entry.enabled) === on) return;
@@ -444,7 +444,7 @@ try {
     await page
       .waitForFunction(
         ({ wantWind, wantHistory, WEATHER }) => {
-          const dm = window.__godsEyeView.dataManager;
+          const dm = window.__cameraEye.dataManager;
           if (wantWind) {
             const d = dm.layers.get('wind')?.module?.getDiagnostics?.();
             if (!d) return false;
@@ -467,7 +467,7 @@ try {
     const readyMs = Date.now() - started;
     await page.evaluate(
       ({ wantPlaying, WEATHER }) => {
-        const dm = window.__godsEyeView.dataManager;
+        const dm = window.__cameraEye.dataManager;
         for (const id of WEATHER) {
           const module = dm.layers.get(id)?.module;
           if (!module || !dm.layers.get(id)?.enabled) continue;

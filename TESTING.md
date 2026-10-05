@@ -1,4 +1,4 @@
-# God's Eye View — Testing Guide (voice map-annotation whiteboard + live tracking)
+# Camera Eye — Testing Guide (voice map-annotation whiteboard + live tracking)
 
 > [!NOTE]
 > This is a **manual field-test scenario script** for the June-2026 whiteboard +
@@ -63,14 +63,14 @@ settled and not applicable because no Google 3D tileset is active.
 ## Setup
 
 - **URL:** http://localhost:4173 — auto-flies to Austin on load. Give photoreal tiles ~10s.
-- **Voice (the real feature):** click **GEV MIC** (bottom of screen) → wait for **LISTENING** →
+- **Voice (the real feature):** click **CE MIC** (bottom of screen) → wait for **LISTENING** →
   just talk. It marks the map *as it talks*, without announcing that it's drawing. Click
   **STOP** when done. (Needs `OPENAI_API_KEY`; `dev-fresh.sh` injects it from Keychain.)
 - **Console (deterministic, no mic/live-data needed):** open DevTools (**Cmd-Opt-J**) and use:
-  - `window.__gevAnnotations.tour()` — self-running narrated SF tour (camera + marks in sequence)
-  - `window.__gevAnnotations.demo()` — lays the SF set down at once
-  - `window.__gevAnnotations.clear()` — erase all marks
-  - `window.__gevAnnotations.count()` — how many marks are live
+  - `window.__ceAnnotations.tour()` — self-running narrated SF tour (camera + marks in sequence)
+  - `window.__ceAnnotations.demo()` — lays the SF set down at once
+  - `window.__ceAnnotations.clear()` — erase all marks
+  - `window.__ceAnnotations.count()` — how many marks are live
 
 ---
 
@@ -126,7 +126,7 @@ cancellation, hardened Overpass + route proxies. Not much to see by hand (see §
 - ✅ Identical smooth behavior.
 
 **1e · Z-order: tracked plane stays on top (→ R13, trickiest to stage)**
-1. While tracking a plane over Austin, GEV MIC: *"annotate downtown Austin."*
+1. While tracking a plane over Austin, CE MIC: *"annotate downtown Austin."*
 2. Orbit/zoom so the plane crosses the annotation's outline or label. 📸 Snap the overlap.
 - ✅ The annotation **dims** where it covers the plane/label — plane stays visible on top.
   ❌ *Was:* the annotation drew over and hid the plane.
@@ -135,7 +135,7 @@ cancellation, hardened Overpass + route proxies. Not much to see by hand (see §
 
 ## 2. Voice annotation — scoping & honesty (Batch B)
 
-> All from the Austin default view (no camera move needed). Click GEV MIC, then speak.
+> All from the Austin default view (no camera move needed). Click CE MIC, then speak.
 
 **2a · Scope: building vs region (→ R1)** — say each, watch what gets outlined:
 - *"annotate the Texas State Capitol"* → ✅ the **Capitol building**, not the whole state.
@@ -162,14 +162,14 @@ cancellation, hardened Overpass + route proxies. Not much to see by hand (see §
 **2e · Clear / new-topic race (→ R4)**
 1. *"annotate downtown Austin"* and, right as it starts, *"actually, clear everything."*
 - ✅ Marks clear and **stay** cleared (the in-flight one doesn't pop back a second later).
-- Sanity in console: `window.__gevAnnotations.count()` → `0` after a clear.
+- Sanity in console: `window.__ceAnnotations.count()` → `0` after a clear.
 
 ---
 
 ## 3. Annotation rendering & motion (Batch C) — deterministic, no mic
 
 **3a · Full experience (smoke test)**
-1. Console: `window.__gevAnnotations.tour()`. 📸 A couple of frames as it runs.
+1. Console: `window.__ceAnnotations.tour()`. 📸 A couple of frames as it runs.
 - ✅ Camera flies to SF; Palace highlight → arrow → Presidio **draped** outline → ILM pin →
   Crissy Field **route** appear in sequence; marks stay glued as the camera moves.
 
@@ -184,7 +184,7 @@ cancellation, hardened Overpass + route proxies. Not much to see by hand (see §
 
 **3d · Large boundary, no freeze (→ R11)**
 1. Console:
-   `window.__gevAnnotations.annotate([{type:'area',target:'Travis County, Texas',label:'Travis County',color:'green',footprint:true}],{flyTo:true,persist:true})`
+   `window.__ceAnnotations.annotate([{type:'area',target:'Travis County, Texas',label:'Travis County',color:'green',footprint:true}],{flyTo:true,persist:true})`
 - ✅ The complex county boundary simplifies and draws **without** freezing/janking the UI.
 
 ---
@@ -228,7 +228,7 @@ While recording, call out anything in these areas — this is the feedback I mos
 - **A voice mark didn't land:** the place may not geocode — try a more specific name
   (e.g. "Palace of Fine Arts, San Francisco").
 - **No planes:** OpenSky data may be momentarily sparse; scroll out or wait a poll cycle.
-- **No GEV MIC button / voice errors:** `OPENAI_API_KEY` didn't load — use the console API for
+- **No CE MIC button / voice errors:** `OPENAI_API_KEY` didn't load — use the console API for
   the annotation tests and skip the voice-only ones (§2).
 
 

@@ -120,10 +120,10 @@ function shotPath(scenario, frame) {
 
 async function readTileReadiness(page) {
   return page.evaluate(() => {
-    const gev = window.__godsEyeView;
-    const controller = gev.mapStackController;
+    const ce = window.__cameraEye;
+    const controller = ce.mapStackController;
     const activeStack = controller?.getActiveId?.() || null;
-    const tileset = controller?.googleTileset || gev.tileset || null;
+    const tileset = controller?.googleTileset || ce.tileset || null;
     const applicable = activeStack === 'photoreal' && tileset?.show !== false;
     return {
       tilesSettled: !applicable || tileset?.tilesLoaded === true,
@@ -135,12 +135,12 @@ async function readTileReadiness(page) {
 
 async function awaitTilesSettled(page, scenario) {
   const result = await page.evaluate(async (timeoutMs) => {
-    const gev = window.__godsEyeView;
-    const controller = gev.mapStackController;
+    const ce = window.__cameraEye;
+    const controller = ce.mapStackController;
     const activeStack = controller?.getActiveId?.() || null;
     // The map-stack controller owns the authoritative Google tileset handle;
     // the bootstrap field is retained only as a compatibility fallback.
-    const tileset = controller?.googleTileset || gev.tileset || null;
+    const tileset = controller?.googleTileset || ce.tileset || null;
     const applicable = activeStack === 'photoreal' && tileset?.show !== false;
     if (!applicable) {
       return {
@@ -166,7 +166,7 @@ async function awaitTilesSettled(page, scenario) {
     const deadline = Date.now() + timeoutMs;
     try {
       while (Date.now() < deadline) {
-        gev.viewer.scene.render(gev.viewer.clock.currentTime);
+        ce.viewer.scene.render(ce.viewer.clock.currentTime);
         if (tileset.tilesLoaded === true || allTilesLoadedObserved) {
           return {
             tilesSettled: true,
@@ -203,7 +203,7 @@ async function capture(page, scenario, frame) {
   // WebGL surface is paused. Reading the explicitly rendered canvas captures
   // that same frame without handing frame ownership back to the browser.
   const dataUrl = await page.evaluate(() => (
-    window.__godsEyeView.viewer.scene.canvas.toDataURL('image/png')
+    window.__cameraEye.viewer.scene.canvas.toDataURL('image/png')
   ));
   fs.writeFileSync(out, Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64'));
   return { file: out, ...tileReadiness };
@@ -220,7 +220,7 @@ async function captureSequenceFrame(page, scenario, frameIndex, update) {
 
 async function takeFrameClock(page) {
   const result = await page.evaluate(() => {
-    const seam = window.__godsEyeView.dataManager.layers.get('flights').module.__focusEvidence;
+    const seam = window.__cameraEye.dataManager.layers.get('flights').module.__focusEvidence;
     return seam.takeFrameClock();
   });
   if (!result?.ok) throw new Error('Unable to take ownership of the evidence frame clock');
@@ -228,9 +228,9 @@ async function takeFrameClock(page) {
 
 async function advanceEvidenceFrame(page, deltaMs = FRAME_MS) {
   return page.evaluate((stepMs) => {
-    const gev = window.__godsEyeView;
-    const viewer = gev.viewer;
-    const seam = gev.dataManager.layers.get('flights').module.__focusEvidence;
+    const ce = window.__cameraEye;
+    const viewer = ce.viewer;
+    const seam = ce.dataManager.layers.get('flights').module.__focusEvidence;
     const nowMs = seam.advanceFrameClock(stepMs);
     const JulianDate = viewer.clock.currentTime.constructor;
     JulianDate.addSeconds(viewer.clock.currentTime, stepMs / 1000, viewer.clock.currentTime);
@@ -254,7 +254,7 @@ async function advanceEvidenceDuration(page, durationMs) {
 
 async function releaseFrameClock(page) {
   await page.evaluate(() => {
-    window.__godsEyeView.dataManager.layers
+    window.__cameraEye.dataManager.layers
       .get('flights').module.__focusEvidence.releaseFrameClock();
   });
 }
@@ -281,14 +281,14 @@ async function installSyntheticFetches(page) {
 async function waitForApp(page) {
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 60_000 });
   await page.waitForFunction(
-    () => Boolean(window.__godsEyeView?.viewer && window.__godsEyeView?.dataManager),
+    () => Boolean(window.__cameraEye?.viewer && window.__cameraEye?.dataManager),
     { timeout: 60_000, polling: 200 },
   );
 }
 
 async function setBasemap(page, stackId) {
   const result = await page.evaluate(async (id) => (
-    window.__godsEyeView.styleManager.setMapStack(id)
+    window.__cameraEye.styleManager.setMapStack(id)
   ), stackId);
   if (!result?.ok) {
     throw new Error(`Unable to activate --basemap ${stackId}: ${result?.error || 'unknown error'}`);
@@ -298,13 +298,13 @@ async function setBasemap(page, stackId) {
 
 async function enableLayer(page, layerId) {
   await page.evaluate(async (id) => {
-    await window.__godsEyeView.dataManager.setEnabled(id, true);
+    await window.__cameraEye.dataManager.setEnabled(id, true);
   }, layerId);
 }
 
 async function requireEvidenceSeams(page) {
   const result = await page.evaluate(() => {
-    const manager = window.__godsEyeView.dataManager;
+    const manager = window.__cameraEye.dataManager;
     return {
       flights: Boolean(manager.layers.get('flights')?.module?.__focusEvidence),
       vessels: Boolean(manager.layers.get('ais-live-vessels')?.module?.__focusEvidence),
@@ -317,7 +317,7 @@ async function requireEvidenceSeams(page) {
 
 async function setCamera(page, values) {
   await page.evaluate(([lon, lat, height, heading, pitch]) => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     const ellipsoid = viewer.scene.globe.ellipsoid;
     viewer.trackedEntity = undefined;
     viewer.camera.cancelFlight?.();
@@ -336,7 +336,7 @@ async function setCamera(page, values) {
 
 async function injectAndTrackTarget(page, extraAircraft = [], target = TARGET) {
   const result = await page.evaluate(({ targetRecord, extras }) => {
-    const layer = window.__godsEyeView.dataManager.layers.get('flights').module;
+    const layer = window.__cameraEye.dataManager.layers.get('flights').module;
     const injected = layer.__focusEvidence.setAircraft([targetRecord, ...extras]);
     const tracked = layer.trackById(targetRecord.id);
     return { injected, tracked };
@@ -345,7 +345,7 @@ async function injectAndTrackTarget(page, extraAircraft = [], target = TARGET) {
     throw new Error(`Synthetic target setup failed: ${JSON.stringify(result)}`);
   }
   await page.waitForFunction(
-    () => Boolean(window.__godsEyeView.viewer.trackedEntity),
+    () => Boolean(window.__cameraEye.viewer.trackedEntity),
     { timeout: 10_000 },
   );
   await advanceEvidenceDuration(page, 400);
@@ -353,10 +353,10 @@ async function injectAndTrackTarget(page, extraAircraft = [], target = TARGET) {
 
 async function readTrackedBasis(page) {
   return page.evaluate((targetId) => {
-    const gev = window.__godsEyeView;
-    const layer = gev.dataManager.layers.get('flights').module;
+    const ce = window.__cameraEye;
+    const layer = ce.dataManager.layers.get('flights').module;
     const target = layer.getAllPositions(100).find((entry) => entry.id === targetId)?.position;
-    const camera = gev.viewer.camera;
+    const camera = ce.viewer.camera;
     if (!target) throw new Error('Tracked target position unavailable');
     const toTarget = {
       x: target.x - camera.positionWC.x,
@@ -364,7 +364,7 @@ async function readTrackedBasis(page) {
       z: target.z - camera.positionWC.z,
     };
     const distance = Math.hypot(toTarget.x, toTarget.y, toTarget.z);
-    const canvasHeight = gev.viewer.scene.canvas.clientHeight;
+    const canvasHeight = ce.viewer.scene.canvas.clientHeight;
     const metresPerPixel = (2 * distance * Math.tan(camera.frustum.fovy / 2)) / canvasHeight;
     return {
       target: [target.x, target.y, target.z],
@@ -379,13 +379,13 @@ async function readTrackedBasis(page) {
 
 async function flightSnapshot(page) {
   return page.evaluate(() => (
-    window.__godsEyeView.dataManager.layers.get('flights').module.__focusEvidence.snapshot()
+    window.__cameraEye.dataManager.layers.get('flights').module.__focusEvidence.snapshot()
   ));
 }
 
 async function setTuning(page, params) {
   return page.evaluate((next) => (
-    window.__godsEyeView.dataManager.layers.get('flights').module.__focusEvidence.setTuning(next)
+    window.__cameraEye.dataManager.layers.get('flights').module.__focusEvidence.setTuning(next)
   ), params);
 }
 
@@ -400,7 +400,7 @@ async function runControlledCrossing(page, effectiveParams) {
   const crossingDepthM = Math.max(600, basis.targetDistanceM * 0.12);
   const start = screenPlanePosition(basis, -180, 0, crossingDepthM);
   await page.evaluate((position) => {
-    const seam = window.__godsEyeView.dataManager.layers.get('flights').module.__focusEvidence;
+    const seam = window.__cameraEye.dataManager.layers.get('flights').module.__focusEvidence;
     seam.moveAircraft([{ id: 'f0c002', cartesian: position, trackDeg: 90 }]);
   }, start);
   // The placeholder begins at the target so tracking can establish its camera
@@ -413,7 +413,7 @@ async function runControlledCrossing(page, effectiveParams) {
     const xPx = -180 + (360 * i) / (FRAME_COUNT - 1);
     const cartesian = screenPlanePosition(basis, xPx, 0, crossingDepthM);
     const captured = await captureSequenceFrame(page, scenario, i, () => page.evaluate((position) => {
-      const seam = window.__godsEyeView.dataManager.layers.get('flights').module.__focusEvidence;
+      const seam = window.__cameraEye.dataManager.layers.get('flights').module.__focusEvidence;
       seam.moveAircraft([{ id: 'f0c002', cartesian: position, trackDeg: 90 }]);
     }, cartesian));
     const snapshot = await flightSnapshot(page);
@@ -424,11 +424,11 @@ async function runControlledCrossing(page, effectiveParams) {
 
 async function vesselRowsAroundTarget(page) {
   return page.evaluate(() => {
-    const gev = window.__godsEyeView;
-    const layer = gev.dataManager.layers.get('flights').module;
+    const ce = window.__cameraEye;
+    const layer = ce.dataManager.layers.get('flights').module;
     const target = layer.getAllPositions(100).find((entry) => entry.id === 'f0c001')?.position;
-    const Cartographic = gev.viewer.camera.positionCartographic.constructor;
-    const ellipsoid = gev.viewer.scene.globe.ellipsoid;
+    const Cartographic = ce.viewer.camera.positionCartographic.constructor;
+    const ellipsoid = ce.viewer.scene.globe.ellipsoid;
     const rows = [];
     for (let i = 0; i < 12; i += 1) {
       const angle = (i / 12) * Math.PI * 2;
@@ -464,7 +464,7 @@ async function runHarborClutter(page, effectiveParams) {
   await injectAndTrackTarget(page, [], lowTarget);
   const rows = await vesselRowsAroundTarget(page);
   await page.evaluate((vessels) => {
-    const seam = window.__godsEyeView.dataManager.layers
+    const seam = window.__cameraEye.dataManager.layers
       .get('ais-live-vessels').module.__focusEvidence;
     seam.setVessels(vessels);
   }, rows);
@@ -473,7 +473,7 @@ async function runHarborClutter(page, effectiveParams) {
   await advanceEvidenceDuration(page, 450);
   const beforeCapture = await capture(page, scenario, 'before');
   const before = await page.evaluate(() => (
-    window.__godsEyeView.dataManager.layers
+    window.__cameraEye.dataManager.layers
       .get('ais-live-vessels').module.__focusEvidence.snapshot()
   ));
 
@@ -481,7 +481,7 @@ async function runHarborClutter(page, effectiveParams) {
   await advanceEvidenceDuration(page, Math.max(500, effectiveParams.focus.attackMs + 200));
   const afterCapture = await capture(page, scenario, 'after');
   const after = await page.evaluate(() => (
-    window.__godsEyeView.dataManager.layers
+    window.__cameraEye.dataManager.layers
       .get('ais-live-vessels').module.__focusEvidence.snapshot()
   ));
   await setTuning(page, effectiveParams);
@@ -520,7 +520,7 @@ async function runAirportTraffic(page, effectiveParams) {
     };
   });
   await page.evaluate((positions) => {
-    const seam = window.__godsEyeView.dataManager.layers.get('flights').module.__focusEvidence;
+    const seam = window.__cameraEye.dataManager.layers.get('flights').module.__focusEvidence;
     seam.moveAircraft(positions);
   }, startingMoves);
   await advanceEvidenceDuration(page, effectiveParams.focus.releaseMs + 150);
@@ -542,7 +542,7 @@ async function runAirportTraffic(page, effectiveParams) {
       };
     });
     const captured = await captureSequenceFrame(page, scenario, frame, () => page.evaluate((positions) => {
-      const seam = window.__godsEyeView.dataManager.layers.get('flights').module.__focusEvidence;
+      const seam = window.__cameraEye.dataManager.layers.get('flights').module.__focusEvidence;
       seam.moveAircraft(positions);
     }, moves));
     frames.push({ index: frame, radiusPx, ...captured, contacts: await flightSnapshot(page) });
@@ -553,7 +553,7 @@ async function runAirportTraffic(page, effectiveParams) {
 async function runHorizonBand(page, effectiveParams) {
   const scenario = 's4-horizon-band';
   await page.evaluate(() => {
-    window.__godsEyeView.dataManager.layers.get('flights').module.stopTracking();
+    window.__cameraEye.dataManager.layers.get('flights').module.stopTracking();
   });
   const contacts = [];
   for (let row = 0; row < 6; row += 1) {
@@ -569,7 +569,7 @@ async function runHorizonBand(page, effectiveParams) {
     }
   }
   await page.evaluate((records) => {
-    window.__godsEyeView.dataManager.layers.get('flights')
+    window.__cameraEye.dataManager.layers.get('flights')
       .module.__focusEvidence.setAircraft(records);
   }, contacts);
   await setCamera(page, HORIZON_CAMERA);

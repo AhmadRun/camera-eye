@@ -62,8 +62,8 @@ export const getBhoteKoshiFlood = defineTool({
   name: 'get_bhote_koshi_flood',
   title: 'Bhote Koshi flood',
   description:
-    "The 26 August 2026 Bhote Koshi outburst flood in Nepal as God's Eye " +
-    'View maps it: the evidence trail of geolocated public witness posts ' +
+    'The 26 August 2026 Bhote Koshi outburst flood in Nepal as Camera Eye ' +
+    'maps it: the evidence trail of geolocated public witness posts ' +
     'from the collapse to Devighat in story order, the mapped flood path, ' +
     'and the before and after satellite imagery. A visualization, not an ' +
     'official hazard model; capture times are unverified.',

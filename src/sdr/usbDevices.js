@@ -8,7 +8,7 @@
  * ADS-B, prefers a channel whose product name names ADS-B or 1090 MHz.
  */
 
-export const SDR_DEVICE_STORAGE_KEY = 'gev:sdr:device:v1';
+export const SDR_DEVICE_STORAGE_KEY = 'ce:sdr:device:v1';
 /** RTL2832U vendor/product pairs requested by the WebUSB RTL-SDR provider. */
 export const RTL_SDR_USB_FILTERS = Object.freeze([
   Object.freeze({ vendorId: 0x0bda, productId: 0x2832 }),

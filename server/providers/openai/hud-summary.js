@@ -46,7 +46,7 @@ async function handleHudSummary(req, res) {
     return;
   }
 
-  // Per-IP throttle (GEV_RATELIMIT_OPENAI_PER_MIN). On by default; 0 disables.
+  // Per-IP throttle (CE_RATELIMIT_OPENAI_PER_MIN). On by default; 0 disables.
   // Keyless HUD fallback has no provider cost and resolves above without
   // consuming a paid-endpoint quota slot.
   if (!enforceRateLimit(openAiRateLimiter(), req, res)) return;

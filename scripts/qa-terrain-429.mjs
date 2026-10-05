@@ -161,7 +161,7 @@ const waitFor = async (predicate, timeoutMs, label) => {
 const setCamera = (lon, lat, height) =>
   page.evaluate(
     ({ lon, lat, height }) => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       // The app's own startup flight would otherwise keep steering the camera
       // through the burst and turn the zoom-out into a zoom-in.
       viewer.camera.cancelFlight();
@@ -176,19 +176,19 @@ const setCamera = (lon, lat, height) =>
           viewer.scene.globe.ellipsoid.cartographicToCartesian(cartographic),
         orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
       });
-      window.__godsEyeView.requestRender?.();
+      window.__cameraEye.requestRender?.();
     },
     { lon, lat, height },
   );
 
 const cameraHeight = () =>
   page.evaluate(
-    () => window.__godsEyeView.viewer.camera.positionCartographic.height,
+    () => window.__cameraEye.viewer.camera.positionCartographic.height,
   );
 
 const globeState = () =>
   page.evaluate(() => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     const surface = viewer.scene.globe._surface;
     let failed = 0;
     let loaded = 0;
@@ -212,9 +212,9 @@ const burst = async () => {
   if (mode === 'zoomOut') {
     for (let i = 0; i < notches; i += 1) {
       await page.evaluate(() => {
-        const viewer = window.__godsEyeView.viewer;
+        const viewer = window.__cameraEye.viewer;
         viewer.camera.zoomOut(viewer.camera.positionCartographic.height * 0.6);
-        window.__godsEyeView.requestRender?.();
+        window.__cameraEye.requestRender?.();
       });
       await sleep(40);
     }
@@ -223,14 +223,14 @@ const burst = async () => {
   await page.mouse.move(640, 400);
   for (let i = 0; i < notches; i += 1) {
     await page.mouse.wheel({ deltaY: 200 });
-    await page.evaluate(() => window.__godsEyeView.requestRender?.());
+    await page.evaluate(() => window.__cameraEye.requestRender?.());
     await sleep(40);
   }
 };
 
 try {
   await page.goto(appUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await page.waitForFunction(() => Boolean(window.__godsEyeView?.viewer), {
+  await page.waitForFunction(() => Boolean(window.__cameraEye?.viewer), {
     timeout: 60000,
   });
   await waitFor(() => layerJsonSeen, 60000, 'the Re:Earth layer.json fetch');

@@ -910,7 +910,7 @@ function freeze(value) {
 }
 
 /** Immutable action names and argument schemas, without model-facing wording. */
-export const GEV_ACTION_SCHEMAS = freeze(schemas);
+export const CE_ACTION_SCHEMAS = freeze(schemas);
 
 /** Build independent function-tool records with description-only metadata. */
 export function createActionTools(descriptions = {}) {

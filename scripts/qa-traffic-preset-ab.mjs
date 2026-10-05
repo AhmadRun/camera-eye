@@ -91,7 +91,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function waitForTilesLoaded(page, timeoutMs) {
   return page.waitForFunction(
     () => {
-      const prims = window.__godsEyeView.viewer.scene.primitives;
+      const prims = window.__cameraEye.viewer.scene.primitives;
       for (let i = 0; i < prims.length; i++) {
         const p = prims.get(i);
         if (p && p.constructor && p.constructor.name === 'Cesium3DTileset') {
@@ -107,13 +107,13 @@ function waitForTilesLoaded(page, timeoutMs) {
 /** Enable traffic + teleport, then poll the layer until settled. */
 function settleTraffic(page, view, { minCount = 100, timeoutS = 45 } = {}) {
   return page.evaluate(async (v, minC, tS) => {
-    const gev = window.__godsEyeView;
-    await gev.dataManager.setEnabled('traffic', true);
-    const mod = gev.dataManager.layers.get('traffic').module;
-    try { gev.viewer.camera.cancelFlight(); } catch { /* no flight */ }
-    const ell = gev.viewer.scene.globe.ellipsoid;
+    const ce = window.__cameraEye;
+    await ce.dataManager.setEnabled('traffic', true);
+    const mod = ce.dataManager.layers.get('traffic').module;
+    try { ce.viewer.camera.cancelFlight(); } catch { /* no flight */ }
+    const ell = ce.viewer.scene.globe.ellipsoid;
     const d2r = Math.PI / 180;
-    gev.viewer.camera.setView({
+    ce.viewer.camera.setView({
       destination: ell.cartographicToCartesian({
         longitude: v.lon * d2r, latitude: v.lat * d2r, height: v.height,
       }),
@@ -176,7 +176,7 @@ async function main() {
     console.log('Loading app...');
     await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(
-      () => window.__godsEyeView?.viewer && window.__godsEyeView?.dataManager,
+      () => window.__cameraEye?.viewer && window.__cameraEye?.dataManager,
       { timeout: 60000 },
     );
     await sleep(1500);
@@ -202,10 +202,10 @@ async function main() {
 
       for (const style of STYLES) {
         // Real user path: StyleManager.setStyle drives the post-FX stage AND
-        // the gev:style-change event the traffic layer listens to. The
+        // the ce:style-change event the traffic layer listens to. The
         // thermal palette uniform selects WHOT vs Ironbow.
         await page.evaluate((s) => {
-          const sm = window.__godsEyeView.styleManager;
+          const sm = window.__cameraEye.styleManager;
           sm.setStyle(s.name, { applyPreset: true });
           if (sm.stages.thermal) sm.stages.thermal.uniforms.palette = s.ironbow ? 1.0 : 0.0;
         }, style);
@@ -215,12 +215,12 @@ async function main() {
         // brackets (DENSE) — presetDots stays at its default 'on'.
         for (const detect of ['off', 'on']) {
           await page.evaluate((d) => {
-            window.__godsEyeView.styleManager._setDetectionMode(d === 'on' ? 'DENSE' : 'OFF');
+            window.__cameraEye.styleManager._setDetectionMode(d === 'on' ? 'DENSE' : 'OFF');
           }, detect);
           await sleep(1200); // label-arbiter solve + a few rendered frames
 
           const final = await page.evaluate(() => {
-            const mod = window.__godsEyeView.dataManager.layers.get('traffic').module;
+            const mod = window.__cameraEye.dataManager.layers.get('traffic').module;
             return { stats: mod.getStats(), params: mod.getParams() };
           });
           const shot = `${view.id}--${style.id}--detect-${detect}.png`;
@@ -263,7 +263,7 @@ async function main() {
 
       // Leave the page in the shipped default state between views.
       await page.evaluate(() => {
-        const sm = window.__godsEyeView.styleManager;
+        const sm = window.__cameraEye.styleManager;
         sm.setStyle('normal', { applyPreset: true });
         sm._setDetectionMode('OFF');
         if (sm.stages.thermal) sm.stages.thermal.uniforms.palette = 0.0;

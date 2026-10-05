@@ -56,7 +56,7 @@ export function initImageryBoxTool({
     };
 
   const dataSource = new cesium.CustomDataSource(
-    'gev-recent-imagery-box-preview',
+    'ce-recent-imagery-box-preview',
   );
   let attaching = Promise.resolve(viewer.dataSources.add(dataSource)).catch(
     () => null,
@@ -204,7 +204,7 @@ export function initImageryBoxTool({
       stock.removeInputAction(cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     }
     documentRef?.addEventListener?.('keydown', onKey, true);
-    documentRef?.body?.classList?.add?.('gev-imagery-box');
+    documentRef?.body?.classList?.add?.('ce-imagery-box');
   }
 
   function releaseScene() {
@@ -228,7 +228,7 @@ export function initImageryBoxTool({
     savedSingleClick = null;
     savedDoubleClick = null;
     documentRef?.removeEventListener?.('keydown', onKey, true);
-    documentRef?.body?.classList?.remove?.('gev-imagery-box');
+    documentRef?.body?.classList?.remove?.('ce-imagery-box');
   }
 
   function setActive(next) {

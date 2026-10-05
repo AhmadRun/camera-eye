@@ -71,7 +71,7 @@ function withPublishedBase(
   { rows, source = 'export const changed = true;\n' },
   check,
 ) {
-  const cwd = mkdtempSync(path.join(tmpdir(), 'gev-layer-token-ledger-'));
+  const cwd = mkdtempSync(path.join(tmpdir(), 'ce-layer-token-ledger-'));
   try {
     git(cwd, 'init', '-q');
     mkdirSync(path.join(cwd, 'src/data'), { recursive: true });
@@ -318,7 +318,7 @@ test('allocation batches cross the last digit and base-36 pair boundaries in ord
 });
 
 test('an isolated valid two-character fixture round-trips an l field beyond the old 64-character cap', async () => {
-  const cwd = mkdtempSync(path.join(tmpdir(), 'gev-layer-token-width-'));
+  const cwd = mkdtempSync(path.join(tmpdir(), 'ce-layer-token-width-'));
   try {
     const priorDigits = [...'03456789'].map((digit) => [
       `qa-prior-digit-${digit}`,

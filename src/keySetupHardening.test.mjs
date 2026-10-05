@@ -89,7 +89,7 @@ test('POSIX hardening verifies the resulting 0600 mode', () => {
 
 test('Windows hardening refuses an unstructured or broad owner SID before icacls', () => {
   const commands = [];
-  const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     environment: { SYSTEMROOT: WINDOWS_ROOT },
     fileSystem: windowsFileSystem(),
@@ -104,7 +104,7 @@ test('Windows hardening refuses an unstructured or broad owner SID before icacls
 
 test('Windows hardening applies and then verifies the exact restricted DACL', () => {
   const calls = [];
-  const filepath = 'C:\\GEV App\\pinokio\\ENVIRONMENT.tmp';
+  const filepath = 'C:\\CE App\\pinokio\\ENVIRONMENT.tmp';
   const result = hardenCredentialFile(filepath, {
     platform: 'win32',
     environment: { SYSTEMROOT: WINDOWS_ROOT },
@@ -132,8 +132,8 @@ test('Windows hardening applies and then verifies the exact restricted DACL', ()
     '*S-1-5-32-544:F',
   ]);
   assert.equal(calls[1].args.filter((arg) => arg === '/grant:r').length, 1);
-  assert.equal(calls[2].options.env.GEV_ACL_FILE, filepath);
-  assert.equal(calls[2].options.env.GEV_ACL_USER_SID, USER_SID);
+  assert.equal(calls[2].options.env.CE_ACL_FILE, filepath);
+  assert.equal(calls[2].options.env.CE_ACL_USER_SID, USER_SID);
   assert.match(calls[2].args.at(-1), /AreAccessRulesProtected/);
   assert.match(calls[2].args.at(-1), /rules\.Count -ne 3/);
   assert.match(calls[2].args.at(-1), /seen\.ContainsKey/);
@@ -153,7 +153,7 @@ test('Windows hardening isolates the verify PowerShell from a pwsh7-polluted PSM
     'C:\\Program Files\\WindowsPowerShell\\Modules',
     'C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules',
   ].join(';');
-  const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     environment: {
       SYSTEMROOT: WINDOWS_ROOT,
@@ -184,7 +184,7 @@ test('Windows hardening isolates the verify PowerShell from a pwsh7-polluted PSM
 
 test('the verify script takes its module path from the running interpreter', () => {
   const calls = [];
-  const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     environment: { SYSTEMROOT: WINDOWS_ROOT },
     fileSystem: windowsFileSystem(),
@@ -211,7 +211,7 @@ test('the verify script takes its module path from the running interpreter', () 
 
 test('a 32-bit caller passes the physical module directory, not the Sysnative bridge', () => {
   const calls = [];
-  const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     architecture: 'ia32',
     environment: { SYSTEMROOT: WINDOWS_ROOT },
@@ -239,7 +239,7 @@ test('a 32-bit caller passes the physical module directory, not the Sysnative br
 
 test('differently cased PSModulePath aliases do not survive into the verify process', () => {
   const calls = [];
-  const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     environment: {
       SYSTEMROOT: WINDOWS_ROOT,
@@ -269,7 +269,7 @@ test('differently cased PSModulePath aliases do not survive into the verify proc
 
 test('Windows hardening bypasses PATH-shadowed native ACL tools', () => {
   const commands = [];
-  const result = hardenCredentialFile('D:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('D:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     environment: {
       PATH: 'D:\\pinokio\\bin;C:\\Windows\\System32',
@@ -302,7 +302,7 @@ test('Windows hardening rejects redirected or ambiguous system roots before spaw
   ];
   for (const environment of rejected) {
     let spawned = false;
-    const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+    const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
       platform: 'win32',
       environment,
       fileSystem: windowsFileSystem(),
@@ -316,7 +316,7 @@ test('Windows hardening rejects redirected or ambiguous system roots before spaw
 test('Windows hardening accepts a canonical Windows root on a non-default drive', () => {
   const root = 'D:\\Windows';
   const commands = [];
-  const result = hardenCredentialFile('D:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('D:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     environment: { SYSTEMROOT: root },
     fileSystem: windowsFileSystem({ root }),
@@ -334,7 +334,7 @@ test('Windows hardening accepts a canonical Windows root on a non-default drive'
 
 test('32-bit Windows hardening uses the native Sysnative bridge', () => {
   const commands = [];
-  const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+  const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     architecture: 'ia32',
     environment: { SYSTEMROOT: WINDOWS_ROOT },
@@ -362,7 +362,7 @@ test('Windows hardening rejects missing, redirected, or non-file native tools', 
   ];
   for (const fileSystem of cases) {
     let spawned = false;
-    assert.equal(hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+    assert.equal(hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
       platform: 'win32',
       environment: { SYSTEMROOT: WINDOWS_ROOT },
       fileSystem,
@@ -375,7 +375,7 @@ test('Windows hardening rejects missing, redirected, or non-file native tools', 
 test('Windows hardening fails closed when ACL application or verification fails', () => {
   for (const failingCommand of ['icacls.exe', 'powershell.exe']) {
     const calls = [];
-    const result = hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+    const result = hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
       platform: 'win32',
       environment: { SYSTEMROOT: WINDOWS_ROOT },
       fileSystem: windowsFileSystem(),
@@ -393,7 +393,7 @@ test('Windows hardening fails closed when ACL application or verification fails'
 });
 
 test('Windows hardening converts subprocess exceptions into a fail-closed result', () => {
-  assert.equal(hardenCredentialFile('C:\\GEV\\ENVIRONMENT.tmp', {
+  assert.equal(hardenCredentialFile('C:\\CE\\ENVIRONMENT.tmp', {
     platform: 'win32',
     environment: { SYSTEMROOT: WINDOWS_ROOT },
     fileSystem: windowsFileSystem(),
@@ -404,7 +404,7 @@ test('Windows hardening converts subprocess exceptions into a fail-closed result
 test('Windows production hardener applies its exact DACL with native tools', {
   skip: process.platform !== 'win32',
 }, () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'gev-provider-acl-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-provider-acl-'));
   const filepath = path.join(directory, 'ENVIRONMENT.tmp');
   try {
     fs.writeFileSync(filepath, '');

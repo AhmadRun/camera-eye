@@ -255,12 +255,12 @@ export class CockpitViewController {
         this.weatherToggle.getAttribute('aria-pressed') !== 'true';
       this.syncWeatherToggle(enabled);
       window.dispatchEvent(
-        new CustomEvent('gev:cockpit-weather-toggle', {
+        new CustomEvent('ce:cockpit-weather-toggle', {
           detail: { enabled },
         }),
       );
     });
-    this._listen(window, 'gev:cockpit-weather-state', (event) => {
+    this._listen(window, 'ce:cockpit-weather-state', (event) => {
       this.syncWeatherToggle(event?.detail?.enabled !== false);
     });
     this._listen(this.signalToggle, 'click', () =>

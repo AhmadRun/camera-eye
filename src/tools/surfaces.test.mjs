@@ -21,7 +21,7 @@ test('each surface offers the tools the table does not turn off', () => {
   }
   const mcp = names(toolsForSurface(coreTools, 'mcp'));
   for (const name of [
-    'show_in_gods_eye_view',
+    'show_in_camera_eye',
     'situation_brief',
     'aircraft_in_area',
   ])

@@ -414,8 +414,8 @@
 }
 
 /* ---- box tool cursor ---------------------------------------------------- */
-body.gev-imagery-box #cesium-container canvas,
-body.gev-imagery-box .cesium-widget canvas {
+body.ce-imagery-box #cesium-container canvas,
+body.ce-imagery-box .cesium-widget canvas {
   cursor: crosshair;
 }
 

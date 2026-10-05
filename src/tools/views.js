@@ -1,5 +1,5 @@
 /**
- * Suggested views: the God's Eye View view that shows a tool's answer, and
+ * Suggested views: the Camera Eye view that shows a tool's answer, and
  * the link that opens it when the app's address is known.
  */
 

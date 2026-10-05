@@ -107,9 +107,9 @@ async function until(fn, arg, timeout = STEP_TIMEOUT) {
  */
 function installPageHelpers() {
   window.__riQa = {
-    layer: () => window.__gevRecentImagery.layer,
-    snap: () => window.__gevRecentImagery.layer.getSnapshot(),
-    owned: () => window.__gevRecentImagery.layer.diagnostics().ownedCount,
+    layer: () => window.__ceRecentImagery.layer,
+    snap: () => window.__ceRecentImagery.layer.getSnapshot(),
+    owned: () => window.__ceRecentImagery.layer.diagnostics().ownedCount,
     gibs(collection) {
       const out = [];
       for (let i = 0; i < (collection?.length || 0); i += 1) {
@@ -124,14 +124,14 @@ function installPageHelpers() {
       return out;
     },
     hosts() {
-      const gev = window.__godsEyeView;
-      const globe = this.gibs(gev.viewer.imageryLayers);
-      const tileset = this.gibs(gev.tileset?.imageryLayers);
+      const ce = window.__cameraEye;
+      const globe = this.gibs(ce.viewer.imageryLayers);
+      const tileset = this.gibs(ce.tileset?.imageryLayers);
       return {
         globe: globe.length,
         tileset: tileset.length,
         splits: [...globe, ...tileset],
-        globeShown: gev.viewer.scene.globe.show,
+        globeShown: ce.viewer.scene.globe.show,
       };
     },
     splitShown() {
@@ -148,7 +148,7 @@ function installPageHelpers() {
         : false;
     },
     activeStack: () =>
-      window.__godsEyeView.mapStackController?.getActiveId?.() ?? null,
+      window.__cameraEye.mapStackController?.getActiveId?.() ?? null,
   };
 }
 
@@ -156,7 +156,7 @@ const state = () =>
   page.evaluate(() => {
     const qa = window.__riQa;
     const snapshot = qa.snap();
-    const gev = window.__godsEyeView;
+    const ce = window.__cameraEye;
     const split = document.getElementById('recent-imagery-split-line');
     const text = (id) => document.getElementById(id)?.textContent || '';
     const hosts = qa.hosts();
@@ -194,8 +194,8 @@ const state = () =>
           ]
         : null,
       splitLeft: split ? split.getBoundingClientRect().left : null,
-      splitPosition: gev.viewer.scene.splitPosition,
-      canvasWidth: gev.viewer.scene.canvas.clientWidth,
+      splitPosition: ce.viewer.scene.splitPosition,
+      canvasWidth: ce.viewer.scene.canvas.clientWidth,
       activeStack: qa.activeStack(),
       gibsOnGlobe: hosts.globe,
       gibsOnTileset: hosts.tileset,
@@ -208,7 +208,7 @@ const hostsDetail = (s) =>
 /** Put the camera straight down over a point at a height, no flight. */
 const setView = (view) =>
   page.evaluate((target) => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     viewer.camera.cancelFlight?.();
     viewer.scene.tweens?.removeAll?.();
     viewer.camera.setView({
@@ -225,7 +225,7 @@ const setView = (view) =>
 /** Ground width of the camera's view rectangle, in km (0 without one). */
 const viewWidthKm = () =>
   page.evaluate(() => {
-    const rect = window.__godsEyeView.viewer.camera.computeViewRectangle?.();
+    const rect = window.__cameraEye.viewer.camera.computeViewRectangle?.();
     if (!rect) return 0;
     const lat = (rect.south + rect.north) / 2;
     return Math.abs(rect.east - rect.west) * 6371 * Math.cos(lat);
@@ -273,9 +273,9 @@ async function probe() {
 
 const tilesSettled = () =>
   until(() => {
-    const gev = window.__godsEyeView;
-    if (gev.viewer.scene.globe.show) return gev.viewer.scene.globe.tilesLoaded;
-    return !gev.tileset || gev.tileset.tilesLoaded;
+    const ce = window.__cameraEye;
+    if (ce.viewer.scene.globe.show) return ce.viewer.scene.globe.tilesLoaded;
+    return !ce.tileset || ce.tileset.tilesLoaded;
   });
 const backOnPhotoreal = () =>
   until(() => window.__riQa.activeStack() === 'photoreal');
@@ -357,8 +357,8 @@ try {
   await page.goto(`${BASE_URL}/?welcome=0`, { waitUntil: 'domcontentloaded' });
   const booted = await until(
     () =>
-      window.__gevRecentImagery &&
-      window.__godsEyeView &&
+      window.__ceRecentImagery &&
+      window.__cameraEye &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     null,
     90_000,
@@ -386,7 +386,7 @@ try {
   check(
     'the layer enables from its toggle',
     await until(() =>
-      window.__godsEyeView.dataManager.isEnabled('recent-imagery'),
+      window.__cameraEye.dataManager.isEnabled('recent-imagery'),
     ),
   );
   check(
@@ -572,9 +572,7 @@ try {
       changedColour = colour;
       break;
     }
-    await page.evaluate(() =>
-      window.__godsEyeView.viewer.scene.requestRender(),
-    );
+    await page.evaluate(() => window.__cameraEye.viewer.scene.requestRender());
     await wait(1000);
   }
   check(
@@ -937,7 +935,7 @@ try {
   check(
     'SELECT BOX arms the box tool',
     (await clickAction('select-box')) &&
-      (await until(() => window.__gevRecentImagery.tool.isActive())),
+      (await until(() => window.__ceRecentImagery.tool.isActive())),
   );
   await page.keyboard.press('Escape');
   const escapedPreview = await until(
@@ -946,7 +944,7 @@ try {
     3_000,
   );
   const stillArmed = await page.evaluate(() =>
-    window.__gevRecentImagery.tool.isActive(),
+    window.__ceRecentImagery.tool.isActive(),
   );
   check(
     'Escape clears the preview first and leaves SELECT BOX armed',
@@ -956,7 +954,7 @@ try {
   await page.keyboard.press('Escape');
   check(
     'the next Escape cancels the box tool',
-    await until(() => !window.__gevRecentImagery.tool.isActive()),
+    await until(() => !window.__ceRecentImagery.tool.isActive()),
   );
   onPhotorealOnly(
     'with the preview cleared Google 3D comes back',
@@ -1027,7 +1025,7 @@ try {
   await panelShot('05-refused-panel');
   // ZOOM IN: straight down to the height whose view is 400 km wide.
   const fitHeight = await page.evaluate(() => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     const canvas = viewer.scene.canvas;
     const halfWidth =
       Math.tan(viewer.camera.frustum.fovy / 2) *
@@ -1038,14 +1036,14 @@ try {
   const zoomed = await until(
     (target) =>
       Math.abs(
-        window.__godsEyeView.viewer.camera.positionCartographic.height - target,
+        window.__cameraEye.viewer.camera.positionCartographic.height - target,
       ) <=
       target * 0.01,
     fitHeight,
     2_000,
   );
   const zoomedHeight = await page.evaluate(
-    () => window.__godsEyeView.viewer.camera.positionCartographic.height,
+    () => window.__cameraEye.viewer.camera.positionCartographic.height,
   );
   check(
     `ZOOM IN flies to ${Math.round(fitHeight / 1000)} km within 2 s`,
@@ -1119,14 +1117,14 @@ try {
   });
   check('a 10 km box previews the START HERE day again', redraped);
   const stacks = await page.evaluate(() =>
-    window.__godsEyeView.mapStackController
+    window.__cameraEye.mapStackController
       .getStacks()
       .filter((s) => s.available)
       .map((s) => s.id),
   );
   const setStack = (id) =>
     page.evaluate(
-      (stack) => window.__godsEyeView.mapStackController.setStack(stack),
+      (stack) => window.__cameraEye.mapStackController.setStack(stack),
       id,
     );
   /** Wait for the one GIBS drape to sit on the given host only. */
@@ -1435,7 +1433,7 @@ try {
   check(
     'the layer disables from its toggle',
     await until(
-      () => !window.__godsEyeView.dataManager.isEnabled('recent-imagery'),
+      () => !window.__cameraEye.dataManager.isEnabled('recent-imagery'),
     ),
   );
   const cleared = await until(() => {

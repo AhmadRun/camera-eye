@@ -127,7 +127,7 @@ export function createSelection({ state, services, parts }) {
       const position = Cesium.Cartesian2.clone(click.position);
       const style = state._stylePreset;
       const stage = scene.postProcessStages?.getStageByName?.(
-        `godsEyeView_${style}`,
+        `cameraEye_${style}`,
       );
       if (stage?.enabled && (style === 'thermal' || style === 'surveillance')) {
         const intensity = stage.uniforms.intensity;

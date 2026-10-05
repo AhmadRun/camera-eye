@@ -1,5 +1,5 @@
 import { readRealtimeSource } from './testSupport/readRealtimeSource.mjs';
-import { GEV_REALTIME_TOOLS } from '../server/providers/openai/tools.js';
+import { CE_REALTIME_TOOLS } from '../server/providers/openai/tools.js';
 import { readShellSource } from './testSupport/readShellSource.mjs';
 import { expandApplicationHtml } from '../build/application-html.js';
 import { readLayerSource } from './testSupport/readLayerSource.mjs';
@@ -23,7 +23,7 @@ const realtime = readRealtimeSource();
 const voice = readFileSync(new URL('./voice/actionSchemas.js', import.meta.url), 'utf8') + '\n' + ['toolDescriptions', 'instructions'].map(name => readFileSync(new URL(`../server/providers/openai/${name}.js`, import.meta.url), 'utf8')).join('\n');
 const css = readStylesheet(new URL('../style.css', import.meta.url));
 
-function realtimeTools() { return GEV_REALTIME_TOOLS; }
+function realtimeTools() { return CE_REALTIME_TOOLS; }
 
 test('Realtime schema exposes the authoritative 30-tool inventory', () => {
   const tools = realtimeTools();
@@ -201,28 +201,28 @@ test('no unchanged Realtime tool definition drifts silently', () => {
     .update(JSON.stringify(unchanged))
     .digest('hex')
     .slice(0, 16);
-  // Analyst additions and ISS wording correction are explicitly excluded above; all other tool definitions retain their pin.
-  assert.equal(digest, '91935845ef2598b1', 'an unchanged Realtime tool definition drifted');
+  // Re-derived for Camera Eye branding; argument schemas remain unchanged.
+  assert.equal(digest, '446c7d9a6a720a15', 'an unchanged Realtime tool definition drifted');
 });
 
 test('Radio volume and mission speed share the Sharpen slider visual language', () => {
   for (const id of ['cockpit-radio-volume', 'context-radio-mini-volume', 'radio-volume', 'sdr-volume']) {
     assert.match(
       html,
-      new RegExp(`id="${id}"[^>]*class="gev-quantitative-slider"[^>]*type="range"`),
+      new RegExp(`id="${id}"[^>]*class="ce-quantitative-slider"[^>]*type="range"`),
     );
   }
   assert.match(
     rocketLaunches,
-    /id="space-mission-replay-speed" class="gev-quantitative-slider" type="range" min="0\.25" max="4" step="0\.25" value="1"/,
+    /id="space-mission-replay-speed" class="ce-quantitative-slider" type="range" min="0\.25" max="4" step="0\.25" value="1"/,
   );
-  assert.match(rocketLaunches, /class="gev-slider-value"[^>]*data-mission-replay-speed-output/);
-  assert.match(css, /\.gev-quantitative-slider\s*\{[\s\S]*?min-width: 0;[\s\S]*?height: 18px;/);
-  assert.match(css, /\.gev-quantitative-slider::-webkit-slider-runnable-track\s*\{[\s\S]*?height: 3px;[\s\S]*?background: rgba\(255, 255, 255, 0\.08\);/);
-  assert.match(css, /\.gev-quantitative-slider::-webkit-slider-thumb\s*\{[\s\S]*?width: 10px;[\s\S]*?height: 10px;[\s\S]*?border-radius: 50%;[\s\S]*?background: var\(--accent\);/);
-  assert.match(css, /\.gev-quantitative-slider:focus-visible\s*\{[\s\S]*?outline: 1px solid/);
-  assert.match(css, /\.gev-quantitative-slider:disabled\s*\{[\s\S]*?opacity: 0\.42;[\s\S]*?cursor: not-allowed;/);
-  assert.match(css, /\.gev-slider-value\s*\{[\s\S]*?color: var\(--accent\);[\s\S]*?font-size: 9px;/);
+  assert.match(rocketLaunches, /class="ce-slider-value"[^>]*data-mission-replay-speed-output/);
+  assert.match(css, /\.ce-quantitative-slider\s*\{[\s\S]*?min-width: 0;[\s\S]*?height: 18px;/);
+  assert.match(css, /\.ce-quantitative-slider::-webkit-slider-runnable-track\s*\{[\s\S]*?height: 3px;[\s\S]*?background: rgba\(255, 255, 255, 0\.08\);/);
+  assert.match(css, /\.ce-quantitative-slider::-webkit-slider-thumb\s*\{[\s\S]*?width: 10px;[\s\S]*?height: 10px;[\s\S]*?border-radius: 50%;[\s\S]*?background: var\(--accent\);/);
+  assert.match(css, /\.ce-quantitative-slider:focus-visible\s*\{[\s\S]*?outline: 1px solid/);
+  assert.match(css, /\.ce-quantitative-slider:disabled\s*\{[\s\S]*?opacity: 0\.42;[\s\S]*?cursor: not-allowed;/);
+  assert.match(css, /\.ce-slider-value\s*\{[\s\S]*?color: var\(--accent\);[\s\S]*?font-size: 9px;/);
   assert.doesNotMatch(css, /#space-mission-panel \[data-mission-replay-speed\]::-webkit-slider-thumb/);
 });
 

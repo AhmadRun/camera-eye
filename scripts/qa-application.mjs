@@ -25,7 +25,7 @@ try {
   });
   page.on('pageerror', (error) => errors.push(error.stack || error.message));
   await page.goto(`${url}/?welcome=1`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__godsEyeView?.voiceCommands, {
+  await page.waitForFunction(() => window.__cameraEye?.voiceCommands, {
     timeout: 60_000,
   });
   const before = await page.evaluate(async () => {
@@ -34,7 +34,7 @@ try {
     );
     const { application } = await import(entry.src);
     window.__qaApplication = application;
-    const app = window.__godsEyeView;
+    const app = window.__cameraEye;
     window.__qaComponents = app;
     await application.start();
     await app.styleManager.initialRestorePromise;
@@ -88,9 +88,9 @@ try {
       annotations: app.annotations.count(),
       governor: app.getRenderGovernorDiagnostics(),
       handlesRemoved:
-        !window.__godsEyeView &&
-        !window.__gevVoiceCommands &&
-        !window.__gevAnnotations,
+        !window.__cameraEye &&
+        !window.__ceVoiceCommands &&
+        !window.__ceAnnotations,
       creditsRemoved: !document.querySelector('#cesium-credits'),
       welcomeHidden: !document.querySelector('#first-run-launcher.visible'),
       settingsRemoved: !document.querySelector('#key-setup'),

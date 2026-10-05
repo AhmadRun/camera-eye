@@ -1,30 +1,16 @@
 <div align="center">
 
-# 🌐 God's Eye View
+# 🌐 Camera Eye
 
-[![CI](https://github.com/bilawalsidhu/gods-eye-view/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bilawalsidhu/gods-eye-view/actions/workflows/ci.yml) [![Reached #1 on GitHub Trending](https://img.shields.io/badge/%231_GitHub_Trending-thank_you!-F0A63C?style=flat-square&logo=github)](https://x.com/bilawalsidhu/status/2093798887815348521)
+[![CI](https://github.com/AhmadRun/camera-eye/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AhmadRun/camera-eye/actions/workflows/ci.yml)
 
-### A spy-satellite simulator in your browser — then you realize the sources are public and the data is real.
+### Live spatial intelligence on a photorealistic 3D globe.
 
-Photorealistic 3D globe. Live aircraft, ships, satellites, earthquakes, traffic, and public cameras. Hands-free voice control powered by a realtime AI agent.
+Live aircraft, ships, satellites, earthquakes, traffic, public cameras, and optional voice control in your browser.
 
-_No place left behind._
+Camera Eye is maintained in [AhmadRun/camera-eye](https://github.com/AhmadRun/camera-eye), a fork of [the original project](https://github.com/bilawalsidhu/gods-eye-view). Original copyright, contributor credits, and third-party data and media attribution are preserved.
 
-![Orbital HUD, a tracked live globe, FLIR terrain — then OPEN SOURCED](docs/media/hero-open-source-reveal.gif)
-
-<a href="https://www.youtube.com/@bilawalsidhu">
-  <img src="docs/media/youtube-popular-videos.png" alt="The God's Eye View video series on YouTube" width="100%">
-</a>
-
-▶️ **From the project behind the viral God's Eye View series** _(formerly WorldView)_ — [5M+ on YouTube](https://youtube.com/playlist?list=PL6qSg2I-7_koPbDnSMo0QeeHX_RknA2uv&si=nBGYMoHWQw41v93Q) · [25M+ across socials](https://www.google.com/search?q=god%27s+eye+view)
-
-🏆 **Reached #1 on GitHub Trending, daily and weekly · August 2026**
-
-**[#8 Product of the Day](https://www.producthunt.com/products/god-s-eye-view?launch=god-s-eye-view)** · Hunted by Chris Messina, creator of the hashtag
-
-_“pretty cool”_ — [Brendan Eich](https://x.com/BrendanEich/status/2094592096401490266), creator of JavaScript and co-founder of Mozilla and Brave · Featured on **[Pinokio](https://pinokio.co/posts/01m1m4p9xxm3qw7dnnpj2wr93g)**
-
-⚡ **Start without API keys.** Install with [Pinokio](https://pinokio.co/apps/github-com-bilawalsidhu-gods-eye-view) or run locally from the terminal. Add optional keys inside the app. **[→ Quick Start](#-quick-start)**
+⚡ **Start without API keys.** Run locally from the terminal and add optional keys inside the app. **[→ Quick Start](#-quick-start)**
 
 </div>
 
@@ -40,9 +26,9 @@ _“pretty cool”_ — [Brendan Eich](https://x.com/BrendanEich/status/20945920
 
 ## 🌍 Why This Exists
 
-God's Eye View brings public signals into one explorable globe. Track the world live. Talk to it. Break it. Extend it.
+Camera Eye brings public signals into one explorable globe. Track the world live. Talk to it. Break it. Extend it.
 
-Flight transponders, ship beacons, orbital elements, seismographs, and public cameras already tell us a lot about the world. God's Eye View puts them in the same place, so you can move between a global picture and an individual aircraft, ship, or street. It runs locally in your browser, with source code you can inspect and extend.
+Flight transponders, ship beacons, orbital elements, seismographs, and public cameras already tell us a lot about the world. Camera Eye puts them in the same place, so you can move between a global picture and an individual aircraft, ship, or street. It runs locally in your browser, with source code you can inspect and extend.
 
 > Half the magic is that it looks like a forbidden cockpit. The other half is that every line of code is inspectable.
 
@@ -79,17 +65,9 @@ Start with the included data sources, then add your own. Each layer is a separat
 
 ---
 
-<div align="center">
-
-[![YouTube video about the God's Eye View open source release](https://img.youtube.com/vi/GRJaKcXZS94/maxresdefault.jpg)](https://www.youtube.com/watch?v=GRJaKcXZS94)
-
-▶️ **[The full walkthrough of everything below, on YouTube](https://www.youtube.com/watch?v=GRJaKcXZS94)**
-
-</div>
-
 ## ⚡ Quick Start
 
-**Start without an account or API keys.** Both paths open the same app with
+**Start without an account or API keys.** The app opens with
 Esri satellite imagery and keyless terrain. OSM is the fallback if Esri is
 unreachable. Flights, military traffic, satellites, earthquakes, public
 cameras, radio, and launches are available without keys.
@@ -103,28 +81,14 @@ app's **POWER UP** panel; [Keys & Costs](#-api-keys) explains the options.
 > public OpenStreetMap Overpass servers, which now refuse them, so Traffic,
 > Mapped Installations and ALPR stay empty until you update.
 
-### Path 1 — One click, no terminal
-
-1. Install or update [Pinokio](https://desktop.pinokio.co/) to **8.2 or later**.
-2. Open [God's Eye View in Pinokio](https://pinokio.co/apps/github-com-bilawalsidhu-gods-eye-view).
-3. Click **Install**, then **Start**.
-
-Available on **Windows, macOS, and Linux**. The Pinokio maintainer reports
-cross-platform testing of the fixed installer. The launcher installs the
-locked dependencies, finds a free local port, and opens the app.
-
-**Tried before and installation failed?** Update Pinokio and try again.
-Version 8.2 fixes the launcher installation issue;
-[details from the Pinokio maintainer](https://pinokio.co/posts/01m1m4p9xxm3qw7dnnpj2wr93g).
-
-### Path 2 — Terminal / coding agent
+### Terminal setup
 
 Use **Node.js 24.x (24.14.0 or later) or 26.x**. The setup doctor warns about
 Node 25, which is end-of-life.
 
 ```bash
-git clone https://github.com/bilawalsidhu/gods-eye-view.git
-cd gods-eye-view
+git clone https://github.com/AhmadRun/camera-eye.git
+cd camera-eye
 npm ci
 npm run doctor
 npm run dev
@@ -171,7 +135,7 @@ reopens the same panel.
 
 Do not enter credentials in Pinokio 8.0.40's native **Configure** panel: that
 release does not save this nested app file correctly, and it logs submitted
-values. Use **POWER UP → Provider Settings** inside GEV instead. The Pinokio
+values. Use **POWER UP → Provider Settings** inside CE instead. The Pinokio
 8.2 announcement fixes installation; it does not establish that this separate
 Configure issue is resolved. On macOS, the Keychain via
 `./scripts/dev-fresh.sh` remains the stronger storage option.
@@ -237,7 +201,7 @@ _Why cockpit mode exists: you're riding a real aircraft over real terrain — an
 
 > Voice needs an **OpenAI key**. Without one the entire app still runs — the mic button just reports voice is unavailable. The same key drives the **AI HUD summary**: a terse, five-word intelligence-style readout of the current view that regenerates as you move.
 
-Click **GEV MIC**, grant the microphone, and just talk. This is more than a voice-controlled remote:
+Click **CE MIC**, grant the microphone, and just talk. This is more than a voice-controlled remote:
 
 - **🧠 It knows what it's looking at.** The agent pulls live scene context before answering — including coordinates, street names, active layers, and view scale. Ask _"what city is this?"_ mid-flight and it knows.
 - **🎯 Entity Q&A.** Click any plane, ship, or datacenter and ask _"what's this?"_ It answers using the object's live telemetry.
@@ -279,7 +243,7 @@ _Ask for radio near anywhere and the globe starts broadcasting — every station
 
 ---
 
-**💬 Or ask from Claude and Codex.** God's Eye View is also an MCP server: ask Claude Desktop, Codex or ChatGPT desktop to show a place, and the live globe opens right in the conversation. Setup takes a minute — see [docs/MCP_SETUP.md](docs/MCP_SETUP.md).
+**💬 Or ask from Claude and Codex.** Camera Eye is also an MCP server: ask Claude Desktop, Codex or ChatGPT desktop to show a place, and the live globe opens right in the conversation. Setup takes a minute — see [docs/MCP_SETUP.md](docs/MCP_SETUP.md).
 
 ## 🛰️ What's on the Globe
 
@@ -512,7 +476,7 @@ Everything above is the deliberately cheap baseline — enough to get a real tas
 
 ### 🔒 Sharing an instance
 
-By default nobody else can reach your server — it binds to localhost. To share on your LAN, opt in explicitly (`npm run dev -- --host 0.0.0.0 --port 4173`, or `HOST=0.0.0.0 ./scripts/dev-fresh.sh` on macOS/Linux). IP addresses work as they are; if you use a LAN hostname, add it with `GEV_ALLOWED_HOSTS=globe.lan`, since binding to `0.0.0.0` does not trust arbitrary Host headers. But know that ⚠️ **a LAN-visible server brokers your configured API keys to anyone who can reach it.** Per-IP throttles on the cost-bearing endpoints are on by default (`GEV_RATELIMIT_OPENAI_PER_MIN`, `GEV_RATELIMIT_GOOGLE_PER_MIN` — see `.env.example` to tune them), but before anything else, **configure provider quotas, usage limits, and billing alerts**: app-level throttles are not billing caps, and a budget alert alone does not stop spending. Full threat model in [SECURITY.md](SECURITY.md).
+By default nobody else can reach your server — it binds to localhost. To share on your LAN, opt in explicitly (`npm run dev -- --host 0.0.0.0 --port 4173`, or `HOST=0.0.0.0 ./scripts/dev-fresh.sh` on macOS/Linux). IP addresses work as they are; if you use a LAN hostname, add it with `CE_ALLOWED_HOSTS=globe.lan`, since binding to `0.0.0.0` does not trust arbitrary Host headers. But know that ⚠️ **a LAN-visible server brokers your configured API keys to anyone who can reach it.** Per-IP throttles on the cost-bearing endpoints are on by default (`CE_RATELIMIT_OPENAI_PER_MIN`, `CE_RATELIMIT_GOOGLE_PER_MIN` — see `.env.example` to tune them), but before anything else, **configure provider quotas, usage limits, and billing alerts**: app-level throttles are not billing caps, and a budget alert alone does not stop spending. Full threat model in [SECURITY.md](SECURITY.md).
 
 Provider Settings is disabled when the server is shared, so remote users cannot
 access the key-entry panel.
@@ -525,20 +489,22 @@ a separately reviewed authentication proxy if remote access is required.
 
 ## 📋 Responsible & Open
 
-God's Eye View runs on **public data, clear sources, and local-first execution.** No secrets, no private datasets, no mystery scraping — anything involving a private key is brokered server-side. It has the visual grammar of a classified ops room, built entirely from open signals and inspectable code.
+Camera Eye runs on **public data, clear sources, and local-first execution.** No secrets, no private datasets, no mystery scraping — anything involving a private key is brokered server-side. It has the visual grammar of a classified ops room, built entirely from open signals and inspectable code.
 
 **The line.** This project models **events, assets, infrastructure, and systems** — aircraft, vessels, satellites, fires, cameras, cities. It does not build features for named-person search, face recognition, or tracking individuals, and pull requests that cross that line won't be merged. People are not a query type here.
 
-**Come build it.** This is the canonical live 3D client from the project that kicked off the recent wave of spatial-intelligence tools — and it's a canvas: the layers here are the signals one person could find and fuse. Add a city pack, a data source, a style, a voice tool. It's the window through which you see the world; bring that window to others.
+**Come build it.** This fork is a canvas: the layers here are the signals one person could find and fuse. Add a city pack, a data source, a style, a voice tool. It's the window through which you see the world; bring that window to others.
 
 **Status:** An evolving open-source client for exploration and learning — a fast, hackable foundation, not a hardened production service. Released under the **[MIT License](LICENSE)**. Bundled and live datasets carry their own terms — see **[DATA_SOURCES.md](DATA_SOURCES.md)**. Security model: **[SECURITY.md](SECURITY.md)**. Want to contribute? **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
-**Maintainers:** [Bilawal Sidhu](https://github.com/bilawalsidhu) and [Sameh Khamis](https://github.com/samehkhamis) at [Halfpixel](https://halfpixel.ai).
+**Fork maintainer:** [AhmadRun](https://github.com/AhmadRun).
+
+**Original project authors:** [Bilawal Sidhu](https://github.com/bilawalsidhu) and [Sameh Khamis](https://github.com/samehkhamis) at [Halfpixel](https://halfpixel.ai).
 
 <sub>Media note: the capture GIFs on this page show Google Photorealistic 3D Tiles and live data layers, used promotionally with in-frame attribution; they aren't licensed for standalone reuse. See [media provenance and permissions](docs/media/README.md); full source terms in [DATA_SOURCES.md](DATA_SOURCES.md).</sub>
 
 > [!IMPORTANT]
-> God's Eye View is an exploratory visualization of public and third-party data.
+> Camera Eye is an exploratory visualization of public and third-party data.
 > Data may be delayed, incomplete, modeled, inferred, or wrong. Do not use it
 > for flight or maritime navigation, emergency response, medical or health
 > decisions, investment decisions, or other safety-critical or operational
@@ -546,24 +512,12 @@ God's Eye View runs on **public data, clear sources, and local-first execution.*
 
 ---
 
-## 🧭 What's Next
+## Fork identity and compatibility
 
-First — thank you. To everyone who watched the God-view demos and went off to build their own, and to everyone who kept asking for the code: I'm grateful. And when I polled whether this should go open source, you weren't subtle about it:
+This fork uses **Camera Eye** for the application and **camera-eye** for the repository and package. Its configuration and diagnostics use `CE_` environment variables, `X-CE-*` headers, `ce-*` CSS and event names, and `cameraEye` browser storage and debug namespaces. The MCP panel tool is `show_in_camera_eye`, with resource URI `ui://camera-eye/globe`.
 
-<img src="docs/media/open-source-survey.png" alt="Community survey on open-sourcing God's Eye View" width="460">
+When moving from an upstream installation, update the application-specific environment variable names and MCP configuration. Browser preferences use a separate namespace and start with the defaults; existing upstream preferences are not deleted. Provider key names such as `OPENAI_API_KEY` and `GOOGLE_MAPS_API_KEY` stay the same.
 
-So here it is. Step inside the spy-thriller cockpit — except the data is real — and let's turn this into our shared sandbox for making sense of the world, and have fun doing it. This repo is the baseline, it stays open, and the whole point is for you to break things and bolt on layers we haven't thought of yet.
+The bundled `pinokio/` launcher uses the Camera Eye name. This fork does not claim the original project's marketplace listing or hosted service.
 
-One heads-up from the inside: build in this space for a week and you learn that **the present is the cheap part**. The moment you try to go back in time — tiling, serving, and scrubbing _what happened_ and _what changed_ at any real resolution — the data gets expensive and the compute gets brutal. That's the long game.
-
-**Update — a hosted version is coming.** We originally planned to keep this repository as the open-source client and build a separate professional product. Then the launch happened, and the loudest request wasn't another feature — it was _"just give me a link."_ So we're building an official hosted God's Eye View at [Halfpixel](https://halfpixel.ai): no installation, just open it in your browser. The hosted version is the easiest way into this open-source project. More soon.
-
----
-
-<div align="center">
-
-▶️ [Watch the God's Eye View series](https://youtube.com/playlist?list=PL6qSg2I-7_koPbDnSMo0QeeHX_RknA2uv&si=nBGYMoHWQw41v93Q) · 📬 [Map the World](https://maptheworld.ai/) — the newsletter behind the project
-
-**🌐 God's Eye View. No place left behind.**
-
-</div>
+Demo captures inherited from upstream may show its historical branding. Their attribution and source provenance remain in [docs/media/README.md](docs/media/README.md); they are not evidence of a separate Camera Eye deployment.

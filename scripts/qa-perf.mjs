@@ -103,14 +103,14 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 860 });
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !!window.__godsEyeView?.viewer, { timeout: 90_000 });
+  await page.waitForFunction(() => !!window.__cameraEye?.viewer, { timeout: 90_000 });
   // Boot flyTo + tile warm + all deferred init.
   await new Promise((r) => setTimeout(r, 15_000));
 
   // Park deterministically and disable every layer.
   await page.evaluate(async () => {
-    const gev = window.__godsEyeView;
-    const v = gev.viewer;
+    const ce = window.__cameraEye;
+    const v = ce.viewer;
     v.camera.cancelFlight();
     const ell = v.scene.globe.ellipsoid;
     v.camera.setView({
@@ -119,8 +119,8 @@ try {
       }),
       orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
     });
-    for (const [id, entry] of gev.dataManager.layers) {
-      if (entry.enabled) { try { await gev.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* gate reports via counts */ } }
+    for (const [id, entry] of ce.dataManager.layers) {
+      if (entry.enabled) { try { await ce.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* gate reports via counts */ } }
     }
   });
   // Let tiles finish + fades settle + the settling frames drain.
@@ -128,7 +128,7 @@ try {
 
   /** Count scene postRender fires and rAF ticks over windowMs. */
   const countFrames = (windowMs) => page.evaluate((ms) => new Promise((resolve) => {
-    const scene = window.__godsEyeView.viewer.scene;
+    const scene = window.__cameraEye.viewer.scene;
     let renders = 0; let rafs = 0;
     const remove = scene.postRender.addEventListener(() => { renders += 1; });
     const t0 = performance.now();
@@ -140,8 +140,8 @@ try {
     requestAnimationFrame(tick);
   }), windowMs);
 
-  const diag = () => page.evaluate(() => window.__godsEyeView.getRenderGovernorDiagnostics?.()
-    || window.__gevRenderGovernor?.getDiagnostics?.() || null);
+  const diag = () => page.evaluate(() => window.__cameraEye.getRenderGovernorDiagnostics?.()
+    || window.__ceRenderGovernor?.getDiagnostics?.() || null);
 
   /**
    * The HUD's semantic summary refreshes on this cadence (`src/hud.js`,
@@ -216,7 +216,7 @@ try {
   // This is the gate for that. The scene above is parked with zero layers, so
   // detection-on and detection-off must yield the SAME near-zero render count.
   const detectionDefault = await page.evaluate(
-    () => window.__godsEyeView.styleManager.getDetectionState?.() || null,
+    () => window.__cameraEye.styleManager.getDetectionState?.() || null,
   );
   check(
     'precondition: detection is ON at its first-run default (Dense @ 75)',
@@ -229,13 +229,13 @@ try {
     d1,
   );
   // The control: the same window with detection explicitly OFF.
-  await page.evaluate(() => { window.__godsEyeView.styleManager._setDetectionMode('OFF'); });
+  await page.evaluate(() => { window.__cameraEye.styleManager._setDetectionMode('OFF'); });
   await new Promise((r) => setTimeout(r, 1_500)); // let any fade chain terminate
   const idleDetectOff = await countFrames(5_000);
   check('idle baseline with detection OFF (≤4 fires / 5s)', idleDetectOff.renders <= 4, idleDetectOff);
   // Back to the default. A regression here is the entire point of this gate: the
   // old hold produced a full 60 fps window instead of near-zero.
-  await page.evaluate(() => { window.__godsEyeView.styleManager._setDetectionMode('DENSE'); });
+  await page.evaluate(() => { window.__cameraEye.styleManager._setDetectionMode('DENSE'); });
   await new Promise((r) => setTimeout(r, 1_500));
   const idleDetectOn = await countFrames(5_000);
   const dDetect = await diag();
@@ -255,7 +255,7 @@ try {
   const detectMove = await Promise.all([
     countFrames(2_500),
     page.evaluate(() => new Promise((resolve) => {
-      const v = window.__godsEyeView.viewer;
+      const v = window.__cameraEye.viewer;
       let steps = 0;
       const id = setInterval(() => {
         v.camera.moveForward(50);
@@ -274,26 +274,26 @@ try {
   // sail through every check above. Count the painter's own frames across the
   // same kind of motion, so the teeth reach the thing this change touched.
   const detectPainted = await page.evaluate(() => new Promise((resolve) => {
-    const gev = window.__godsEyeView;
-    const before = gev.styleManager.getDetectionDiagnostics?.()?.frameCount ?? null;
+    const ce = window.__cameraEye;
+    const before = ce.styleManager.getDetectionDiagnostics?.()?.frameCount ?? null;
     let paints = 0;
     // The diagnostics object is rebuilt on every detection paint, so a fresh
     // identity is one painted frame. Sampling it per scene frame is enough to
     // tell "painting" from "silent" without reaching into module internals.
-    let last = gev.styleManager.getDetectionDiagnostics?.();
-    const remove = gev.viewer.scene.postRender.addEventListener(() => {
-      const now = gev.styleManager.getDetectionDiagnostics?.();
+    let last = ce.styleManager.getDetectionDiagnostics?.();
+    const remove = ce.viewer.scene.postRender.addEventListener(() => {
+      const now = ce.styleManager.getDetectionDiagnostics?.();
       if (now && now !== last) { paints += 1; last = now; }
     });
     let steps = 0;
     const id = setInterval(() => {
-      gev.viewer.camera.moveForward(50);
+      ce.viewer.camera.moveForward(50);
       steps += 1;
       if (steps >= 20) {
         clearInterval(id);
         setTimeout(() => {
           remove();
-          resolve({ paints, before, after: gev.styleManager.getDetectionDiagnostics?.()?.frameCount ?? null });
+          resolve({ paints, before, after: ce.styleManager.getDetectionDiagnostics?.()?.frameCount ?? null });
         }, 400);
       }
     }, 60);
@@ -322,7 +322,7 @@ try {
   check('real slider mutation while idle renders ≥1 and ≤10 frames', afterMutation.renders >= 1 && afterMutation.renders <= 10, afterMutation);
 
   // ── 2b. animated style cycle: style-anim holds, then releases ─────────
-  await page.evaluate(() => { window.__godsEyeView.styleManager.setStyle('retro'); });
+  await page.evaluate(() => { window.__cameraEye.styleManager.setStyle('retro'); });
   await new Promise((r) => setTimeout(r, 900)); // crossfade + first ticks
   const dAnim = await diag();
   check('animated style takes the style-anim hold (continuous)', dAnim?.mode === 'continuous' && dAnim.holds.includes('style-anim'), dAnim);
@@ -333,11 +333,11 @@ try {
   // nothing, so this asserts the strictly harder thing: the scene returns to
   // idle with detection still ON — where before it could only go idle by also
   // turning detection off.
-  await page.evaluate(() => { window.__godsEyeView.styleManager.setStyle('normal'); });
+  await page.evaluate(() => { window.__cameraEye.styleManager.setStyle('normal'); });
   await new Promise((r) => setTimeout(r, 1_500)); // fade out + loop self-stop
   const dAnimOff = await diag();
   const detectionStillOn = await page.evaluate(
-    () => window.__godsEyeView.styleManager.getDetectionState?.()?.detectionMode || null,
+    () => window.__cameraEye.styleManager.getDetectionState?.()?.detectionMode || null,
   );
   check(
     'style-anim hold releases and the scene goes idle with detection still ON',
@@ -350,12 +350,12 @@ try {
 
   // ── 2c. satellites holder enters and leaves diagnostics ───────────────
   await page.evaluate(async () => {
-    await window.__godsEyeView.dataManager.setEnabled('satellites', true, { origin: 'user' });
+    await window.__cameraEye.dataManager.setEnabled('satellites', true, { origin: 'user' });
   });
   const dSat = await diag();
   check('satellites enable registers its holder', dSat?.holds.includes('satellites'), dSat);
   await page.evaluate(async () => {
-    await window.__godsEyeView.dataManager.setEnabled('satellites', false, { origin: 'user' });
+    await window.__cameraEye.dataManager.setEnabled('satellites', false, { origin: 'user' });
   });
   await new Promise((r) => setTimeout(r, 2_000));
   const dSatOff = await diag();
@@ -365,7 +365,7 @@ try {
   const duringMove = await Promise.all([
     countFrames(2_500),
     page.evaluate(() => new Promise((resolve) => {
-      const v = window.__godsEyeView.viewer;
+      const v = window.__cameraEye.viewer;
       let steps = 0;
       const id = setInterval(() => {
         v.camera.moveForward(50);
@@ -379,7 +379,7 @@ try {
 
   // ── 4. flights enabled → continuous ───────────────────────────────────
   await page.evaluate(async () => {
-    await window.__godsEyeView.dataManager.setEnabled('flights', true, { origin: 'user' });
+    await window.__cameraEye.dataManager.setEnabled('flights', true, { origin: 'user' });
   });
   await new Promise((r) => setTimeout(r, 5_000));
   const active = await countFrames(5_000);
@@ -390,7 +390,7 @@ try {
 
   // ── 5. flights disabled → idle again ──────────────────────────────────
   await page.evaluate(async () => {
-    await window.__godsEyeView.dataManager.setEnabled('flights', false, { origin: 'user' });
+    await window.__cameraEye.dataManager.setEnabled('flights', false, { origin: 'user' });
   });
   // Deselect flows, fades, and the chrome churn the overlay host re-evaluates
   // its occluders against all have to drain first — and this teardown, like the

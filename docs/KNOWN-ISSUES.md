@@ -44,23 +44,23 @@ Workaround:
   from its header control; it also opens on its own when a camera activates.
 - To force it open on an ordinary load, store the expanded state and reload. In
   the browser console:
-  - `localStorage.setItem('godsEyeView.v6.panelCollapsed.cctv-panel', '0');`
+  - `localStorage.setItem('cameraEye.v6.panelCollapsed.cctv-panel', '0');`
   - `location.reload();`
 - Removing that key instead returns the panel to its default, which is collapsed:
-  - `localStorage.removeItem('godsEyeView.v6.panelCollapsed.cctv-panel');`
+  - `localStorage.removeItem('cameraEye.v6.panelCollapsed.cctv-panel');`
   - `location.reload();`
 - Neither console line changes anything when the page was opened from a share
   link: a shared view is laid out from the link, not from what this browser has
   stored, so open the panel from its header control instead.
 
 Related keys (current versions):
-- Panel collapsed state: `godsEyeView.v6.panelCollapsed.<panel-id>` — `'0'` open,
+- Panel collapsed state: `cameraEye.v6.panelCollapsed.<panel-id>` — `'0'` open,
   `'1'` closed, absent means the panel's own default. A view opened from a share
   link ignores the stored value entirely.
-- Panel positions: `godsEyeView.v8.panelPos.<panel-id>` — the versioned name for a
+- Panel positions: `cameraEye.v8.panelPos.<panel-id>` — the versioned name for a
   stored position. The current layout writes none, so deleting one changes
   nothing.
-- CCTV calibration: `godsEyeView.cctv.calibration.v2`
+- CCTV calibration: `cameraEye.cctv.calibration.v2`
 
 ---
 

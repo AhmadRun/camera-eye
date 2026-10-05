@@ -35,7 +35,7 @@ export function createRailTimeline({
   const previous = makeButton('‹', 'Earlier observation', row);
   const slider = document.createElement('input');
   slider.type = 'range';
-  slider.className = `gev-quantitative-slider${sliderClassName ? ` ${sliderClassName}` : ''}`;
+  slider.className = `ce-quantitative-slider${sliderClassName ? ` ${sliderClassName}` : ''}`;
   slider.min = '0';
   slider.max = '0';
   slider.step = '1';

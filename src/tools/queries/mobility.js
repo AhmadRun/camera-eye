@@ -204,7 +204,7 @@ export const getTransitVehicles = defineTool({
           Number.isFinite(contacted) ? Math.min(contacted, now) : fetchedAt,
         );
         const stale =
-          response.headers?.get?.('x-gev-cache') === 'STALE-ERROR' ||
+          response.headers?.get?.('x-ce-cache') === 'STALE-ERROR' ||
           now - answeredAt > FEED_STALE_AFTER_MS;
         const vehicles = snapshot.vehicles || [];
         const current = vehicles.filter(

@@ -1,5 +1,5 @@
 /**
- * Tools that answer questions from God's Eye View data, independent of the
+ * Tools that answer questions from Camera Eye data, independent of the
  * surface that exposes them. See docs/TOOLS.md.
  */
 
@@ -41,7 +41,7 @@ import {
 } from './queries/mobility.js';
 import { placesNearby, planRoute, searchPlaces } from './queries/places.js';
 import { panelRequest } from './queries/panelRequest.js';
-import { showInGodsEyeView } from './queries/share.js';
+import { showInCameraEye } from './queries/share.js';
 import { findAlprCameras } from './queries/surveillance.js';
 import {
   findCctvCameras,
@@ -122,6 +122,6 @@ export const coreTools = Object.freeze([
   situationBrief,
   militaryAwareness,
   getHudCaption,
-  showInGodsEyeView,
+  showInCameraEye,
   panelRequest,
 ]);

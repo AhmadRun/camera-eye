@@ -187,7 +187,7 @@ test('satellite and launch sources read the proxies stale markers', async () => 
   assert.equal((await satellites.readGroup('stations')).stale, true);
   const launches = createLaunchSource({
     fetchImpl: async () =>
-      Response.json([], { headers: { 'X-GEV-Cache': 'STALE-ERROR' } }),
+      Response.json([], { headers: { 'X-CE-Cache': 'STALE-ERROR' } }),
   });
   assert.deepEqual(await launches.getLaunchSnapshot(), {
     payload: [],

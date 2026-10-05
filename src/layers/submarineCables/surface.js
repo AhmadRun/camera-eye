@@ -27,7 +27,7 @@ export function cableClassificationTypeForStack(activeId) {
 
 /**
  * Derive the active surface from live scene state. The boot-time
- * `setStack(..., { silent: true })` fires no 'gev:map-stack-changed' event,
+ * `setStack(..., { silent: true })` fires no 'ce:map-stack-changed' event,
  * so the initial classification reads the scene the way the height-datum
  * listeners do: the photoreal regime is exactly "globe hidden".
  * @param {Cesium.Scene|null|undefined} scene

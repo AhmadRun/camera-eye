@@ -5,7 +5,7 @@
  * is sometimes the wrong leg — reject a route rather than display a wrong one.
  * Adapted from skylight (MIT) web/src/display/renderer.ts routePlausible(),
  * with the vertical-trend check made observer-free (skylight anchors it to a
- * fixed ground station; GEV has no observer, so the check is anchored to the
+ * fixed ground station; CE has no observer, so the check is anchored to the
  * PLANE: climbing hard + low → its origin should be nearby; descending hard +
  * low → its destination should be nearby).
  */

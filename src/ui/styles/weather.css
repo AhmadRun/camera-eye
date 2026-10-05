@@ -240,8 +240,8 @@
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
 }
-body.ui-clean-view .gev-wind-inspection-marker,
-body.recording-mode .gev-wind-inspection-marker {
+body.ui-clean-view .ce-wind-inspection-marker,
+body.recording-mode .ce-wind-inspection-marker {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;

@@ -52,14 +52,14 @@ export function createLifecycle({
 
       // Preset-aware dot styling: adopt the active post-FX style (persisted
       // style restore may run before layer registration, so read the dataset)
-      // and follow StyleManager's gev:style-change event thereafter. Guarded
+      // and follow StyleManager's ce:style-change event thereafter. Guarded
       // for non-browser contexts; bound once per page (init survives layer
       // destroy/re-register).
       if (typeof window !== 'undefined') {
         layerState._stylePreset =
-          document?.documentElement?.dataset?.gevStyle || 'normal';
+          document?.documentElement?.dataset?.ceStyle || 'normal';
         if (!layerState._styleListenerBound) {
-          window.addEventListener('gev:style-change', (e) =>
+          window.addEventListener('ce:style-change', (e) =>
             parts.style.setStylePreset(e?.detail?.style),
           );
           layerState._styleListenerBound = true;

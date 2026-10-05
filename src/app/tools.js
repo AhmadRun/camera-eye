@@ -3,7 +3,7 @@ import { initAnnotations } from '../annotations/index.js';
 import { initDrawTool } from '../annotations/drawTool.js';
 import { initImageryBoxTool } from '../ui/imageryBoxTool.js';
 import { createRecentImageryPanel } from '../ui/recentImagery.js';
-import { initGevVoiceCommands } from '../voice/gevRealtime.js';
+import { initGevVoiceCommands } from '../voice/ceRealtime.js';
 import { installViews, isEmbeddedInline } from './embed.js';
 import { installScopeMask, destroyScopeMask } from '../scopeMask.js';
 import {
@@ -48,7 +48,7 @@ export function createApplicationTools({
     resolver: operations.annotationResolver,
   });
   defer(() => {
-    if (window.__gevAnnotations === annotations) delete window.__gevAnnotations;
+    if (window.__ceAnnotations === annotations) delete window.__ceAnnotations;
     annotations.destroy();
   });
   // DISPLAY ▸ Draw: the same whiteboard, drawn by hand. It claims the pointer
@@ -85,10 +85,10 @@ export function createApplicationTools({
     );
     // The live gate's handle (scripts/qa-recent-imagery.mjs).
     const recentImageryHandle = { layer: recentImagery, tool: imageryBoxTool };
-    window.__gevRecentImagery = recentImageryHandle;
+    window.__ceRecentImagery = recentImageryHandle;
     defer(() => {
-      if (window.__gevRecentImagery === recentImageryHandle)
-        delete window.__gevRecentImagery;
+      if (window.__ceRecentImagery === recentImageryHandle)
+        delete window.__ceRecentImagery;
       data.presentation.attachRecentImagery(null);
       imageryBoxTool?.destroy();
     });
@@ -142,7 +142,7 @@ export function createApplicationTools({
   // loop burning behind a hidden tab. (perf wave 2 fix)
   syncVisibilitySuspension();
 
-  window.__godsEyeView = {
+  window.__cameraEye = {
     viewer,
     styleManager,
     tileset,
@@ -156,9 +156,9 @@ export function createApplicationTools({
     surfaceServices: operations.surface,
     requestRender: governorRequestRender,
   };
-  const debug = window.__godsEyeView;
+  const debug = window.__cameraEye;
   defer(() => {
-    if (window.__godsEyeView === debug) delete window.__godsEyeView;
+    if (window.__cameraEye === debug) delete window.__cameraEye;
   });
   const voiceCommands = initGevVoiceCommands({
     ...voice,
@@ -175,8 +175,8 @@ export function createApplicationTools({
   });
   defer(() => {
     voiceCommands.stop({ removeUi: true });
-    if (window.__gevVoiceCommands === voiceCommands)
-      delete window.__gevVoiceCommands;
+    if (window.__ceVoiceCommands === voiceCommands)
+      delete window.__ceVoiceCommands;
   });
   debug.voiceCommands = voiceCommands;
   defer(

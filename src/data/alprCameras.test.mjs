@@ -441,25 +441,25 @@ test('all manufacturers share one ALPR title and color; only supplied metadata a
     const entities = h.source.entities.values;
     assert.equal(alprCamerasLayer.name, 'ALPR Cameras');
     assert.deepEqual(
-      entities.map((entity) => entity.gevLabelModel.title),
+      entities.map((entity) => entity.ceLabelModel.title),
       ['ALPR-0042', 'ALPR-0043', 'ALPR-0044'],
     );
     assert.equal(
       new Set(entities.map((entity) => entity.billboard.image.getValue())).size,
       1,
     );
-    assert.deepEqual(entities[0].gevLabelModel.details, [
+    assert.deepEqual(entities[0].ceLabelModel.details, [
       'OSM MAPPED',
       'FLOCK SAFETY · CITY POLICE · FIXED',
       'PUBLIC MAP DATA',
     ]);
-    assert.deepEqual(entities[1].gevLabelModel.details, [
+    assert.deepEqual(entities[1].ceLabelModel.details, [
       'OSM MAPPED',
       'MOTOROLA SOLUTIONS',
       'PUBLIC MAP DATA',
     ]);
     assert.deepEqual(
-      entities[2].gevLabelModel.details,
+      entities[2].ceLabelModel.details,
       ['OSM MAPPED', 'PUBLIC MAP DATA'],
       'unknown metadata is not guessed, but the source is always named',
     );
@@ -788,7 +788,7 @@ test('selected readout samples the rendered ground, not zero elevation or the di
     h.click('alpr:42');
     const entity = h.source.entities.getById('alpr:42');
     const anchor = Cesium.Cartographic.fromCartesian(
-      entity.gevDisplayPosition(),
+      entity.ceDisplayPosition(),
     );
     assert.ok(Math.abs(anchor.height - 187) < 0.001);
     assert.ok(
@@ -796,7 +796,7 @@ test('selected readout samples the rendered ground, not zero elevation or the di
     );
     for (let i = 0; i < 60; i++) {
       h.viewer.scene.postRender.raiseEvent();
-      entity.gevDisplayPosition();
+      entity.ceDisplayPosition();
     }
     assert.equal(samples, 1, 'no per-frame raycasts');
     h.advance(1000);
@@ -896,7 +896,7 @@ test('two factories keep their requests, records and destruction independent', a
     assert.equal(b.source.entities.values[0].id, 'directory:99');
     assert.equal(second.source, 'Test camera directory');
     assert.ok(
-      b.source.entities.values[0].gevLabelModel.details.includes(
+      b.source.entities.values[0].ceLabelModel.details.includes(
         'Source: Test directory',
       ),
     );
@@ -1046,8 +1046,8 @@ test('orbit cache hits and metadata refreshes preserve marker geometry and selec
     let selections = 0,
       clears = 0,
       collectionChanges = 0;
-    window.addEventListener('gev:entity-selected', () => selections++);
-    window.addEventListener('gev:entity-selection-cleared', () => clears++);
+    window.addEventListener('ce:entity-selected', () => selections++);
+    window.addEventListener('ce:entity-selection-cleared', () => clears++);
     h.source.entities.collectionChanged.addEventListener(
       (_collection, added, removed) => {
         collectionChanges += added.length + removed.length;
@@ -1419,12 +1419,12 @@ test('map-source changes reposition all ALPR entities and saved native appearanc
     await layer.update();
     const entities = [...h.source.entities.values];
     const saved = entities[1];
-    saved.gevAlprNativeAppearance = {
+    saved.ceAlprNativeAppearance = {
       position: saved.position,
       heightReference: saved.billboard.heightReference,
     };
     saved.position = Cesium.Cartesian3.fromDegrees(-97.7431, 30.26721, 190);
-    saved.gevAlprPickPosition = saved.position;
+    saved.ceAlprPickPosition = saved.position;
     for (const next of [150, 120, null, 180]) {
       floor = next;
       // Includes a provider switch with the same globe.show value.
@@ -1445,10 +1445,10 @@ test('map-source changes reposition all ALPR entities and saved native appearanc
             ? Cesium.HeightReference.CLAMP_TO_GROUND
             : Cesium.HeightReference.NONE,
         );
-        assert.equal(entity.gevAlprCanvasPosition, null);
+        assert.equal(entity.ceAlprCanvasPosition, null);
       }
       assert.equal(
-        saved.gevAlprNativeAppearance,
+        saved.ceAlprNativeAppearance,
         null,
         'saved appearance restores at the new floor',
       );

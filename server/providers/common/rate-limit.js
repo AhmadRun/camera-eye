@@ -10,7 +10,7 @@ export { makeRateLimiter } from '../../../src/sources/rateLimit.js';
  *
  * A value that cannot be read as a number — a typo, a stray unit, a negative —
  * also takes the default rather than disabling the guard. That asymmetry is the
- * point: `GEV_RATELIMIT_OPENAI_PER_MIN=3O` should not quietly hand an exposed
+ * point: `CE_RATELIMIT_OPENAI_PER_MIN=3O` should not quietly hand an exposed
  * server's API key to whoever asks. Removing the throttle stays possible, but
  * only by saying `0`, which cannot be typed by accident.
  *

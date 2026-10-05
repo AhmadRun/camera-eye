@@ -100,7 +100,7 @@ export class RealtimeConnection {
       const costState = this.cost.bindServedModel(minted.model);
       if (!costState.ratesRecognized) {
         console.warn(
-          `[GEV voice] unrecognised Realtime model "${costState.modelId}" — ` +
+          `[CE voice] unrecognised Realtime model "${costState.modelId}" — ` +
             'billing this session at the most expensive known rates. Update the ' +
             'rate table in src/voice/voiceCost.js.',
         );
@@ -128,11 +128,11 @@ export class RealtimeConnection {
       this.startVoiceVisualizer(localStream);
 
       document
-        .querySelectorAll('audio[data-gev-realtime-audio="true"]')
+        .querySelectorAll('audio[data-ce-realtime-audio="true"]')
         .forEach((el) => el.remove());
       this.audioEl = document.createElement('audio');
       this.audioEl.autoplay = true;
-      this.audioEl.dataset.gevRealtimeAudio = 'true';
+      this.audioEl.dataset.ceRealtimeAudio = 'true';
       this.audioEl.style.display = 'none';
       document.body.appendChild(this.audioEl);
 

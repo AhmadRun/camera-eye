@@ -228,7 +228,7 @@ export function createGround({ state: layerState, services, parts, source }) {
   }
 
   /**
-   * Task 5: surface-regime change handler ('gev:map-stack-changed'
+   * Task 5: surface-regime change handler ('ce:map-stack-changed'
    * CustomEvent, dispatched by main.js from MapStackController.onChange). The
    * surface HEIGHT at a camera differs between regimes (a photogrammetric
    * deck/building-top in google-3d vs bare Re:Earth DEM on globe stacks), so

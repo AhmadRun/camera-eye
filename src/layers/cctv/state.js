@@ -121,7 +121,7 @@ export function createState({ services }) {
 
   layerState._lastAppliedRegime = null;
 
-  // Task 5: window listener handle for the 'gev:map-stack-changed' CustomEvent
+  // Task 5: window listener handle for the 'ce:map-stack-changed' CustomEvent
   // main.js dispatches from MapStackController's onChange (removed in destroy).
 
   layerState._mapStackListener = null;

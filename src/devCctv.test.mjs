@@ -14,7 +14,7 @@ const bashTest = process.platform === 'win32' ? test.skip : test;
 async function launch(overrides = {}, dotenv = '', omitCctv = false) {
   // Physical path: the launched process reports its cwd resolved, and macOS
   // reaches the temp directory through a symlink.
-  const root = await makeFixtureRoot('gev-cctv-launch-');
+  const root = await makeFixtureRoot('ce-cctv-launch-');
   try {
     await fs.mkdir(path.join(root, 'scripts'));
     await fs.mkdir(path.join(root, 'bin'));
@@ -60,8 +60,8 @@ bashTest('CCTV preset starts keyless on localhost through the normal launcher', 
   assert.equal(result.env.CCTV_PREFER_AUSTIN, '1');
   assert.equal(result.env.CCTV_AUSTIN_MAX_SOURCES, '36');
   assert.equal(result.env.CCTV_MAX_SOURCES, '48');
-  assert.equal(result.env.GEV_LAUNCHER, 'dev-fresh');
-  assert.equal(result.env.GEV_KEY_SETUP_EXTERNAL_KEYS, '');
+  assert.equal(result.env.CE_LAUNCHER, 'dev-fresh');
+  assert.equal(result.env.CE_KEY_SETUP_EXTERNAL_KEYS, '');
   assert.equal(result.env.GOOGLE_MAPS_API_KEY, undefined);
   assert.match(result.output, /Startup map: Esri World Imagery/);
   assert.doesNotMatch(result.output, /!! WARNING/);
@@ -83,7 +83,7 @@ bashTest('CCTV preset shares dotenv precedence and names-only credential provena
   const result = await launch({ GOOGLE_MAPS_API_KEY: 'fixture-shell-maps' }, 'GOOGLE_MAPS_API_KEY=fixture-file-maps\nOPENAI_API_KEY=fixture-file-voice\n');
   assert.equal(result.env.GOOGLE_MAPS_API_KEY, 'fixture-shell-maps');
   assert.equal(result.env.OPENAI_API_KEY, 'fixture-file-voice');
-  assert.equal(result.env.GEV_KEY_SETUP_EXTERNAL_KEYS, 'GOOGLE_MAPS_API_KEY');
+  assert.equal(result.env.CE_KEY_SETUP_EXTERNAL_KEYS, 'GOOGLE_MAPS_API_KEY');
   assert.doesNotMatch(result.output, /fixture-shell-maps|fixture-file-maps|fixture-file-voice/);
 });
 

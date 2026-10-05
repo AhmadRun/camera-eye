@@ -354,7 +354,7 @@ test('tracked-identity resolution falls back to layer precedence', () => {
   const civilian = { icao24: 'aaa077' };
   const military = { icao24: 'ae01ce' };
   // No stamped identity (or one that matches neither layer) keeps the historic
-  // civilian-first order so tracking paths without gevTrackedId still work.
+  // civilian-first order so tracking paths without ceTrackedId still work.
   assert.equal(resolveTrackedAircraftInfo({ civilian, military }).layerId, 'flights');
   assert.equal(
     resolveTrackedAircraftInfo({ civilian, military, trackedId: 'satellites:25544' }).layerId,

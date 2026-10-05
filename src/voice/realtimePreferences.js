@@ -6,11 +6,11 @@ import {
   serializeCostLimits,
 } from './voiceCost.js';
 
-// Voice cost control (repo-wide `godsEyeView.<feature>.<field>` convention;
+// Voice cost control (repo-wide `cameraEye.<feature>.<field>` convention;
 // the neighbouring ERROR_STORAGE_KEY predates it).
-export const VOICE_TIER_STORAGE_KEY = 'godsEyeView.voiceCost.tier';
+export const VOICE_TIER_STORAGE_KEY = 'cameraEye.voiceCost.tier';
 
-export const VOICE_LIMITS_STORAGE_KEY = 'godsEyeView.voiceCost.limits';
+export const VOICE_LIMITS_STORAGE_KEY = 'cameraEye.voiceCost.limits';
 
 /** Best-effort localStorage handle; absent in tests and locked-down browsers. */
 export function voiceStorage(storage) {

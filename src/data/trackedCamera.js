@@ -57,7 +57,7 @@ export function trackedModelScaleForPixelCap({
  * @returns {Cesium.Cartesian3|undefined} Camera-frame position.
  */
 export function trackedDisplayPositionForCamera(entity, time, result) {
-  const displayedPosition = entity?.gevDisplayPosition?.();
+  const displayedPosition = entity?.ceDisplayPosition?.();
   return displayedPosition
     ? Cesium.Cartesian3.clone(displayedPosition, result)
     : entity?.position?.getValue(time, result);

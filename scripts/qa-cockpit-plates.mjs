@@ -275,7 +275,7 @@ async function main() {
     });
 
     await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 90_000 });
-    await page.waitForFunction(() => window.__godsEyeView?.styleManager, { timeout: 90_000 });
+    await page.waitForFunction(() => window.__cameraEye?.styleManager, { timeout: 90_000 });
     await page.waitForFunction(
       () => document.getElementById('loading-screen')?.classList.contains('hidden'),
       { timeout: 90_000 },
@@ -303,7 +303,7 @@ async function main() {
     // Inject the field. The layers keep their real pipelines; only the source
     // of observations is replaced, exactly as scripts/qa-labels.mjs does.
     await page.evaluate((payload) => {
-      const { viewer, dataManager, styleManager } = window.__godsEyeView;
+      const { viewer, dataManager, styleManager } = window.__cameraEye;
       viewer.camera.cancelFlight();
       const Cartesian3 = viewer.camera.position.constructor;
       window.__PLATE_QA_FIELD = payload.contacts.map((contact) => ({
@@ -331,7 +331,7 @@ async function main() {
     for (const pose of POSES) {
       console.log(`\n  — pose "${pose.name}" (${pose.note})`);
       await page.evaluate((payload) => {
-        const { viewer } = window.__godsEyeView;
+        const { viewer } = window.__cameraEye;
         const Cartesian3 = viewer.camera.position.constructor;
         viewer.camera.setView({
           destination: Cartesian3.fromDegrees(payload.lon, payload.lat, payload.height),
@@ -356,7 +356,7 @@ async function main() {
         // OUTPUT has to ask for its own renders. Production is unaffected: real
         // Cockpit holds, and a parked map keeps showing the last correct frame
         // precisely because nothing changed.
-        const scene = window.__godsEyeView.viewer.scene;
+        const scene = window.__cameraEye.viewer.scene;
         const pump = () => {
           if (!window.__PLATE_TAP.on) return;
           scene.requestRender();
@@ -414,7 +414,7 @@ async function main() {
           entry.meanPixelAlpha = total / (data.length / 4) / 255;
         }
 
-        const diagnostics = window.__godsEyeView.styleManager.getDetectionDiagnostics();
+        const diagnostics = window.__cameraEye.styleManager.getDetectionDiagnostics();
         return {
           plated: [...byId.values()],
           visibleCount: diagnostics?.visibleCount ?? null,

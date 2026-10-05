@@ -17,7 +17,7 @@ export async function decodeWindGribMessage(buffer, { eccodesModule } = {}) {
   const eccodes = eccodesModule ?? (await loadEccodes());
   // Everything after this await is synchronous. A shared virtual file is safe
   // across U/V and model requests and its storage is released after each decode.
-  const file = '/gev-wind.grib2';
+  const file = '/ce-wind.grib2';
   let handle = null;
   try {
     eccodes.writeFile(file, buffer);

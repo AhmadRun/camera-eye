@@ -23,7 +23,7 @@ import {
   ensureGeoidReady,
   geoidHeight,
 } from './data/geoid.js';
-import { getBasemapLabelContext } from './voice/gevActions.js';
+import { getBasemapLabelContext } from './voice/ceActions.js';
 import {
   hudSummaryMatchesProvenance,
   hudSummaryLayerContext,

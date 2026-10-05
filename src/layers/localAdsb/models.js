@@ -77,7 +77,7 @@ export function createLocalAdsbModels({
     const spec = civilAircraftModelSpec(marker.klass);
     const key = specKey(spec);
     const current = models.get(id);
-    if (current && current._gevSpecKey === key) return;
+    if (current && current._ceSpecKey === key) return;
     if (current) release(id);
     if (pending.has(id) || models.size + pending.size >= cap) return;
     const loadGeneration = generation;
@@ -111,8 +111,8 @@ export function createLocalAdsbModels({
       return;
     }
     model.id = id;
-    model._gevSpecKey = key;
-    model._gevBellyM = spec.bellyM;
+    model._ceSpecKey = key;
+    model._ceBellyM = spec.bellyM;
     // Admitted, not yet the visual: placement turns it on.
     model.show = false;
     collection.add(model);
@@ -180,7 +180,7 @@ export function createLocalAdsbModels({
     return Cesium.Cartesian3.fromRadians(
       carto.longitude,
       carto.latitude,
-      height + (model?._gevBellyM || 0),
+      height + (model?._ceBellyM || 0),
       Cesium.Ellipsoid.WGS84,
       scratchGround,
     );

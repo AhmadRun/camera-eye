@@ -16,7 +16,7 @@ test('stable commands reuse uniforms and derived pipelines while all native fiel
   });
   const record = {},
     program = {},
-    uniforms = { u_gevSonar: () => 42 };
+    uniforms = { u_ceSonar: () => 42 };
   const derived = syncCyberSonarCommand(native, record, program, uniforms, 0);
   const map = derived.uniformMap;
   derived.dirty = false;
@@ -33,7 +33,7 @@ test('stable commands reuse uniforms and derived pipelines while all native fiel
   );
   assert.equal(derived.lastDirtyTime, 7);
   assert.equal(derived.uniformMap, map);
-  assert.equal(map.u_gevSonarLabelBackground(), 1);
+  assert.equal(map.u_ceSonarLabelBackground(), 1);
   for (const [key, value] of Object.entries({
     count: 12,
     offset: 2,
@@ -63,7 +63,7 @@ test('stable commands reuse uniforms and derived pipelines while all native fiel
   syncCyberSonarCommand(native, record, program, uniforms, 0);
   assert.equal(map.value, undefined);
   assert.equal(map.replacement(), 3);
-  assert.equal(map.u_gevSonar(), 42);
+  assert.equal(map.u_ceSonar(), 42);
   const nextProgram = {};
   syncCyberSonarCommand(native, record, nextProgram, uniforms, 0);
   assert.equal(derived.shaderProgram, nextProgram);
@@ -91,9 +91,9 @@ test('GPU shader transform is isolated, settings-driven, and precedes native fra
     assert.equal(source.sources[0], original);
     assert.notEqual(next, source);
     assert.deepEqual(next.defines, ['SDF']);
-    assert.match(next.sources[0], /void gev_sonar_main/);
+    assert.match(next.sources[0], /void ce_sonar_main/);
     assert.match(next.sources[1], /v_color.a \*= factor/);
-    assert.match(next.sources[1], /u_gevSonarSector/);
+    assert.match(next.sources[1], /u_ceSonarSector/);
     assert.match(next.sources[1], /floorValue \+ \(1.0 - floorValue\) \* 0.46/);
     assert.ok(
       next.sources[1].includes(

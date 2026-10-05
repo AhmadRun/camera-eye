@@ -114,14 +114,14 @@ export function workerFilesPrelude(files) {
     const xhr = XMLHttpRequest.prototype;
     const { open, send, setRequestHeader } = xhr;
     xhr.open = function (method, url, ...rest) {
-      this.__gevFile = find(url);
-      if (this.__gevFile === null) return open.call(this, method, url, ...rest);
+      this.__ceFile = find(url);
+      if (this.__ceFile === null) return open.call(this, method, url, ...rest);
     };
     xhr.setRequestHeader = function (...args) {
-      if (this.__gevFile === null) return setRequestHeader.apply(this, args);
+      if (this.__ceFile === null) return setRequestHeader.apply(this, args);
     };
     xhr.send = function (body) {
-      const text = this.__gevFile;
+      const text = this.__ceFile;
       if (text === null || text === undefined) return send.call(this, body);
       const type = this.responseType;
       const response =

@@ -78,7 +78,7 @@ try {
     });
     await page.setViewport({ width: 1280, height: 800 });
     await page.evaluateOnNewDocument(() =>
-      sessionStorage.setItem('gev:first-run-mission-session:v1', 'dismissed'),
+      sessionStorage.setItem('ce:first-run-mission-session:v1', 'dismissed'),
     );
     const u = new URL(url);
     u.searchParams.set('trafficRoads', mode);
@@ -86,16 +86,16 @@ try {
     await page.goto(u.href, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(
       () =>
-        window.__godsEyeView?.dataManager &&
+        window.__cameraEye?.dataManager &&
         document.getElementById('loading-screen')?.classList.contains('hidden'),
       { timeout: 120000 },
     );
     await page.evaluate(
-      () => window.__godsEyeView.styleManager.initialRestorePromise,
+      () => window.__cameraEye.styleManager.initialRestorePromise,
     );
     await page.keyboard.press('Escape');
     await page.evaluate(() => {
-      const g = window.__godsEyeView;
+      const g = window.__cameraEye;
       g.styleManager.setDetection({ enabled: false });
       for (const [id] of g.dataManager.layers)
         g.dataManager.setEnabled(id, false);
@@ -107,7 +107,7 @@ try {
       overlay: Boolean(document.querySelector('vite-error-overlay')),
     }));
     await page.evaluate((baseline) => {
-      const { viewer, dataManager } = window.__godsEyeView;
+      const { viewer, dataManager } = window.__cameraEye;
       const layer = dataManager.layers.get('traffic').module;
       if (!baseline && typeof layer.visitMotionDots !== 'function')
         throw new Error('Traffic must expose stable dot identities');
@@ -256,7 +256,7 @@ try {
     const fly = (lat, lon, height, pitch, duration, heading = 20) =>
       page.evaluate(
         async (v) => {
-          const { viewer } = window.__godsEyeView;
+          const { viewer } = window.__cameraEye;
           window.__motion.label = 'camera moving';
           window.__motion.holdStart = null;
           viewer.camera.cancelFlight();
@@ -330,7 +330,7 @@ try {
       console.log(`${mode}: captured ${name}`);
     };
     await page.evaluate(() =>
-      window.__godsEyeView.dataManager.setEnabled('traffic', true),
+      window.__cameraEye.dataManager.setEnabled('traffic', true),
     );
     // Match motion-reference: begin the camera-motion scenario from a
     // settled street view. Initial mesh acquisition is recorded in the clip
@@ -352,14 +352,14 @@ try {
       );
       await step('downtown-500m', [30.2672, -97.7431, 500, -35, 2.5, 20]);
       await page.evaluate(() =>
-        window.__godsEyeView.dataManager.setEnabled('alpr-cameras', true),
+        window.__cameraEye.dataManager.setEnabled('alpr-cameras', true),
       );
       await hold('enable-alpr', true, 6000);
       await step('pan-west-600m', [30.2672, -97.7494, 500, -35, 2, 20], 5000);
       await step('city-12km', [30.28, -97.75, 12000, -60, 3, 0], 8000, true);
       await fly(30.3125, -97.765, 1000, -45, 3, 0);
       await page.evaluate(() =>
-        window.__godsEyeView.dataManager.setEnabled(
+        window.__cameraEye.dataManager.setEnabled(
           'military-installations',
           true,
         ),
@@ -407,7 +407,7 @@ try {
         })),
     );
     const stats = await page.evaluate(() =>
-      window.__godsEyeView.dataManager.layers.get('traffic').module.getStats(),
+      window.__cameraEye.dataManager.layers.get('traffic').module.getStats(),
     );
     const phases = holds.map((h) => {
       const all = rows.filter((r) => r.t >= h.start && r.t < h.end);

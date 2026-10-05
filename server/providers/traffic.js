@@ -16,12 +16,12 @@ import {
  * "Traffic flow"). The key comes from TOMTOM_API_KEY server-side only — the
  * browser fetches same-origin `/api/tomtom/flow/{z}/{x}/{y}.pbf`.
  *
- * Cache: memory + disk (.gev-cache/tomtom/), TTL 120 s (traffic is fresh
+ * Cache: memory + disk (.ce-cache/tomtom/), TTL 120 s (traffic is fresh
  * data), single-flight per tile, serve-stale-on-failure — the celestrakProxy
  * pattern. Cache hits never count against the budget.
  *
  * Budget governor (mirrors the OpenSky credit-governor philosophy — last-good
- * data beats a dead layer): a persistent counter (.gev-cache/tomtom/budget.json,
+ * data beats a dead layer): a persistent counter (.ce-cache/tomtom/budget.json,
  * keyed by UTC date, reset on day change) counts upstream fetch attempts
  * against a soft cap (TOMTOM_DAILY_TILE_BUDGET). Over the cap the proxy
  * serves stale tiles when available, else 429 {error:'budget'}.
@@ -42,7 +42,7 @@ import {
  */
 export function tomtomProxy() {
   const TILE_TTL_MS = 120_000;
-  const CACHE_DIR = path.join(process.cwd(), '.gev-cache', 'tomtom');
+  const CACHE_DIR = path.join(process.cwd(), '.ce-cache', 'tomtom');
   const BUDGET_PATH = path.join(CACHE_DIR, 'budget.json');
   // 200,000/month free tier / 31 days = 6,451. Rounded down for headroom.
   const DEFAULT_DAILY_BUDGET = 6000;

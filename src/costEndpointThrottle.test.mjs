@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
 import { readPinokioEnvironment } from '../scripts/pinokio-environment.mjs';
-import { openAiRealtimeProxy } from 'gods-eye-view/server/providers/openai';
+import { openAiRealtimeProxy } from 'camera-eye/server/providers/openai';
 import {
   makeCostRateLimiter,
   resolvePerMinuteCap,
@@ -134,7 +134,7 @@ test('the default cap clears the app’s own demand with room to spare', () => {
 });
 
 test('the realtime token route throttles by default, and says so in a 429', async (t) => {
-  env(t, 'GEV_RATELIMIT_OPENAI_PER_MIN', undefined);
+  env(t, 'CE_RATELIMIT_OPENAI_PER_MIN', undefined);
   env(t, 'OPENAI_API_KEY', 'fixture-upstream-secret');
   let upstreamCalls = 0;
   t.mock.method(globalThis, 'fetch', async () => {
@@ -220,7 +220,7 @@ test('the HUD summary route throttles the paid path, never the free one', async 
 });
 
 test('the Google places route throttles by default and keeps its places[] contract', async (t) => {
-  env(t, 'GEV_RATELIMIT_GOOGLE_PER_MIN', undefined);
+  env(t, 'CE_RATELIMIT_GOOGLE_PER_MIN', undefined);
   let upstreamCalls = 0;
   const handler = install(
     googlePlacesContextProxy({
@@ -271,11 +271,11 @@ test('the code defaults match the caps the Pinokio build ships', () => {
     ),
   );
   assert.equal(
-    Number(shipped.GEV_RATELIMIT_OPENAI_PER_MIN),
+    Number(shipped.CE_RATELIMIT_OPENAI_PER_MIN),
     OPENAI_DEFAULT_PER_MIN,
   );
   assert.equal(
-    Number(shipped.GEV_RATELIMIT_GOOGLE_PER_MIN),
+    Number(shipped.CE_RATELIMIT_GOOGLE_PER_MIN),
     GOOGLE_DEFAULT_PER_MIN,
   );
 });

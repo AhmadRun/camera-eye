@@ -36,7 +36,7 @@ test('Warendorf loader tolerates a missing catalog file', (t) => {
 
 test('Warendorf loader skips malformed rows without throwing', (t) => {
   t.mock.method(console, 'log', () => {});
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gev-warendorf-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ce-warendorf-'));
   fs.mkdirSync(path.join(dir, 'config'));
   fs.writeFileSync(
     path.join(dir, 'config', 'cctv_sources.warendorf.json'),

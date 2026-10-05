@@ -75,7 +75,7 @@ test('tracked camera prefers the already-rendered display cache', () => {
   let callbackReads = 0;
   const cached = new Cesium.Cartesian3(1, 2, 3);
   const entity = {
-    gevDisplayPosition: () => cached,
+    ceDisplayPosition: () => cached,
     position: {
       getValue: () => {
         callbackReads += 1;

@@ -16,7 +16,7 @@ export function createSelection({
     if (!layerState.enabled) return;
     // Tracking layers publish this event before replacing the shared context.
     const selected =
-      event?.type === 'gev:awareness-subject-selected'
+      event?.type === 'ce:awareness-subject-selected'
         ? event.detail
         : services.context.getSelectedEntityContext();
     const next =
@@ -40,9 +40,9 @@ export function createSelection({
   function installInteraction(viewer) {
     if (layerState.clickHandler) return;
     const events = [
-      'gev:entity-selected',
-      'gev:entity-selection-cleared',
-      'gev:awareness-subject-selected',
+      'ce:entity-selected',
+      'ce:entity-selection-cleared',
+      'ce:awareness-subject-selected',
     ];
     for (const event of events)
       globalThis.window?.addEventListener?.(event, syncContextSelection);

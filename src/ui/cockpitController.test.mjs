@@ -95,9 +95,9 @@ test('aircraft identity is read from the supplied layer instances', () => {
         militaryFlightsLayer: { getTrackedInfo: () => military },
       },
     });
-    env.viewer.trackedEntity = { gevTrackedId: 'military:def456' };
+    env.viewer.trackedEntity = { ceTrackedId: 'military:def456' };
     assert.deepEqual(owner.readAircraftInfo(), military);
-    env.viewer.trackedEntity = { gevTrackedId: 'flights:abc123' };
+    env.viewer.trackedEntity = { ceTrackedId: 'flights:abc123' };
     assert.deepEqual(owner.readAircraftInfo(), civilian);
     owner.dispose();
   } finally {

@@ -119,7 +119,7 @@ export function createStyle({ state: layerState, services, parts, source }) {
   }
 
   /**
-   * Adopt a new active style preset (from the gev:style-change event or the
+   * Adopt a new active style preset (from the ce:style-change event or the
    * dataset read at init) and restyle live dots immediately.
    * @param {string|null|undefined} name - StyleManager preset name.
    */

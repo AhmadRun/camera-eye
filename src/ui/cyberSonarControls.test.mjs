@@ -4,9 +4,9 @@ import {
   getCyberSonarControlState,
   setCyberSonarControls,
 } from './cyberSonarControls.js';
-import { GEV_ACTION_SCHEMAS } from '../voice/actionSchemas.js';
-import { GEV_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
-import { createGevActionRunner } from '../voice/gevActions.js';
+import { CE_ACTION_SCHEMAS } from '../voice/actionSchemas.js';
+import { CE_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
+import { createGevActionRunner } from '../voice/ceActions.js';
 import { StyleManager } from './applicationShell.js';
 import { VisualSettings } from './visualSettings.js';
 import { readFileSync } from 'node:fs';
@@ -89,7 +89,7 @@ test('native sonar sliders represent every accepted integer without browser snap
 });
 
 test('sonar action is available to both shared and server voice schemas', () => {
-  for (const tools of [GEV_ACTION_SCHEMAS, GEV_REALTIME_TOOLS]) {
+  for (const tools of [CE_ACTION_SCHEMAS, CE_REALTIME_TOOLS]) {
     const action = tools.find((tool) => tool.name === 'set_cyber_sonar');
     assert.ok(action);
     assert.equal(action.parameters.additionalProperties, false);

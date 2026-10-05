@@ -42,5 +42,5 @@ Regenerate against a running app (resumable; only cameras whose pose changed
 or whose entry is incomplete are redone):
 
 ```
-GEV_BASE=http://localhost:4173 node scripts/precompute-cctv-heights.mjs
+CE_BASE=http://localhost:4173 node scripts/precompute-cctv-heights.mjs
 ```

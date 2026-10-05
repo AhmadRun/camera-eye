@@ -447,7 +447,7 @@ export class SdrController {
       );
       this._audioNode = new AudioWorkletNode(
         this._audioContext,
-        'gev-sdr-audio-player',
+        'ce-sdr-audio-player',
         {
           outputChannelCount: [1],
         },

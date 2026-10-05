@@ -53,9 +53,9 @@ export function createLifecycle({ state, services, parts }) {
 
   /**
    * Follow the active post-FX style so the sprites can be restyled for it.
-   * The map style arrives on `gev:style-change`; a cockpit vision override
+   * The map style arrives on `ce:style-change`; a cockpit vision override
    * (NVG/thermal inside the cockpit view, which sets no map style) arrives on
-   * `gev:vision-change` with the effective style and wins while it lasts.
+   * `ce:vision-change` with the effective style and wins while it lasts.
    * Bound once per instance and removed on destroy. Read the document's
    * current style first: a persisted style restores before layers register.
    */
@@ -63,7 +63,7 @@ export function createLifecycle({ state, services, parts }) {
     if (typeof window === 'undefined') return;
     if (state._styleListeners.length > 0) return;
     parts.rendering.setStylePreset(
-      document?.documentElement?.dataset?.gevStyle || 'normal',
+      document?.documentElement?.dataset?.ceStyle || 'normal',
     );
     const onStyle = (event) => {
       if (state._cockpitVision) return;
@@ -73,11 +73,11 @@ export function createLifecycle({ state, services, parts }) {
       state._cockpitVision = event?.detail?.cockpit === true;
       parts.rendering.setStylePreset(event?.detail?.style);
     };
-    window.addEventListener('gev:style-change', onStyle);
-    window.addEventListener('gev:vision-change', onVision);
+    window.addEventListener('ce:style-change', onStyle);
+    window.addEventListener('ce:vision-change', onVision);
     state._styleListeners.push(
-      ['gev:style-change', onStyle],
-      ['gev:vision-change', onVision],
+      ['ce:style-change', onStyle],
+      ['ce:vision-change', onVision],
     );
   }
 

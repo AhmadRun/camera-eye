@@ -26,7 +26,7 @@ try {
   url.searchParams.set('welcome', '0');
   await page.goto(url.href, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
-    () => window.__godsEyeView?.styleManager?._applicationShortcuts,
+    () => window.__cameraEye?.styleManager?._applicationShortcuts,
     { timeout: 60_000 },
   );
   await page.waitForFunction(
@@ -40,7 +40,7 @@ try {
     { timeout: 60_000 },
   );
   await page.evaluate(() => {
-    const manager = window.__godsEyeView.styleManager;
+    const manager = window.__cameraEye.styleManager;
     manager.setStyle('normal');
     document.activeElement?.blur();
   });
@@ -48,11 +48,11 @@ try {
   check(
     'native number shortcut selects CRT',
     await page.evaluate(
-      () => window.__godsEyeView.styleManager.activeStyle === 'retro',
+      () => window.__cameraEye.styleManager.activeStyle === 'retro',
     ),
   );
   const initial = await page.evaluate(() => {
-    const manager = window.__godsEyeView.styleManager;
+    const manager = window.__cameraEye.styleManager;
     manager.setPanelCollapsed('pp-toggles', false, {
       persist: false,
       syncShare: false,
@@ -79,7 +79,7 @@ try {
   await page.keyboard.press('ArrowRight');
   const changed = await page.evaluate(() => {
     const slider = window.__qaOldSlider;
-    const manager = window.__godsEyeView.styleManager;
+    const manager = window.__cameraEye.styleManager;
     return {
       value: Number(slider.value),
       readout: slider.nextElementSibling.textContent,
@@ -96,13 +96,13 @@ try {
   check(
     'focused range retains native input instead of changing style',
     await page.evaluate(
-      () => window.__godsEyeView.styleManager.activeStyle === 'retro',
+      () => window.__cameraEye.styleManager.activeStyle === 'retro',
     ),
   );
   check(
     'replacing a style revokes its detached slider',
     await page.evaluate(() => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       const before = manager.stages.retro.uniforms[window.__qaParameter.name];
       manager.setStyle('thermal');
       window.__qaOldSlider.value = '0';
@@ -115,7 +115,7 @@ try {
   check(
     'normal style clears rows; reopening restores current shader values',
     await page.evaluate(() => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       manager.setStyle('normal');
       const cleared = manager._sliderContainer.children.length === 0;
       manager.setStyle('retro');
@@ -128,7 +128,7 @@ try {
   );
   const hudBefore = await page.evaluate(() => {
     document.getElementById('hud-layout-select').focus();
-    return window.__godsEyeView.styleManager.hud.visible;
+    return window.__cameraEye.styleManager.hud.visible;
   });
   await page.keyboard.press('h');
   check(
@@ -136,12 +136,12 @@ try {
     await page.evaluate(
       (visible) =>
         document.activeElement?.id === 'hud-layout-select' &&
-        window.__godsEyeView.styleManager.hud.visible === visible,
+        window.__cameraEye.styleManager.hud.visible === visible,
       hudBefore,
     ),
   );
   const displayBefore = await page.evaluate(() => {
-    const manager = window.__godsEyeView.styleManager;
+    const manager = window.__cameraEye.styleManager;
     manager._setBloomEnabled(true);
     manager._bloomSlider.value = '80';
     manager._bloomSlider.dispatchEvent(new Event('input', { bubbles: true }));
@@ -155,7 +155,7 @@ try {
   check(
     'native Display slider updates effect state',
     await page.evaluate((before) => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       return (
         Number(manager._bloomSlider.value) > before.value &&
         manager._bloomStage.uniforms.contrast < before.contrast
@@ -165,7 +165,7 @@ try {
   check(
     'Display buttons toggle current state once',
     await page.evaluate(() => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       const before = manager.bloomEnabled;
       manager._bloomBtn.click();
       const changed = manager.bloomEnabled !== before;
@@ -176,7 +176,7 @@ try {
   check(
     'Display rebind removes old listeners',
     await page.evaluate(() => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       manager._initUI();
       const before = manager.bloomEnabled;
       manager._bloomBtn.click();
@@ -193,13 +193,13 @@ try {
   );
   await page.evaluate(() => {
     const slider =
-      window.__godsEyeView.styleManager._sliderContainer.querySelector('input');
+      window.__cameraEye.styleManager._sliderContainer.querySelector('input');
     slider.focus();
     slider.scrollIntoView({ block: 'center', behavior: 'instant' });
   });
   await page.screenshot({ path: 'qa-shots/visual-input/narrow.png' });
   await page.evaluate(() => {
-    const manager = window.__godsEyeView.styleManager;
+    const manager = window.__cameraEye.styleManager;
     window.__qaCurrentSlider = manager._sliderContainer.querySelector('input');
     manager._applicationShortcuts.destroy();
     manager._styleParameters.destroy();
@@ -209,13 +209,13 @@ try {
   check(
     'destroyed application shortcuts cannot change the selected style',
     await page.evaluate(
-      () => window.__godsEyeView.styleManager.activeStyle === 'retro',
+      () => window.__cameraEye.styleManager.activeStyle === 'retro',
     ),
   );
   check(
     'destroyed parameter controls cannot write through a retained element',
     await page.evaluate(() => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       const before = manager.stages.retro.uniforms[window.__qaParameter.name];
       window.__qaCurrentSlider.value = '0';
       window.__qaCurrentSlider.dispatchEvent(
@@ -230,7 +230,7 @@ try {
   check(
     'destroyed Display controls cannot change settings',
     await page.evaluate(() => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       manager._displayControls.destroy();
       const before = manager.bloomEnabled;
       const contrast = manager._bloomStage.uniforms.contrast;

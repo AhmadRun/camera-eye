@@ -84,7 +84,7 @@ let marker = 'startup';
 try {
   page = await browser.newPage();
   await page.evaluateOnNewDocument(() => {
-    sessionStorage.setItem('gev:first-run-mission-session:v1', 'dismissed');
+    sessionStorage.setItem('ce:first-run-mission-session:v1', 'dismissed');
   });
   await page.setViewport({ width: 1280, height: 800 });
   const client = await page.createCDPSession();
@@ -145,7 +145,7 @@ try {
     timeout: 60_000,
   });
   await page.waitForFunction(
-    () => window.__godsEyeView?.viewer && window.__godsEyeView?.annotations,
+    () => window.__cameraEye?.viewer && window.__cameraEye?.annotations,
     { timeout: 90_000, polling: 500 },
   );
   await page.waitForFunction(
@@ -154,7 +154,7 @@ try {
     { timeout: 90_000, polling: 250 },
   );
   await page.evaluate(
-    () => window.__godsEyeView.styleManager.initialRestorePromise,
+    () => window.__cameraEye.styleManager.initialRestorePromise,
   );
   await page.keyboard.press('Escape');
   await page.waitForFunction(
@@ -162,7 +162,7 @@ try {
     { timeout: 10_000 },
   );
   result.renderer = await page.evaluate(() => {
-    const gl = window.__godsEyeView.viewer.scene.context._gl;
+    const gl = window.__cameraEye.viewer.scene.context._gl;
     const debug = gl.getExtension('WEBGL_debug_renderer_info');
     return debug
       ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL)
@@ -172,7 +172,7 @@ try {
 
   // In-page helpers: camera moves, frame timing and annotation state.
   await page.evaluate(() => {
-    const { viewer } = window.__godsEyeView;
+    const { viewer } = window.__cameraEye;
     const Cesium = window.__CESIUM__;
     window.__qaOutlines = {
       fly(view, duration) {
@@ -213,7 +213,7 @@ try {
       annotationSource() {
         for (let i = 0; i < viewer.dataSources.length; i++) {
           const source = viewer.dataSources.get(i);
-          if (source.name === 'gev-annotations') return source;
+          if (source.name === 'ce-annotations') return source;
         }
         return null;
       },
@@ -267,7 +267,7 @@ try {
     page
       .waitForFunction(
         () => {
-          const { scene } = window.__godsEyeView.viewer;
+          const { scene } = window.__cameraEye.viewer;
           for (let i = 0; i < scene.primitives.length; i++) {
             const p = scene.primitives.get(i);
             if (p?.show && typeof p.tilesLoaded === 'boolean' && !p.tilesLoaded)
@@ -308,14 +308,14 @@ try {
     const timing = await page.evaluate(
       async (target, flyTo) => {
         const started = performance.now();
-        const response = await window.__godsEyeView.annotations.annotate(
+        const response = await window.__cameraEye.annotations.annotate(
           [{ type: 'area', target, label: target, footprint: true }],
           { flyTo },
         );
         const resolvedMs = performance.now() - started;
         // "Drawn" = the first rendered frame after the entity visualizers have
         // built the mark's primitives (each tick updates them before render).
-        const { viewer } = window.__godsEyeView;
+        const { viewer } = window.__cameraEye;
         await new Promise((resolve) => {
           const off = viewer.scene.postRender.addEventListener(() => {
             if (!viewer.dataSourceDisplay.ready) return;
@@ -324,7 +324,7 @@ try {
           });
         });
         const drawnMs = performance.now() - started;
-        const mark = window.__godsEyeView.annotations
+        const mark = window.__cameraEye.annotations
           .list()
           .find((m) => m.id === response.ids?.[0]);
         return {
@@ -395,7 +395,7 @@ try {
   }
 
   // Start from a clean board and the default layers, as a user would.
-  await page.evaluate(() => window.__godsEyeView.annotations.clear?.());
+  await page.evaluate(() => window.__cameraEye.annotations.clear?.());
   await page.evaluate(() =>
     window.__qaOutlines.fly(
       { lat: 25.5, lon: -99.6, height: 2_600_000, pitch: -80 },
@@ -448,7 +448,7 @@ try {
   // Close over the shared Travis/Williamson line near Pflugerville: the
   // outline must lie on the photoreal mesh, not float above or sink into it.
   const border = await page.evaluate(() => {
-    const travis = window.__godsEyeView.annotations
+    const travis = window.__cameraEye.annotations
       .list()
       .find((m) => m.label === 'Travis County, Texas');
     let best = null;
@@ -508,7 +508,7 @@ try {
     ['georgia-country', 'Georgia', 42, 43.6, 700000],
     ['georgia-qualified', 'the country of Georgia', 42, 43.6, 700000],
   ]) {
-    await page.evaluate(() => window.__godsEyeView.annotations.clear());
+    await page.evaluate(() => window.__cameraEye.annotations.clear());
     await move(name, { lat, lon, height, pitch: -90 }, 1);
     await outline(name, target);
     await shot(name);

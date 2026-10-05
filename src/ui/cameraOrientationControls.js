@@ -6,7 +6,7 @@ function trackedTarget(viewer) {
   // Read the visual's sample first; sampling a flight CallbackProperty twice
   // can advance dead reckoning ahead of the displayed aircraft.
   return (
-    entity?.gevDisplayPosition?.() ||
+    entity?.ceDisplayPosition?.() ||
     entity?.position?.getValue(viewer.clock?.currentTime)
   );
 }

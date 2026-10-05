@@ -139,7 +139,7 @@ export function createRendering({
     const meta = flightState.records.data.get(icao24);
     bb.image = aircraftIcon(
       _iconKind(icao24, meta?.klass),
-      bb._gevIconLarge ? TRACKED_ICON_PX : undefined,
+      bb._ceIconLarge ? TRACKED_ICON_PX : undefined,
     );
     bb.width = icao24 === flightState._trackedIcao ? 24 : 20;
     bb.height = icao24 === flightState._trackedIcao ? 24 : 20;
@@ -406,7 +406,7 @@ export function createRendering({
     const key = _specKeyFor(flightState.records.data.get(icao24)?.klass);
     const current = flightState._models.get(icao24);
     if (
-      (current && current._gevSpecKey !== key) ||
+      (current && current._ceSpecKey !== key) ||
       (!current && flightState._modelPending.has(icao24))
     ) {
       const bb = flightState._billboards.get(icao24);
@@ -416,7 +416,7 @@ export function createRendering({
     if (
       icao24 === flightState._trackedIcao &&
       flightState._trackedModel &&
-      flightState._trackedModel._gevSpecKey !== key
+      flightState._trackedModel._ceSpecKey !== key
     ) {
       _releaseTrackedModel();
     }
@@ -439,7 +439,7 @@ export function createRendering({
     const batch = flightState._irReloadQueue.splice(0, IR_RELOAD_BATCH);
     for (const icao of batch) {
       const model = flightState._models.get(icao);
-      if (!model || model._gevIrBoost === flightState._irBoost) continue; // already right state
+      if (!model || model._ceIrBoost === flightState._irBoost) continue; // already right state
       const bb = flightState._billboards.get(icao);
       if (bb && icao !== flightState._trackedIcao) bb.show = true;
       _releaseModel(icao);
@@ -544,8 +544,8 @@ export function createRendering({
     // Keep the pick identity explicit on the resolved primitive. This also
     // protects injected/custom loaders that do not copy the creation option.
     model.id = icao24;
-    model._gevSpecKey = specKey; // class-change sync compares against this
-    model._gevIrBoost = loadIrBoost; // boost-flip reload queue compares against this
+    model._ceSpecKey = specKey; // class-change sync compares against this
+    model._ceIrBoost = loadIrBoost; // boost-flip reload queue compares against this
     // Admitted, not yet the visual. Cesium's default is show=true, which would let
     // an unplaced primitive claim ownership from the billboard for the frames
     // between admission and the next fleet tick (and draw at the identity matrix,
@@ -736,7 +736,7 @@ export function createRendering({
           // Assign after resolution as well as in the creation options so the
           // standalone primitive always exposes the tracked aircraft pick id.
           m.id = flightState._trackedIcao;
-          m._gevSpecKey = trackedKey; // class-change sync compares against this
+          m._ceSpecKey = trackedKey; // class-change sync compares against this
           m.show = false; // admitted, not yet the visual — the driver shows it once placed
           // Seed the world transform before the primitive enters the scene. A model
           // can become ready+shown between render phases; leaving Cesium's identity
@@ -1039,9 +1039,9 @@ export function createRendering({
           (bb.scale || 1) *
           distanceScale *
           (globalThis.devicePixelRatio || 1);
-        const wantLarge = bb._gevIconLarge ? glyphDevPx > 56 : glyphDevPx > 76;
-        if (wantLarge !== !!bb._gevIconLarge) {
-          bb._gevIconLarge = wantLarge;
+        const wantLarge = bb._ceIconLarge ? glyphDevPx > 56 : glyphDevPx > 76;
+        if (wantLarge !== !!bb._ceIconLarge) {
+          bb._ceIconLarge = wantLarge;
           bb.image = aircraftIcon(
             _iconKind(icao24, info?.klass),
             wantLarge ? TRACKED_ICON_PX : undefined,

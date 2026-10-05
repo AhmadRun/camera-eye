@@ -56,14 +56,14 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 860 });
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !!window.__godsEyeView?.viewer, { timeout: 90_000 });
+  await page.waitForFunction(() => !!window.__cameraEye?.viewer, { timeout: 90_000 });
   await new Promise((r) => setTimeout(r, 12_000)); // boot flyTo + deferred init
 
   // Park mid-Atlantic (many cables + both coasts' landings in range) and
   // disable every layer so the cables layer is measured in isolation.
   await page.evaluate(async () => {
-    const gev = window.__godsEyeView;
-    const v = gev.viewer;
+    const ce = window.__cameraEye;
+    const v = ce.viewer;
     v.camera.cancelFlight();
     const ell = v.scene.globe.ellipsoid;
     v.camera.setView({
@@ -72,8 +72,8 @@ try {
       }),
       orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
     });
-    for (const [id, entry] of gev.dataManager.layers) {
-      if (entry.enabled) { try { await gev.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* measured via counts */ } }
+    for (const [id, entry] of ce.dataManager.layers) {
+      if (entry.enabled) { try { await ce.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* measured via counts */ } }
     }
   });
   await new Promise((r) => setTimeout(r, 6_000)); // tiles + fades settle
@@ -81,21 +81,21 @@ try {
   // ── b. toggle-ON → labels visible ─────────────────────────────────────
   if (!control) {
     const labelLatency = await page.evaluate(async (layerId, isLegacy) => {
-      const gev = window.__godsEyeView;
+      const ce = window.__cameraEye;
       const t0 = performance.now();
-      await gev.dataManager.setEnabled(layerId, true, { origin: 'user' });
+      await ce.dataManager.setEnabled(layerId, true, { origin: 'user' });
       const deadline = t0 + 60_000;
       const labelsUp = () => {
         if (isLegacy) {
-          const stats = gev.dataManager.layers.get(layerId)?.module?.getStats?.() || {};
+          const stats = ce.dataManager.layers.get(layerId)?.module?.getStats?.() || {};
           return (stats.referenceLabelCount || 0) > 0;
         }
-        const diag = window.__gevWorldOverlay?.getDiagnostics?.() || {};
+        const diag = window.__ceWorldOverlay?.getDiagnostics?.() || {};
         return (diag.paintedBySource?.[layerId] || 0) > 0;
       };
       while (performance.now() < deadline) {
         if (labelsUp()) return { ms: Math.round(performance.now() - t0), timedOut: false };
-        gev.viewer.scene.requestRender?.();
+        ce.viewer.scene.requestRender?.();
         await new Promise((r) => setTimeout(r, 100));
       }
       return { ms: 60_000, timedOut: true };
@@ -107,8 +107,8 @@ try {
 
   // ── c. entity / label / host counts ───────────────────────────────────
   const counts = await page.evaluate((layerId) => {
-    const gev = window.__godsEyeView;
-    const v = gev.viewer;
+    const ce = window.__cameraEye;
+    const v = ce.viewer;
     const out = {
       dataSources: {}, nativeLabels: 0, dynamicPositionEntities: 0,
       referenceEntities: 0, hostEntries: 0, hostPainted: 0,
@@ -127,10 +127,10 @@ try {
       }
       if (/References/.test(ds.name)) out.referenceEntities = list.length;
     }
-    const diag = window.__gevWorldOverlay?.getDiagnostics?.() || {};
+    const diag = window.__ceWorldOverlay?.getDiagnostics?.() || {};
     out.hostEntries = diag.entriesBySource?.[layerId] || 0;
     out.hostPainted = diag.paintedBySource?.[layerId] || 0;
-    const stats = gev.dataManager.layers.get(layerId)?.module?.getStats?.() || {};
+    const stats = ce.dataManager.layers.get(layerId)?.module?.getStats?.() || {};
     out.referenceLabelCount = stats.referenceLabelCount ?? null;
     return out;
   }, LAYER_ID);
@@ -138,7 +138,7 @@ try {
 
   // ── a. per-frame scene.render cost over a ~10 s driven orbit ─────────
   const frameCost = await page.evaluate(() => new Promise((resolve) => {
-    const v = window.__godsEyeView.viewer;
+    const v = window.__cameraEye.viewer;
     const scene = v.scene;
     const durations = [];
     const originalRender = scene.render;
@@ -178,7 +178,7 @@ try {
   // ── d. parked idle honesty (labels must not force continuous render) ──
   await new Promise((r) => setTimeout(r, 4_000)); // orbit stop + fades settle
   const idle = await page.evaluate(() => new Promise((resolve) => {
-    const scene = window.__godsEyeView.viewer.scene;
+    const scene = window.__cameraEye.viewer.scene;
     let renders = 0;
     const remove = scene.postRender.addEventListener(() => { renders += 1; });
     setTimeout(() => { remove(); resolve({ renders }); }, 5_000);
@@ -206,21 +206,21 @@ try {
 
     // OFF must clear the host source (no orphan labels), ON must restore.
     const cycle = await page.evaluate(async (layerId) => {
-      const gev = window.__godsEyeView;
-      await gev.dataManager.setEnabled(layerId, false, { origin: 'user' });
-      gev.viewer.scene.requestRender?.();
+      const ce = window.__cameraEye;
+      await ce.dataManager.setEnabled(layerId, false, { origin: 'user' });
+      ce.viewer.scene.requestRender?.();
       await new Promise((r) => setTimeout(r, 1_200));
-      const offDiag = window.__gevWorldOverlay?.getDiagnostics?.() || {};
+      const offDiag = window.__ceWorldOverlay?.getDiagnostics?.() || {};
       const offEntries = offDiag.entriesBySource?.[layerId] || 0;
       const offPainted = offDiag.paintedBySource?.[layerId] || 0;
-      await gev.dataManager.setEnabled(layerId, true, { origin: 'user' });
+      await ce.dataManager.setEnabled(layerId, true, { origin: 'user' });
       const t0 = performance.now();
       let onPainted = 0;
       while (performance.now() - t0 < 20_000) {
-        const diag = window.__gevWorldOverlay?.getDiagnostics?.() || {};
+        const diag = window.__ceWorldOverlay?.getDiagnostics?.() || {};
         onPainted = diag.paintedBySource?.[layerId] || 0;
         if (onPainted > 0) break;
-        gev.viewer.scene.requestRender?.();
+        ce.viewer.scene.requestRender?.();
         await new Promise((r) => setTimeout(r, 100));
       }
       return { offEntries, offPainted, onPainted };

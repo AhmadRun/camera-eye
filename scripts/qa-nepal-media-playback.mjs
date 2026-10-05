@@ -86,12 +86,12 @@ try {
     );
     await page.waitForFunction(
       () =>
-        window.__godsEyeView?.sceneDirector &&
+        window.__cameraEye?.sceneDirector &&
         document.querySelector('#loading-screen')?.classList.contains('hidden'),
       { timeout: 60000 },
     );
     const result = await page.evaluate(async (pinokio) => {
-      const d = window.__godsEyeView.sceneDirector;
+      const d = window.__cameraEye.sceneDirector;
       const scene = d._project.scenes.find((s) => /Nepal/.test(s.title));
       const shot = scene.shots.find((s) => /Mailung Bazzar/.test(s.title));
       const following = scene.shots[scene.shots.indexOf(shot) + 1];

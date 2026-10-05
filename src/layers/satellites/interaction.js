@@ -36,7 +36,7 @@ export function createInteraction({
           ) {
             parts.tracking._clearTracking(true, {
               origin:
-                layerState._viewer.trackedEntity?.gevSelectionOrigin ||
+                layerState._viewer.trackedEntity?.ceSelectionOrigin ||
                 'programmatic',
             });
           }

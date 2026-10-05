@@ -25,12 +25,12 @@ try {
   );
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.sceneDirector &&
+      window.__cameraEye?.sceneDirector &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 60000 },
   );
   const result = await page.evaluate(async () => {
-    const director = window.__godsEyeView.sceneDirector;
+    const director = window.__cameraEye.sceneDirector;
     const camera = director.styleManager.getCameraState();
     const visual = director.styleManager.getVisualState();
     const scene = {
@@ -89,7 +89,7 @@ try {
   });
   for (const [name, passed] of Object.entries(result)) check(name, passed);
   const content = await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const scene = d._project.scenes.find(({ title }) =>
       /Nepal Flood Incident/i.test(title),
     );
@@ -111,7 +111,7 @@ try {
   await new Promise((resolve) => setTimeout(resolve, 2500));
   await page.screenshot({ path: path.join(shots, 'nepal-regional.png') });
   await page.evaluate(() => {
-    const g = window.__godsEyeView;
+    const g = window.__cameraEye;
     g.sceneDirector.stopScene();
     const pose = g.styleManager.getCameraState();
     g.sceneDirector._setCameraView({
@@ -126,7 +126,7 @@ try {
     'no pending clocks after Stop',
     await page.evaluate(
       () =>
-        window.__godsEyeView.sceneDirector.getPlaybackTimingState()
+        window.__cameraEye.sceneDirector.getPlaybackTimingState()
           .activeTimers === 0,
     ),
   );

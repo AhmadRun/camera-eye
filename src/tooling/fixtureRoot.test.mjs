@@ -19,7 +19,7 @@ symlinkTest(
     // Linux runner while every Mac contributor still saw the failure it exists
     // to prevent.
     const scratch = await realpath(
-      await mkdtemp(path.join(tmpdir(), 'gev-fixture-root-')),
+      await mkdtemp(path.join(tmpdir(), 'ce-fixture-root-')),
     );
     t.after(() => rm(scratch, { recursive: true, force: true }));
     const physical = path.join(scratch, 'physical');
@@ -41,7 +41,7 @@ symlinkTest(
       'the symlinked temp root was not in force, so nothing was exercised',
     );
 
-    const root = await makeFixtureRoot('gev-fixture-case-');
+    const root = await makeFixtureRoot('ce-fixture-case-');
     assert.equal(
       root,
       await realpath(root),

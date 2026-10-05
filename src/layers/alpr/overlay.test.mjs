@@ -143,7 +143,7 @@ test('the overlay bounds its cohort and promotes selection while leaving farther
   h.state.selectedId = 'camera:69';
   h.overlay.sync(h.records);
   h.paint();
-  const hidden = h.entities.values.filter((e) => e.gevAlprNativeAppearance);
+  const hidden = h.entities.values.filter((e) => e.ceAlprNativeAppearance);
   assert.equal(hidden.length, 64);
   assert.ok(hidden.some((e) => e.id === 'camera:69'));
   assert.equal(
@@ -160,16 +160,16 @@ test('surface changes invalidate cached anchors, and disable/disposal release pa
   h.overlay.sync(h.records);
   h.paint();
   const entity = h.entities.getById('camera:0');
-  const first = entity.gevAlprCanvasPosition;
+  const first = entity.ceAlprCanvasPosition;
   h.paint();
   assert.equal(
-    entity.gevAlprCanvasPosition,
+    entity.ceAlprCanvasPosition,
     first,
     'stable anchor across frames',
   );
   h.state.viewer.scene.globe.show = false;
   h.mapChanged();
-  assert.equal(entity.gevAlprCanvasPosition, null);
+  assert.equal(entity.ceAlprCanvasPosition, null);
   h.state.enabled = false;
   h.overlay.clear();
   assert.equal(h.active, false);
@@ -242,7 +242,7 @@ test('a still view replaces floor anchors with the rendered surface, within the 
   h.paint();
   const height = (id) =>
     Cesium.Cartographic.fromCartesian(
-      h.entities.getById(id).gevAlprCanvasPosition,
+      h.entities.getById(id).ceAlprCanvasPosition,
     ).height;
   assert.equal(
     samples,

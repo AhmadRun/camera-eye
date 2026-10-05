@@ -21,7 +21,7 @@ import { hardenCredentialFile } from './key-setup-hardening.mjs';
  * reflect the real launcher (scripts/pinokio-start.mjs sets it) and never a
  * value a project `.env` could inject.
  */
-const LAUNCHER_AT_BOOT = process.env.GEV_LAUNCHER;
+const LAUNCHER_AT_BOOT = process.env.CE_LAUNCHER;
 
 /**
  * Provider values present before Vite loads the checkout's dotenv files.
@@ -30,7 +30,7 @@ const LAUNCHER_AT_BOOT = process.env.GEV_LAUNCHER;
  * Recomputing the snapshot there would classify the panel's own keys as
  * external (read-only) until the whole process is relaunched.
  */
-const PROVIDER_ENV_AT_BOOT = (globalThis.__GEV_PROVIDER_ENV_AT_BOOT ??=
+const PROVIDER_ENV_AT_BOOT = (globalThis.__CE_PROVIDER_ENV_AT_BOOT ??=
   Object.freeze(
     Object.fromEntries(
       [...knownKeySetupEnvVars()].map((name) => [
@@ -47,7 +47,7 @@ const PROVIDER_ENV_AT_BOOT = (globalThis.__GEV_PROVIDER_ENV_AT_BOOT ??=
  * Pinokio deliberately treats its app-scoped ENVIRONMENT as authoritative.
  */
 const DEV_FRESH_EXTERNAL_KEYS_AT_BOOT = new Set(
-  String(process.env.GEV_KEY_SETUP_EXTERNAL_KEYS ?? '')
+  String(process.env.CE_KEY_SETUP_EXTERNAL_KEYS ?? '')
     .split(',')
     .map((name) => name.trim())
     .filter((name) => knownKeySetupEnvVars().has(name)),
@@ -89,7 +89,7 @@ function keySetupEndpoint({ sourceRoot = defaultSourceRoot } = {}) {
   // touches a store some other workflow owns.
   // The launcher marker is read from the BOOT environment captured before
   // Vite's loadEnv merges dotenv files into process.env — otherwise a stray
-  // `GEV_LAUNCHER=pinokio` line in someone's .env would silently redirect a
+  // `CE_LAUNCHER=pinokio` line in someone's .env would silently redirect a
   // plain `npm run dev` to write the Pinokio store it never loaded.
   const pinokioManaged = () => LAUNCHER_AT_BOOT === 'pinokio';
   const storeName = () =>
@@ -118,7 +118,7 @@ function keySetupEndpoint({ sourceRoot = defaultSourceRoot } = {}) {
       const unreadable = new Error(
         'the existing configuration could not be read, so nothing was changed',
       );
-      unreadable.code = 'GEV_STORE_UNREADABLE';
+      unreadable.code = 'CE_STORE_UNREADABLE';
       throw unreadable;
     }
   };
@@ -211,7 +211,7 @@ function keySetupEndpoint({ sourceRoot = defaultSourceRoot } = {}) {
         const error = new Error(
           'could not restrict the credential file to your account; nothing was saved',
         );
-        error.code = 'GEV_HARDEN_FAILED';
+        error.code = 'CE_HARDEN_FAILED';
         throw error;
       }
       // writeSync may write fewer bytes than asked; loop until the whole
@@ -236,7 +236,7 @@ function keySetupEndpoint({ sourceRoot = defaultSourceRoot } = {}) {
     }
   };
   return {
-    name: 'gev-key-setup',
+    name: 'ce-key-setup',
     // serve AND not preview: `vite preview` resolves with command 'serve' too,
     // so a bare apply:'serve' would still configure under preview. The endpoints
     // only install via configureServer (never configurePreviewServer), so they
@@ -300,8 +300,8 @@ function keySetupEndpoint({ sourceRoot = defaultSourceRoot } = {}) {
             // error. Everything else returns a fixed message (a raw filesystem
             // error can carry an absolute path; that stays in the server log).
             if (
-              error?.code === 'GEV_HARDEN_FAILED' ||
-              error?.code === 'GEV_STORE_UNREADABLE'
+              error?.code === 'CE_HARDEN_FAILED' ||
+              error?.code === 'CE_STORE_UNREADABLE'
             ) {
               return respond(res, 500, {
                 error: `The key was not saved: ${error.message}`,

@@ -107,8 +107,8 @@ try {
   await page.goto(`${origin}/?welcome=0`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.styleManager?._cctvControls &&
-      window.__godsEyeView?.dataManager?.layers?.has('cctv') &&
+      window.__cameraEye?.styleManager?._cctvControls &&
+      window.__cameraEye?.dataManager?.layers?.has('cctv') &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 60000 },
   );
@@ -118,7 +118,7 @@ try {
   await page.click('#cctv-enable-btn');
   await page.waitForFunction(
     () =>
-      window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState()
+      window.__cameraEye.dataManager.layers.get('cctv').module.getUIState()
         .cameras.length === 2 &&
       !document.getElementById('cctv-camera-select').disabled,
     { timeout: 30000 },
@@ -141,12 +141,12 @@ try {
   );
   const state = () =>
     page.evaluate(() =>
-      window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState(),
+      window.__cameraEye.dataManager.layers.get('cctv').module.getUIState(),
     );
   check(
     'selected camera, decoded preview and source label agree',
     await page.evaluate(() => {
-      const camera = window.__godsEyeView.dataManager.layers
+      const camera = window.__cameraEye.dataManager.layers
         .get('cctv')
         .module.getUIState().activeCamera;
       return (
@@ -179,13 +179,13 @@ try {
   await page.click('#cctv-next-btn');
   await page.waitForFunction(
     () =>
-      window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState()
+      window.__cameraEye.dataManager.layers.get('cctv').module.getUIState()
         .activeCameraId === 'qa-camera-b',
   );
   await page.click('#cctv-prev-btn');
   await page.waitForFunction(
     () =>
-      window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState()
+      window.__cameraEye.dataManager.layers.get('cctv').module.getUIState()
         .activeCameraId === 'qa-camera-a',
   );
   check(
@@ -209,7 +209,7 @@ try {
   await page.select('#cctv-camera-select', 'qa-camera-a');
   await page.waitForFunction(
     () =>
-      window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState()
+      window.__cameraEye.dataManager.layers.get('cctv').module.getUIState()
         .activeCameraId === 'qa-camera-a',
   );
   const heading = (await state()).activeCamera.headingDeg;
@@ -231,7 +231,7 @@ try {
     await page.evaluate(() =>
       Boolean(
         JSON.parse(
-          localStorage.getItem('godsEyeView.cctv.calibration.v2') || '{}',
+          localStorage.getItem('cameraEye.cctv.calibration.v2') || '{}',
         )['qa-camera-a'],
       ),
     ),
@@ -260,7 +260,7 @@ try {
   await page.evaluate(() => {
     const input = document.querySelector('.cctv-cal-input');
     input.value = '110';
-    window.__godsEyeView.dataManager.layers
+    window.__cameraEye.dataManager.layers
       .get('cctv')
       .module.selectCamera('qa-camera-b');
     input.dispatchEvent(new Event('blur'));
@@ -290,7 +290,7 @@ try {
   );
   await page.evaluate(() => {
     const image =
-      window.__godsEyeView.styleManager._cctvControls._cctvFramePreloader;
+      window.__cameraEye.styleManager._cctvControls._cctvFramePreloader;
     window.__qaLateCctvImage = image;
     window.__qaLateCctvImageLoaded = false;
     image.addEventListener(
@@ -333,7 +333,7 @@ try {
   delayCameraA = false;
   await page.click('#cctv-enable-btn');
   await page.waitForFunction(
-    () => !window.__godsEyeView.dataManager.isEnabled('cctv'),
+    () => !window.__cameraEye.dataManager.isEnabled('cctv'),
   );
   const disabledCleanly = await page.$eval(
     '#cctv-frame',
@@ -342,7 +342,7 @@ try {
   await page.click('#cctv-enable-btn');
   await page.waitForFunction(
     () =>
-      window.__godsEyeView.dataManager.isEnabled('cctv') &&
+      window.__cameraEye.dataManager.isEnabled('cctv') &&
       document
         .getElementById('cctv-frame-wrap')
         .classList.contains('has-frame'),
@@ -357,7 +357,7 @@ try {
   fs.mkdirSync('qa-shots/camera-controls', { recursive: true });
   await page.screenshot({ path: 'qa-shots/camera-controls/desktop.png' });
   await page.evaluate(() => {
-    const camera = window.__godsEyeView.viewer.camera;
+    const camera = window.__cameraEye.viewer.camera;
     camera.setView({
       orientation: {
         heading: camera.heading + Math.PI / 3,
@@ -381,7 +381,7 @@ try {
   check(
     'rebuilding Radio preserves the active camera controller and subscription',
     await page.evaluate(() => {
-      const ui = window.__godsEyeView.styleManager;
+      const ui = window.__cameraEye.styleManager;
       const camera = ui._cctvControls;
       const cameraId = camera.getState()?.activeCameraId;
       ui._initRadioPanel();
@@ -394,11 +394,11 @@ try {
       );
     }),
   );
-  await page.evaluate(() => window.__godsEyeView.styleManager.dispose());
+  await page.evaluate(() => window.__cameraEye.styleManager.dispose());
   check(
     'CCTV controller is destroyed with the real UI',
     await page.evaluate(
-      () => window.__godsEyeView.styleManager._cctvControls.destroyed,
+      () => window.__cameraEye.styleManager._cctvControls.destroyed,
     ),
   );
   check(

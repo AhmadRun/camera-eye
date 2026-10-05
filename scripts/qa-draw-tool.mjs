@@ -112,19 +112,19 @@ async function clickWorld(x, y, options = {}) {
 
 const drawState = () =>
   page.evaluate(() => {
-    const tool = window.__gevDrawTool;
+    const tool = window.__ceDrawTool;
     return {
       ...tool.diagnostics(),
       shape: tool.shape,
       vertices: tool.session?.vertices?.length ?? null,
       hint: document.getElementById('draw-hint')?.textContent || '',
-      marks: window.__gevAnnotations.count(),
+      marks: window.__ceAnnotations.count(),
     };
   });
 
 const marks = () =>
   page.evaluate(() =>
-    window.__gevAnnotations.list().map((mark) => ({
+    window.__ceAnnotations.list().map((mark) => ({
       type: mark.type,
       label: mark.label,
       color: mark.color,
@@ -136,7 +136,7 @@ const marks = () =>
 async function waitForMarks(expected, timeout = 15_000) {
   try {
     await page.waitForFunction(
-      (want) => window.__gevAnnotations.count() === want,
+      (want) => window.__ceAnnotations.count() === want,
       { timeout },
       expected,
     );
@@ -151,13 +151,13 @@ try {
   await page.goto(`${BASE_URL}/?welcome=0`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
     () =>
-      window.__gevDrawTool &&
-      window.__gevAnnotations &&
+      window.__ceDrawTool &&
+      window.__ceAnnotations &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 90_000 },
   );
   await page.evaluate((view) => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     viewer.camera.cancelFlight?.();
     viewer.scene.tweens?.removeAll?.();
     viewer.camera.setView({
@@ -177,7 +177,7 @@ try {
   const settled = await page
     .waitForFunction(
       () => {
-        const primitives = window.__godsEyeView.viewer.scene.primitives;
+        const primitives = window.__cameraEye.viewer.scene.primitives;
         for (let index = 0; index < primitives.length; index++) {
           const primitive = primitives.get(index);
           if (
@@ -224,7 +224,7 @@ try {
   // must be absent while drawing and back — as the SAME functions — after.
   await page.evaluate(() => {
     const Cesium = window.__CESIUM__;
-    const stock = window.__godsEyeView.viewer.screenSpaceEventHandler;
+    const stock = window.__cameraEye.viewer.screenSpaceEventHandler;
     window.__qaStock = {
       click:
         stock.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK) || null,
@@ -236,7 +236,7 @@ try {
   const stockActions = () =>
     page.evaluate(() => {
       const Cesium = window.__CESIUM__;
-      const stock = window.__godsEyeView.viewer.screenSpaceEventHandler;
+      const stock = window.__cameraEye.viewer.screenSpaceEventHandler;
       const live = {
         click:
           stock.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK) || null,
@@ -365,7 +365,7 @@ try {
   const areaLanded = await waitForMarks(3);
   await wait(900);
   const afterDoubleClick = await page.evaluate(() =>
-    window.__gevAnnotations.count(),
+    window.__ceAnnotations.count(),
   );
   check('an area finished by double-click lands on the board', areaLanded);
   check(
@@ -392,7 +392,7 @@ try {
   await shot('03-pins-and-shapes');
 
   // ── Escape cancels the shape, a second Escape leaves draw mode ──────────
-  await page.evaluate(() => window.__gevDrawTool.cancel());
+  await page.evaluate(() => window.__ceDrawTool.cancel());
   await clickWorld(500, 300);
   await clickWorld(560, 340);
   check('a new shape is in progress', (await drawState()).vertices === 2);
@@ -432,21 +432,21 @@ try {
   if (target) {
     await clickWorld(target.x, target.y, { settle: 900 });
     const selectedNormally = await page.evaluate(() =>
-      Boolean(window.__godsEyeView.viewer.selectedEntity),
+      Boolean(window.__cameraEye.viewer.selectedEntity),
     );
     check(
       `clicking a ${target.layer} selects it when nothing owns the pointer`,
       selectedNormally,
     );
     await page.evaluate(() => {
-      window.__godsEyeView.viewer.selectedEntity = undefined;
+      window.__cameraEye.viewer.selectedEntity = undefined;
     });
     await page.click('#draw-toggle');
     await page.click('.pp-mode-btn[data-shape="area"]');
     await clickWorld(target.x, target.y, { settle: 900 });
     const whileDrawing = await drawState();
     const selectedWhileDrawing = await page.evaluate(() =>
-      Boolean(window.__godsEyeView.viewer.selectedEntity),
+      Boolean(window.__cameraEye.viewer.selectedEntity),
     );
     check(
       `clicking the same ${target.layer} while drawing adds a vertex and selects nothing`,
@@ -460,18 +460,16 @@ try {
 
   // ── what a reload actually does ─────────────────────────────────────────
   const beforeReload = await page.evaluate(() =>
-    window.__gevAnnotations.count(),
+    window.__ceAnnotations.count(),
   );
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
     () =>
-      window.__gevAnnotations &&
+      window.__ceAnnotations &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 90_000 },
   );
-  const afterReload = await page.evaluate(() =>
-    window.__gevAnnotations.count(),
-  );
+  const afterReload = await page.evaluate(() => window.__ceAnnotations.count());
   check(
     'a reload starts an empty board — marks live for the session, not across reloads',
     beforeReload > 0 && afterReload === 0,
@@ -495,7 +493,7 @@ try {
   // actions so the identity comparisons below still mean something.
   await page.evaluate(() => {
     const Cesium = window.__CESIUM__;
-    const stock = window.__godsEyeView.viewer.screenSpaceEventHandler;
+    const stock = window.__cameraEye.viewer.screenSpaceEventHandler;
     window.__qaStock = {
       click:
         stock.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK) || null,
@@ -505,7 +503,7 @@ try {
     };
   });
   await page.evaluate((view) => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     viewer.camera.cancelFlight?.();
     viewer.camera.setView({
       destination: viewer.scene.globe.ellipsoid.cartographicToCartesian({
@@ -569,7 +567,7 @@ try {
 
   // ── a shape that describes nothing is refused, not placed ───────────────
   const degenerateVertices = await page.evaluate(() => {
-    const tool = window.__gevDrawTool;
+    const tool = window.__ceDrawTool;
     tool.cancel();
     // Three points on one line, placed through the same addVertex the clicks use.
     tool.addVertex(-122.42, 37.77);
@@ -593,7 +591,7 @@ try {
 
   // ── a shape drawn across the antimeridian lands where it was drawn ──────
   await page.evaluate(() => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     viewer.camera.cancelFlight?.();
     viewer.camera.setView({
       destination: viewer.scene.globe.ellipsoid.cartographicToCartesian({
@@ -607,7 +605,7 @@ try {
   });
   await wait(2500);
   await page.evaluate(() => {
-    const tool = window.__gevDrawTool;
+    const tool = window.__ceDrawTool;
     tool.cancel();
     tool.setShape('area');
     // A ~200 m square straddling 180.
@@ -619,7 +617,7 @@ try {
   await pressFinish();
   const datelineLanded = await waitForMarks(1);
   const datelineAnchor = await page.evaluate(() => {
-    const mark = window.__gevAnnotations.list()[0];
+    const mark = window.__ceAnnotations.list()[0];
     return mark ? { lon: mark.anchor?.lon, lat: mark.anchor?.lat } : null;
   });
   check(
@@ -630,7 +628,7 @@ try {
       Math.abs(datelineAnchor.lat) < 0.1,
     JSON.stringify(datelineAnchor),
   );
-  await page.evaluate(() => window.__gevAnnotations.clear());
+  await page.evaluate(() => window.__ceAnnotations.clear());
 
   await page.click('#draw-toggle');
   await wait(200);
@@ -645,34 +643,34 @@ try {
   );
   // ── destroy(): the shell disposing the tool leaves nothing behind ───────
   const beforeDestroy = await page.evaluate(
-    () => window.__godsEyeView.viewer.dataSources.length,
+    () => window.__cameraEye.viewer.dataSources.length,
   );
   await page.click('#draw-toggle'); // destroy from an ACTIVE session: the harder case
   await wait(200);
   const destroyed = await page.evaluate(async () => {
-    const tool = window.__gevDrawTool;
+    const tool = window.__ceDrawTool;
     const wasActive = tool.active;
     await tool.destroy();
     await new Promise((resolve) => setTimeout(resolve, 50));
     const Cesium = window.__CESIUM__;
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     const stock = viewer.screenSpaceEventHandler;
     let previews = 0;
     for (let i = 0; i < viewer.dataSources.length; i += 1)
-      if (viewer.dataSources.get(i)?.name === 'gev-draw-preview') previews += 1;
+      if (viewer.dataSources.get(i)?.name === 'ce-draw-preview') previews += 1;
     return {
       wasActive,
       diagnostics: tool.diagnostics(),
       previews,
       dataSources: viewer.dataSources.length,
-      handleGone: window.__gevDrawTool === undefined,
+      handleGone: window.__ceDrawTool === undefined,
       clickRestored:
         stock.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK) ===
         window.__qaStock.click,
       doubleRestored:
         stock.getInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK) ===
         window.__qaStock.double,
-      drawingClass: document.body.classList.contains('gev-drawing'),
+      drawingClass: document.body.classList.contains('ce-drawing'),
     };
   });
   check(
@@ -719,7 +717,7 @@ async function findClickableTarget() {
   // tracking click gesture that flights and military use too.
   const camera = await page
     .evaluate(async () => {
-      const manager = window.__godsEyeView.dataManager;
+      const manager = window.__cameraEye.dataManager;
       await manager.setEnabled('cctv', true, { origin: 'user' });
       const module = manager.layers.get('cctv')?.module;
       if (!module?.getUIState) return null;
@@ -744,7 +742,7 @@ async function findClickableTarget() {
 
   if (camera) {
     await page.evaluate((spot) => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       viewer.camera.cancelFlight?.();
       viewer.camera.setView({
         destination: viewer.scene.globe.ellipsoid.cartographicToCartesian({
@@ -767,8 +765,8 @@ async function findClickableTarget() {
   // the same shared claim, and always present without a key.
   const site = await page
     .evaluate(async () => {
-      const viewer = window.__godsEyeView.viewer;
-      await window.__godsEyeView.dataManager.setEnabled(
+      const viewer = window.__cameraEye.viewer;
+      await window.__cameraEye.dataManager.setEnabled(
         'local-datacenters',
         true,
         {
@@ -807,7 +805,7 @@ async function findClickableTarget() {
     .catch(() => null);
   if (!site) return null;
   await page.evaluate((spot) => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     viewer.camera.cancelFlight?.();
     viewer.camera.setView({
       destination: viewer.scene.globe.ellipsoid.cartographicToCartesian({
@@ -837,12 +835,12 @@ async function onScreen(belongs, timeout = 20_000) {
       (belongsSource) => {
         // eslint-disable-next-line no-new-func
         const belongsTo = new Function(`return (${belongsSource})`)();
-        const viewer = window.__godsEyeView.viewer;
+        const viewer = window.__cameraEye.viewer;
         const scene = viewer.scene;
         const collections = [viewer.entities];
         for (let i = 0; i < viewer.dataSources.length; i += 1) {
           const source = viewer.dataSources.get(i);
-          if (source?.name === 'gev-draw-preview') continue;
+          if (source?.name === 'ce-draw-preview') continue;
           collections.push(source.entities);
         }
         for (const source of collections) {

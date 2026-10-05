@@ -6,11 +6,11 @@ import {
   rocketLaunchesProxy,
   launchLibraryRequestHeaders,
   LL2_CACHE_TTL_MS,
-} from 'gods-eye-view/server/providers/space';
+} from 'camera-eye/server/providers/space';
 import {
   celestrakTleUrl,
   launchLibraryRecentUrl,
-} from 'gods-eye-view/sources/space';
+} from 'camera-eye/sources/space';
 import * as compatibility from '../../server/providers/local.js';
 
 function install(plugin, preview = false) {
@@ -139,10 +139,10 @@ for (const preview of [false, true])
     const request = install(rocketLaunchesProxy(), preview);
     assert.equal((await request('/api/launches', '/', 'POST')).status, 405);
     const first = await request('/api/launches');
-    assert.equal(first.headers['X-GEV-Cache'], 'MISS');
+    assert.equal(first.headers['X-CE-Cache'], 'MISS');
     assert.doesNotMatch(first.body, /fixture-token/);
     const hit = await request('/api/launches');
-    assert.equal(hit.headers['X-GEV-Cache'], 'HIT');
+    assert.equal(hit.headers['X-CE-Cache'], 'HIT');
     assert.equal(hit.body, first.body);
     assert.equal(calls, 1);
   });

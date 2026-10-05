@@ -1,4 +1,4 @@
-const STORE_KEY = '__gevContextStore';
+const STORE_KEY = '__ceContextStore';
 
 function createStore() {
   return {
@@ -36,20 +36,20 @@ export function registerEntityContext(entity, metadata) {
     entity,
     updatedAt: Date.now(),
   };
-  entity.__gevContextId = metadata.id;
+  entity.__ceContextId = metadata.id;
   store.entities.set(metadata.id, record);
   return record;
 }
 
 export function selectEntityContext(entity) {
   const store = getContextStore();
-  const contextId = entity?.__gevContextId;
+  const contextId = entity?.__ceContextId;
   if (!contextId || !store.entities.has(contextId)) return null;
   store.selectedEntityId = contextId;
   store.selectedAt = Date.now();
   const record = store.entities.get(contextId);
   window.dispatchEvent(
-    new CustomEvent('gev:entity-selected', { detail: record }),
+    new CustomEvent('ce:entity-selected', { detail: record }),
   );
   return record;
 }
@@ -63,8 +63,8 @@ export function selectEntityContext(entity) {
  * one slot, so a tracking layer that stays out of it is invisible to them
  * even while its readout card is on screen.
  *
- * Deliberately does NOT dispatch `gev:entity-selected`: tracking layers own a
- * separate publication lane (`gev:awareness-subject-selected`) that the
+ * Deliberately does NOT dispatch `ce:entity-selected`: tracking layers own a
+ * separate publication lane (`ce:awareness-subject-selected`) that the
  * readout and Contacts panel already consume, and a second event for the same
  * click would make those two surfaces fight over one subject.
  *
@@ -84,7 +84,7 @@ export function selectTrackedSubjectContext(metadata) {
       store.entities.delete(key);
   }
   // Reuse the existing carrier so a per-poll refresh does not churn identity.
-  const carrier = store.entities.get(id)?.entity || { __gevContextId: id };
+  const carrier = store.entities.get(id)?.entity || { __ceContextId: id };
   const record = registerEntityContext(carrier, { ...metadata, id });
   if (!record) return null;
   store.selectedEntityId = id;
@@ -113,7 +113,7 @@ export function refreshTrackedSubjectContext(metadata) {
  * Drop a tracking layer's subject when the operator deselects it.
  *
  * Pairs with {@link selectTrackedSubjectContext} and stays event-free for the
- * same reason: `gev:awareness-subject-cleared` is the tracking layers' lane.
+ * same reason: `ce:awareness-subject-cleared` is the tracking layers' lane.
  * @param {string} layerId Owning layer.
  * @returns {void}
  */
@@ -160,7 +160,7 @@ export function clearSelectedEntityContextForLayer(
     store.selectedEntityId = null;
     store.selectedAt = null;
     window.dispatchEvent(
-      new CustomEvent('gev:entity-selection-cleared', {
+      new CustomEvent('ce:entity-selection-cleared', {
         detail: { layerId, reason: evicted ? 'evicted' : 'deliberate' },
       }),
     );
@@ -183,7 +183,7 @@ export function removeEntityContextsForLayer(layerId, { retainIds } = {}) {
     // A viewport refresh dropped the record out from under the selection —
     // the user did not deselect anything.
     window.dispatchEvent(
-      new CustomEvent('gev:entity-selection-cleared', {
+      new CustomEvent('ce:entity-selection-cleared', {
         detail: { layerId, reason: 'evicted' },
       }),
     );

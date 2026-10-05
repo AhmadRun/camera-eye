@@ -495,7 +495,7 @@ export function bindRadioControls() {
   );
   this.listen(
     window,
-    'gev:cockpit-mode-changed',
+    'ce:cockpit-mode-changed',
     (event) => {
       if (event?.detail?.active) return;
       setCockpitDisclosure('display', false);
@@ -505,7 +505,7 @@ export function bindRadioControls() {
   );
   this.listen(
     window,
-    'gev:cockpit-signal-expanded',
+    'ce:cockpit-signal-expanded',
     () => {
       setCockpitDisclosure('display', false);
     },
@@ -513,7 +513,7 @@ export function bindRadioControls() {
   );
   this.listen(
     window,
-    'gev:cockpit-context-expanded',
+    'ce:cockpit-context-expanded',
     () => {
       this.actions.setPanelCollapsed('data-panel', true);
     },
@@ -806,5 +806,5 @@ export function bindRadioControls() {
   // Globe motion therefore never rebuilds or re-ranks the frequency band.
   this._radioSelectedHandler = () =>
     this.actions.setPanelCollapsed('radio-panel', false);
-  this.listen(document, 'gev:radio-selected', this._radioSelectedHandler);
+  this.listen(document, 'ce:radio-selected', this._radioSelectedHandler);
 }

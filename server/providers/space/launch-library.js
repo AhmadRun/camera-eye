@@ -24,7 +24,7 @@ export function rocketLaunchesProxy() {
   const maxDiskCacheBytes = 24 * 1024 * 1024;
   const cachePath = path.join(
     process.cwd(),
-    '.gev-cache',
+    '.ce-cache',
     'launch-library-2-v2.3.json',
   );
   let cache = null;
@@ -61,7 +61,7 @@ export function rocketLaunchesProxy() {
     res.writeHead(status, {
       'Content-Type': 'application/json',
       'Cache-Control': status === 200 ? 'public, max-age=900' : 'no-store',
-      'X-GEV-Cache': cacheState,
+      'X-CE-Cache': cacheState,
     });
     res.end(body);
   }

@@ -23,11 +23,11 @@ try {
     `${process.env.QA_BASE_URL || 'http://localhost:4173'}/?welcome=0`,
     { waitUntil: 'domcontentloaded' },
   );
-  await page.waitForFunction(() => window.__godsEyeView?.dataManager, {
+  await page.waitForFunction(() => window.__cameraEye?.dataManager, {
     timeout: 60000,
   });
   const results = await page.evaluate(async () => {
-    const manager = window.__godsEyeView.dataManager;
+    const manager = window.__cameraEye.dataManager;
     const entry = document.querySelector(
       'script[type="module"][src*="/src/main.js"]',
     );
@@ -37,7 +37,7 @@ try {
     const id = 'qa-panel-lifecycle';
     let listener = null;
     let enabled = 0;
-    window.__gevQaRegisterLayer(manager, {
+    window.__ceQaRegisterLayer(manager, {
       id,
       name: '<b>Literal layer</b>',
       icon: '◌',
@@ -86,7 +86,7 @@ try {
         'feed state reflects the settled layer snapshot',
         row().querySelector('.data-toggle-btn').dataset.feedState === 'stale',
       ]);
-      const ui = window.__godsEyeView.styleManager;
+      const ui = window.__cameraEye.styleManager;
       ui._clearSelectedLayersBtn.click();
       result.push([
         'native clear activation presents busy state',
@@ -115,7 +115,7 @@ try {
     } finally {
       presentation._panel?.destroy();
       presentation._panel = null;
-      await window.__gevQaUnregisterLayer(manager, id);
+      await window.__ceQaUnregisterLayer(manager, id);
       presentation.mount(container);
     }
     result.push([

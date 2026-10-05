@@ -65,7 +65,7 @@ test('the stdio server answers newline-delimited requests using only its data so
     .map((line) => JSON.parse(line));
   const byId = new Map(responses.map((response) => [response.id, response]));
   assert.equal(responses.length, 4);
-  assert.equal(byId.get(1).result.serverInfo.name, 'gods-eye-view');
+  assert.equal(byId.get(1).result.serverInfo.name, 'camera-eye');
   assert.equal(byId.get(null).error.code, -32700);
   // Every Core tool's services are composed locally.
   assert.deepEqual(
@@ -123,12 +123,12 @@ test('a failed tool call is logged with its reason', async () => {
     log: (line) => logged.push(line),
   });
   input.end(
-    '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"show_in_gods_eye_view"}}\n',
+    '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"show_in_camera_eye"}}\n',
   );
   await served;
   assert.deepEqual(logged, [
-    'tools/call show_in_gods_eye_view',
-    '   tools/call show_in_gods_eye_view failed: bad area',
+    'tools/call show_in_camera_eye',
+    '   tools/call show_in_camera_eye failed: bad area',
   ]);
 });
 
@@ -152,7 +152,7 @@ test("only the key in the server's own panel page opens panel requests", async (
     jsonrpc: '2.0',
     id: 1,
     method: 'resources/read',
-    params: { uri: 'ui://gods-eye-view/globe' },
+    params: { uri: 'ui://camera-eye/globe' },
   });
   const [, key] = page.result.contents[0].text.match(/"panelKey":"([^"]+)"/);
   assert.ok(key.length >= 40);
@@ -167,7 +167,7 @@ test("only the key in the server's own panel page opens panel requests", async (
     jsonrpc: '2.0',
     id: 4,
     method: 'resources/read',
-    params: { uri: 'ui://gods-eye-view/globe' },
+    params: { uri: 'ui://camera-eye/globe' },
   });
   assert.doesNotMatch(otherPage.result.contents[0].text, new RegExp(key));
 });

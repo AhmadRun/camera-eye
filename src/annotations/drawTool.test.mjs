@@ -118,7 +118,7 @@ test('the DISPLAY rail styles live in their current owner, not the shim', () => 
     '.pp-text-input',
     '.draw-clear-btn',
     '.draw-hint',
-    'body.gev-drawing',
+    'body.ce-drawing',
   ]) {
     assert.ok(
       controls.includes(rule),

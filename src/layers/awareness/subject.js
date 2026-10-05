@@ -133,7 +133,7 @@ export function createSubject({ state: layerState, services, parts, source }) {
 
   function currentTrackedFlightSubject() {
     const trackedKey = normalizeContextId(
-      layerState.viewer?.trackedEntity?.gevTrackedId,
+      layerState.viewer?.trackedEntity?.ceTrackedId,
     );
     if (!trackedKey) return null;
     const subjects = [
@@ -202,14 +202,14 @@ export function createSubject({ state: layerState, services, parts, source }) {
     if (!subject?.position) return null;
     if (subject.layerId === 'flights' || subject.layerId === 'military') {
       const trackedPosition =
-        layerState.viewer?.trackedEntity?.gevDisplayPosition?.();
+        layerState.viewer?.trackedEntity?.ceDisplayPosition?.();
       if (trackedPosition) {
         return {
           position: Cesium.Cartesian3.clone(trackedPosition),
           // Only the follow camera's own contact proves presence this way; a
           // different tracked entity says nothing about this subject.
           presence:
-            String(layerState.viewer?.trackedEntity?.gevTrackedId || '') ===
+            String(layerState.viewer?.trackedEntity?.ceTrackedId || '') ===
             subjectKey(subject)
               ? SUBJECT_PRESENCE.LIVE
               : SUBJECT_PRESENCE.UNCHECKED,

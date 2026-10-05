@@ -34,7 +34,7 @@ const css = readStylesheet(path.join(ROOT, 'style.css'));
 const sceneDirector = fs.readFileSync(path.join(ROOT, 'src', 'scenes', 'director.js'), 'utf8');
 const manager = fs.readFileSync(path.join(ROOT, 'src', 'data', 'lifecycle.js'), 'utf8');
 const contextLayer = readLayerSource(path.join(ROOT, 'src', 'data', 'militaryAwareness.js'), 'utf8');
-const voiceActions = fs.readFileSync(path.join(ROOT, 'src', 'voice', 'gevActions.js'), 'utf8');
+const voiceActions = fs.readFileSync(path.join(ROOT, 'src', 'voice', 'ceActions.js'), 'utf8');
 
 test('Cockpit has one reset action beside its bottom exit path', () => {
   assert.doesNotMatch(html, /id="cockpit-quick-entry"/);
@@ -154,7 +154,7 @@ test('Cockpit Escape handling precedes form-control shortcut suppression and foc
   assert.doesNotMatch(exit, /applyTrackedCameraFrame/);
   assert.match(
     ui,
-    /restoreTrackingFrame: \(entity\) => \{[\s\S]*?gevTrackedId[\s\S]*?flightsLayer\.refocusTrackedById[\s\S]*?militaryFlightsLayer\.refocusTrackedById/,
+    /restoreTrackingFrame: \(entity\) => \{[\s\S]*?ceTrackedId[\s\S]*?flightsLayer\.refocusTrackedById[\s\S]*?militaryFlightsLayer\.refocusTrackedById/,
     'Cockpit exit must return camera-frame ownership through the source layer so Contact Focus cannot accumulate a second owner',
   );
 });
@@ -217,7 +217,7 @@ test('the cockpit reads its aircraft from the layer that owns Cesium tracking', 
   const read = readAircraftInfo.toString();
   assert.ok(read, 'readAircraftInfo is missing');
   assert.match(read, /resolveTrackedAircraftInfo\(\{/);
-  assert.match(read, /gevTrackedId/);
+  assert.match(read, /ceTrackedId/);
   // In cockpit mode the controller moves the entity off viewer.trackedEntity,
   // so its own handle is the tracked identity there.
   assert.match(read, /this\.viewer\?\.trackedEntity \|\| this\.trackedEntity/);
@@ -378,10 +378,10 @@ test('Cockpit side surfaces behave as two single-expanded accordions', () => {
     /if \(displayOpen \|\| radioOpen\) this\.actions\.setSignalCollapsed\(true\);/,
   );
   assert.match(radioBindings,
-    /'gev:cockpit-signal-expanded'[\s\S]*?setCockpitDisclosure\('display', false\);/,
+    /'ce:cockpit-signal-expanded'[\s\S]*?setCockpitDisclosure\('display', false\);/,
   );
   assert.match(radioBindings,
-    /'gev:cockpit-context-expanded'[\s\S]*?setPanelCollapsed\('data-panel', true\);/,
+    /'ce:cockpit-context-expanded'[\s\S]*?setPanelCollapsed\('data-panel', true\);/,
   );
   assert.match(
     ui,
@@ -393,11 +393,11 @@ test('Cockpit side surfaces behave as two single-expanded accordions', () => {
     'closing Data Layers must restore Contact only after an automatic collapse',
   );
   assert.match(setContextCollapsed.toString(),
-    /const wasCollapsed = this\.contextCollapsed;[\s\S]*?this\.active && wasCollapsed && !this\.contextCollapsed[\s\S]*?'gev:cockpit-context-expanded'/,
+    /const wasCollapsed = this\.contextCollapsed;[\s\S]*?this\.active && wasCollapsed && !this\.contextCollapsed[\s\S]*?'ce:cockpit-context-expanded'/,
     'Contact expansion must notify only on a collapsed-to-expanded transition',
   );
   assert.match(setSignalCollapsed.toString(),
-    /const wasCollapsed = this\.signalCollapsed;[\s\S]*?this\.active && wasCollapsed && !this\.signalCollapsed[\s\S]*?'gev:cockpit-signal-expanded'/,
+    /const wasCollapsed = this\.signalCollapsed;[\s\S]*?this\.active && wasCollapsed && !this\.signalCollapsed[\s\S]*?'ce:cockpit-signal-expanded'/,
     'Live Signals expansion must notify only on a collapsed-to-expanded transition',
   );
   assert.match(
@@ -692,7 +692,7 @@ test('Cockpit Display portals shared HUD, Detection, Parameters, and 3D controls
   assert.doesNotMatch(ui, /\['presets',/);
   assert.match(
     CockpitDisplayPortal.toString(),
-    /group\.before\(anchor\)[\s\S]*?window\.addEventListener\(\s*'gev:cockpit-mode-changed'/,
+    /group\.before\(anchor\)[\s\S]*?window\.addEventListener\(\s*'ce:cockpit-mode-changed'/,
   );
   assert.match(
     CockpitDisplayPortal.prototype.setActive.toString(),

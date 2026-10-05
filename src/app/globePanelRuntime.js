@@ -1,5 +1,5 @@
 /**
- * The God's Eye View panel's script, run inside the panel page a host shows.
+ * The Camera Eye panel's script, run inside the panel page a host shows.
  * It is sent as source text (see src/tools/globePanel.js), so it must not use
  * imports or anything outside the function.
  *
@@ -209,23 +209,23 @@ export function panelRuntime(config) {
     xhr.open = function (method, url, ...rest) {
       const path = appPath(url);
       if (path === null) {
-        this.__gev = null;
+        this.__ce = null;
         return nativeOpen.call(this, method, url, ...rest);
       }
-      this.__gev = { method, path, headers: {}, controller: null };
+      this.__ce = { method, path, headers: {}, controller: null };
       setState(this, { readyState: 1 });
       this.dispatchEvent(new Event('readystatechange'));
     };
     xhr.setRequestHeader = function (name, value) {
-      if (!this.__gev) return nativeHeader.call(this, name, value);
-      this.__gev.headers[name] = value;
+      if (!this.__ce) return nativeHeader.call(this, name, value);
+      this.__ce.headers[name] = value;
     };
     xhr.abort = function () {
-      if (!this.__gev) return nativeAbort.call(this);
-      this.__gev.controller?.abort();
+      if (!this.__ce) return nativeAbort.call(this);
+      this.__ce.controller?.abort();
     };
     xhr.send = function (body) {
-      const state = this.__gev;
+      const state = this.__ce;
       if (!state) return nativeSend.call(this, body);
       state.controller = new AbortController();
       appFetch(state.path, {
@@ -322,9 +322,9 @@ export function panelRuntime(config) {
     const NativeWorker = window.Worker;
     const BOOT =
       'const early=[];let ready=false;' +
-      "addEventListener('message',e=>{if(e.data&&e.data.__gevScript){" +
+      "addEventListener('message',e=>{if(e.data&&e.data.__ceScript){" +
       'const go=()=>{ready=true;for(const d of early)dispatchEvent(new MessageEvent("message",{data:d}))};' +
-      'if(e.data.module)import(e.data.__gevScript).then(go);else{importScripts(e.data.__gevScript);go()}' +
+      'if(e.data.module)import(e.data.__ceScript).then(go);else{importScripts(e.data.__ceScript);go()}' +
       'e.stopImmediatePropagation();return}' +
       'if(!ready){early.push(e.data);e.stopImmediatePropagation()}});';
     window.Worker = function Worker(url, options) {
@@ -340,7 +340,7 @@ export function panelRuntime(config) {
         .then((blob) => URL.createObjectURL(blob))
         .then((script) =>
           worker.postMessage({
-            __gevScript: script,
+            __ceScript: script,
             module: options?.type === 'module',
           }),
         );
@@ -366,12 +366,12 @@ export function panelRuntime(config) {
         (tag, before, quote, value) =>
           appPath(value) === null
             ? tag
-            : `${before}data-gev-src=${quote}${value}${quote}`,
+            : `${before}data-ce-src=${quote}${value}${quote}`,
       );
     const fillHeldImages = (root) => {
-      for (const element of root?.querySelectorAll?.('[data-gev-src]') ?? []) {
-        const path = appPath(element.getAttribute('data-gev-src'));
-        element.removeAttribute('data-gev-src');
+      for (const element of root?.querySelectorAll?.('[data-ce-src]') ?? []) {
+        const path = appPath(element.getAttribute('data-ce-src'));
+        element.removeAttribute('data-ce-src');
         appFileUrl(path).then((url) => element.setAttribute('src', url));
       }
     };
@@ -459,12 +459,12 @@ export function panelRuntime(config) {
   }
 
   /**
-   * Load God's Eye View into this page from the app's panel build, in
+   * Load Camera Eye into this page from the app's panel build, in
    * inline embed mode, starting at the first view as its link would.
    */
   async function startApp(url, view) {
-    window.GEV_EMBED_INLINE = true;
-    window.GEV_APP_BASE_URL = config.appBaseUrl;
+    window.CE_EMBED_INLINE = true;
+    window.CE_APP_BASE_URL = config.appBaseUrl;
     try {
       history.replaceState(
         null,
@@ -541,9 +541,9 @@ export function panelRuntime(config) {
         const notice = document.createElement('div');
         notice.id = 'status';
         notice.textContent =
-          "This panel lost its 3D graphics, likely because other God's Eye " +
-          "View panels in this conversation hold them. Use Open in God's " +
-          'Eye View above, or show it in a new conversation.';
+          'This panel lost its 3D graphics, likely because other Camera Eye ' +
+          'panels in this conversation hold them. Use Open in Camera ' +
+          'Eye above, or show it in a new conversation.';
         document.body.appendChild(notice);
       },
       { capture: true, once: true },
@@ -556,7 +556,7 @@ export function panelRuntime(config) {
   let queued = null;
   let currentUrl = null;
   const postView = (view) =>
-    window.postMessage({ type: 'gev:view', id: nextId++, view }, '*');
+    window.postMessage({ type: 'ce:view', id: nextId++, view }, '*');
   function show(result) {
     const data = result?.structuredContent;
     const view = data?.view;
@@ -568,16 +568,16 @@ export function panelRuntime(config) {
     queued = view;
     if (started) return;
     started = true;
-    say("Loading God's Eye View…");
+    say('Loading Camera Eye…');
     startApp(url, view).catch((error) =>
-      say(`God's Eye View could not load here: ${error?.message || error}.`),
+      say(`Camera Eye could not load here: ${error?.message || error}.`),
     );
     setTimeout(() => {
       if (!ready)
         say(
-          "God's Eye View did not load here" +
+          'Camera Eye did not load here' +
             (blocked ? ` (${blocked})` : '') +
-            ". Use Open in God's Eye View above.",
+            '. Use Open in Camera Eye above.',
         );
     }, config.loadTimeoutMs);
   }
@@ -585,7 +585,7 @@ export function panelRuntime(config) {
   window.addEventListener('message', (event) => {
     const message = event.data;
     if (event.source === window) {
-      if (message?.type === 'gev:ready') {
+      if (message?.type === 'ce:ready') {
         ready = true;
         status.remove();
         if (queued) postView(queued);
@@ -639,8 +639,8 @@ export function panelRuntime(config) {
   request('ui/initialize', {
     appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] },
     appInfo: {
-      name: 'gods-eye-view',
-      title: "God's Eye View",
+      name: 'camera-eye',
+      title: 'Camera Eye',
       version: '1.0.0',
     },
     protocolVersion: config.protocolVersion,
@@ -655,7 +655,7 @@ export function panelRuntime(config) {
     },
     (error) =>
       say(
-        "This client did not accept the God's Eye View panel" +
+        'This client did not accept the Camera Eye panel' +
           (error?.message ? `: ${error.message}` : '.'),
       ),
   );

@@ -48,7 +48,7 @@ const CLASSIFY = Cesium.ClassificationType.BOTH;
 const CLAMP = Cesium.HeightReference.CLAMP_TO_GROUND;
 
 export function createWorldAnnotationRenderer(viewer) {
-  const dataSource = new Cesium.CustomDataSource('gev-annotations');
+  const dataSource = new Cesium.CustomDataSource('ce-annotations');
   viewer.dataSources.add(dataSource);
   const osmAnnotations = new Set();
 

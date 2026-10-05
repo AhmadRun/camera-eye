@@ -43,7 +43,7 @@ const literal = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
  */
 async function fixture(t) {
   const scratch = await realpath(
-    await mkdtemp(path.join(tmpdir(), 'gev-update-')),
+    await mkdtemp(path.join(tmpdir(), 'ce-update-')),
   );
   t.after(() => rm(scratch, { recursive: true, force: true }));
   const origin = path.join(scratch, 'origin');
@@ -377,11 +377,11 @@ test('a credential in a query parameter is not printed', () => {
 });
 
 test('an ordinary remote URL is printed unchanged', () => {
-  const url = 'https://github.com/bilawalsidhu/gods-eye-view.git';
+  const url = 'https://github.com/AhmadRun/camera-eye.git';
   assert.equal(redactRemoteUrl(url), url);
   assert.equal(
-    redactRemoteUrl('git@github.com:bilawalsidhu/gods-eye-view.git'),
-    'git@github.com:bilawalsidhu/gods-eye-view.git',
+    redactRemoteUrl('git@github.com:AhmadRun/camera-eye.git'),
+    'git@github.com:AhmadRun/camera-eye.git',
   );
   assert.equal(redactRemoteUrl(null), null);
   assert.equal(redactRemoteUrl(''), null);

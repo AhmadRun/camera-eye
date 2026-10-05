@@ -1,7 +1,7 @@
 import { makeCostRateLimiter, clientKey } from '../common/rate-limit.js';
 
 /**
- * Requests/min/IP applied when GEV_RATELIMIT_OPENAI_PER_MIN is unset. Both
+ * Requests/min/IP applied when CE_RATELIMIT_OPENAI_PER_MIN is unset. Both
  * places that already name a value agree on it: `.env.example` recommends 30
  * and the Pinokio build ships 30 (pinokio/_ENVIRONMENT), so the packaged app
  * is unaffected and only an unconfigured server changes. The HUD asks for a
@@ -23,7 +23,7 @@ let _openAiRateLimiter;
 function openAiRateLimiter() {
   if (_openAiRateLimiter === undefined)
     _openAiRateLimiter = makeCostRateLimiter(
-      process.env.GEV_RATELIMIT_OPENAI_PER_MIN,
+      process.env.CE_RATELIMIT_OPENAI_PER_MIN,
       OPENAI_DEFAULT_PER_MIN,
     );
   return _openAiRateLimiter;

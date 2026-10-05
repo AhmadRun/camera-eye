@@ -13,7 +13,7 @@ export function createVoiceCommands({
   debugSink,
   createControl = createVoiceControl,
 }) {
-  window.__gevVoiceCommands?.stop?.({ removeUi: true });
+  window.__ceVoiceCommands?.stop?.({ removeUi: true });
   const ui = createControl({ reset: true });
   const session = createVoiceSession({
     runner,
@@ -81,6 +81,6 @@ export function createVoiceCommands({
     updateStatus();
     ui.root.remove();
   } else adapter.bindControls?.();
-  window.__gevVoiceCommands = controls;
+  window.__ceVoiceCommands = controls;
   return controls;
 }

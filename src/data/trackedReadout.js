@@ -79,9 +79,9 @@ export function trackedLabelModelFromText(
  * @returns {Object|null}
  */
 export function cachedTrackedDisplayPosition(entity) {
-  if (!entity || typeof entity.gevDisplayPosition !== 'function') return null;
+  if (!entity || typeof entity.ceDisplayPosition !== 'function') return null;
   try {
-    return entity.gevDisplayPosition() || null;
+    return entity.ceDisplayPosition() || null;
   } catch {
     return null;
   }
@@ -91,22 +91,22 @@ export function cachedTrackedDisplayPosition(entity) {
  * Anchor for the tracked CARD: the position the target is visually at.
  *
  * A layer that renders its tracked contact as a 3D model publishes
- * `gevVisualPosition`, which returns the translation that model is actually rendering
+ * `ceVisualPosition`, which returns the translation that model is actually rendering
  * with. For a grounded aircraft that differs from the display position by the full
  * ground-snap offset (~100 m at an inland airport), so a card anchored to the display
  * position sits below the aircraft and climbs slowly as the coarse floor cell warms.
  *
  * Falls back to the display position, so layers without a 3D visual (and any layer
  * before its model is ready) are unchanged. This deliberately does NOT repurpose
- * `gevDisplayPosition`: that accessor carries the follow-camera anti-jitter contract
+ * `ceDisplayPosition`: that accessor carries the follow-camera anti-jitter contract
  * and must keep returning the value the camera settled on.
  * @param {Object|null} entity Tracked or selected presentation entity.
  * @returns {Object|null}
  */
 export function cachedTrackedVisualPosition(entity) {
-  if (entity && typeof entity.gevVisualPosition === 'function') {
+  if (entity && typeof entity.ceVisualPosition === 'function') {
     try {
-      const visual = entity.gevVisualPosition();
+      const visual = entity.ceVisualPosition();
       if (visual) return visual;
     } catch {
       /* fall through to the display position */
@@ -116,7 +116,7 @@ export function cachedTrackedVisualPosition(entity) {
 }
 
 function entryIdFor(entity) {
-  const explicit = String(entity?.gevTrackedId || '').trim();
+  const explicit = String(entity?.ceTrackedId || '').trim();
   if (explicit) return explicit;
   const fallback = String(entity?.id || '').trim();
   return fallback ? `entity:${fallback}` : null;
@@ -132,9 +132,9 @@ function activeEntity() {
  * @returns {Object|null}
  */
 export function createTrackedOverlayEntry(entity) {
-  const model = entity?.gevLabelModel;
+  const model = entity?.ceLabelModel;
   const id = entryIdFor(entity);
-  if (!id || !model || typeof entity.gevDisplayPosition !== 'function') {
+  if (!id || !model || typeof entity.ceDisplayPosition !== 'function') {
     return null;
   }
   const title = String(model.title || '').trim();
@@ -204,7 +204,7 @@ function syncActiveEntity() {
 }
 
 /**
- * Republish a layer's newly assigned `gevLabelModel` when that entity owns the
+ * Republish a layer's newly assigned `ceLabelModel` when that entity owns the
  * active tracked readout. Layers call this only when presentation text changes;
  * position remains the live frame-cache getter already registered with host.
  * @param {Object} entity Entity whose model changed.
@@ -261,13 +261,13 @@ export function initTrackedReadout(viewer) {
     _selectedContext = null;
     if (!_viewer?.trackedEntity) clearTrackedSource();
   };
-  window.addEventListener('gev:entity-selected', _contextSelectedHandler);
+  window.addEventListener('ce:entity-selected', _contextSelectedHandler);
   window.addEventListener(
-    'gev:entity-selection-cleared',
+    'ce:entity-selection-cleared',
     _contextClearedHandler,
   );
   window.addEventListener(
-    'gev:awareness-subject-selected',
+    'ce:awareness-subject-selected',
     _aircraftSelectedHandler,
   );
   syncActiveEntity();
@@ -281,15 +281,15 @@ export function destroyTrackedReadout() {
   _trackedEntityChangedRemove?.();
   _trackedEntityChangedRemove = null;
   if (_contextSelectedHandler)
-    window.removeEventListener('gev:entity-selected', _contextSelectedHandler);
+    window.removeEventListener('ce:entity-selected', _contextSelectedHandler);
   if (_contextClearedHandler)
     window.removeEventListener(
-      'gev:entity-selection-cleared',
+      'ce:entity-selection-cleared',
       _contextClearedHandler,
     );
   if (_aircraftSelectedHandler)
     window.removeEventListener(
-      'gev:awareness-subject-selected',
+      'ce:awareness-subject-selected',
       _aircraftSelectedHandler,
     );
   _contextSelectedHandler = null;

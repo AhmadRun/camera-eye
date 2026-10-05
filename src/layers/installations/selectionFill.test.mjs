@@ -61,7 +61,7 @@ test('geometry rebuild and canonical alias migration preserve shared selection b
     const services = { context, render: { governorRequestRender() {} }, ground: { floorAltitudeM: () => 0, cachedGroundFloor: () => 0 }, anchors: {} };
     const rendering = createRendering({ state: h.state, services, parts: h.parts });
     const cleared = [];
-    window.addEventListener('gev:entity-selection-cleared', e => { cleared.push(e.detail); h.state.selectedId = null; });
+    window.addEventListener('ce:entity-selection-cleared', e => { cleared.push(e.detail); h.state.selectedId = null; });
     rendering.renderRecords({ claimSelection: true });
     const oldEntity = context.getSelectedEntityContext().entity;
     h.record.latitude += 0.001;

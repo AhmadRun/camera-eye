@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ROOT_DIR="$(cd "${GEV_PROJECT_ROOT:-$SOURCE_ROOT}" && pwd)"
+ROOT_DIR="$(cd "${CE_PROJECT_ROOT:-$SOURCE_ROOT}" && pwd)"
 cd "$ROOT_DIR"
 
 PORT="${PORT:-4173}"
@@ -255,7 +255,7 @@ if ! grep -q "return createApplicationCatalog(" "$SOURCE_ROOT/src/standalone/cat
   exit 1
 fi
 
-echo "Stopping all existing God's Eye View dev servers..."
+echo "Stopping all existing Camera Eye dev servers..."
 pkill -f "${ROOT_DIR}/node_modules/.bin/vite" >/dev/null 2>&1 || true
 pkill -f "${ROOT_DIR}/node_modules/vite/bin/vite.js" >/dev/null 2>&1 || true
 
@@ -271,7 +271,7 @@ fi
 echo "Clearing Vite cache..."
 rm -rf node_modules/.vite
 
-echo "Starting fresh God's Eye View dev server..."
+echo "Starting fresh Camera Eye dev server..."
 case "${HOST}" in
   localhost|127.0.0.1|::1)
     echo "Local-only mode: reachable at http://localhost:${PORT}/ (set HOST=0.0.0.0 for LAN)"
@@ -294,8 +294,8 @@ case "${HOST}" in
     echo "!! This dev server brokers your configured API keys (OpenAI,"
     echo "!! OpenSky, AISStream, TomTom, FIRMS, LL2, Google) to ANYONE who can"
     echo "!! reach it on the network. Use only on networks you trust."
-    echo "!! Consider the opt-in per-IP throttles GEV_RATELIMIT_OPENAI_PER_MIN"
-    echo "!! and GEV_RATELIMIT_GOOGLE_PER_MIN (see .env.example) — and note"
+    echo "!! Consider the opt-in per-IP throttles CE_RATELIMIT_OPENAI_PER_MIN"
+    echo "!! and CE_RATELIMIT_GOOGLE_PER_MIN (see .env.example) — and note"
     echo "!! they are NOT billing caps; set provider-side budget alerts too."
     if [[ -n "${LAN_IP}" ]]; then
       echo "!! LAN URL: http://${LAN_IP}:${PORT}/"
@@ -310,7 +310,7 @@ esac
 echo "Google Maps key source: ${GOOGLE_MAPS_API_KEY_SOURCE}"
 echo "Tip: after server starts, hard refresh browser (Cmd+Shift+R)."
 echo "The CCTV panel starts collapsed; open it from its header, or in browser console:"
-echo "localStorage.setItem('godsEyeView.v6.panelCollapsed.cctv-panel', '0'); location.reload();"
+echo "localStorage.setItem('cameraEye.v6.panelCollapsed.cctv-panel', '0'); location.reload();"
 echo "OpenSky auth mode: ${OPENSKY_AUTH_MODE}"
 if [[ -n "${OPENSKY_CREDENTIALS_FILE}" ]]; then
   if [[ -f "${OPENSKY_CREDENTIALS_FILE}" ]]; then
@@ -347,7 +347,7 @@ case "${OPENSKY_AUTH_MODE}" in
     echo "OpenSky auth: disabled (anonymous mode)"
     ;;
 esac
-[[ -n "${OPENAI_API_KEY}" ]] && echo "OpenAI key (voice + HUD summary): configured" || echo "OpenAI key (voice + HUD summary): not set — GEV MIC disabled"
+[[ -n "${OPENAI_API_KEY}" ]] && echo "OpenAI key (voice + HUD summary): configured" || echo "OpenAI key (voice + HUD summary): not set — CE MIC disabled"
 [[ -n "${AISSTREAM_API_KEY}" ]] && echo "AISStream key (live vessels): configured" || echo "AISStream key (live vessels): not set — ships layer empty"
 if [[ -n "${GOOGLE_MAPS_API_KEY}" ]]; then
   echo "Startup map: Google Photorealistic 3D Tiles (direct)"
@@ -420,7 +420,7 @@ put_env_if_set CESIUM_ION_TOKEN "${CESIUM_ION_TOKEN}"
 put_env_if_set TOMTOM_API_KEY "${TOMTOM_API_KEY}"
 put_env_if_set FIRMS_MAP_KEY "${FIRMS_MAP_KEY}"
 put_env_if_set LL2_API_TOKEN "${LL2_API_TOKEN}"
-put_env GEV_LAUNCHER "dev-fresh"
-put_env GEV_KEY_SETUP_EXTERNAL_KEYS "${KEY_SETUP_EXTERNAL_KEYS_CSV}"
+put_env CE_LAUNCHER "dev-fresh"
+put_env CE_KEY_SETUP_EXTERNAL_KEYS "${KEY_SETUP_EXTERNAL_KEYS_CSV}"
 
 env ${DEV_UNSET[@]+"${DEV_UNSET[@]}"} "${DEV_ENV[@]}" "${DEV_COMMAND[@]}" --host "${HOST}" --port "${PORT}" --force

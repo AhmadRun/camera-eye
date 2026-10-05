@@ -50,7 +50,7 @@ import {
 
 /** The id this tool claims the pointer under. */
 export const DRAW_POINTER_OWNER = 'draw';
-const PREVIEW_DATA_SOURCE_NAME = 'gev-draw-preview';
+const PREVIEW_DATA_SOURCE_NAME = 'ce-draw-preview';
 
 const COLORS = ['primary', 'amber', 'cyan', 'green', 'red'];
 const PREVIEW = {
@@ -63,7 +63,7 @@ const PREVIEW = {
 
 /**
  * Wire the Draw control. Returns a handle with a `destroy()` the application
- * lifetime owns, plus the console/test seam (`window.__gevDrawTool`).
+ * lifetime owns, plus the console/test seam (`window.__ceDrawTool`).
  * @param {{viewer: Cesium.Viewer, annotations: {annotate: Function, clear: Function}}} deps
  * @returns {{destroy: Function}|null}
  */
@@ -333,7 +333,7 @@ export function initDrawTool({ viewer, annotations }) {
     toggle.setAttribute('aria-pressed', String(active));
     modeRow?.classList.toggle('visible', active);
     labelRow?.classList.toggle('visible', active);
-    document.body.classList.toggle('gev-drawing', active);
+    document.body.classList.toggle('ce-drawing', active);
     if (active) {
       session = createDrawSession(shape);
       bindSceneHandler();
@@ -520,17 +520,17 @@ export function initDrawTool({ viewer, annotations }) {
           /* viewer already disposed — nothing to detach from */
         }
       });
-      document.body.classList.remove('gev-drawing');
+      document.body.classList.remove('ce-drawing');
       toggle.classList.remove('active');
       toggle.setAttribute('aria-pressed', 'false');
       modeRow?.classList.remove('visible');
       labelRow?.classList.remove('visible');
       if (hint) hint.textContent = '';
-      if (window.__gevDrawTool === api) delete window.__gevDrawTool;
+      if (window.__ceDrawTool === api) delete window.__ceDrawTool;
       return attaching;
     },
   };
-  window.__gevDrawTool = api;
+  window.__ceDrawTool = api;
   return api;
 }
 

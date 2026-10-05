@@ -55,11 +55,11 @@ function fakeServices() {
       render: { governorRequestRender() {} },
       context: {
         registerEntityContext(entity, metadata) {
-          entity.__gevContextId = metadata.id;
+          entity.__ceContextId = metadata.id;
           calls.registered.push(metadata);
         },
         selectEntityContext(entity) {
-          selected = { id: entity.__gevContextId, entity };
+          selected = { id: entity.__ceContextId, entity };
           calls.selected.push(selected.id);
           return selected;
         },
@@ -252,8 +252,8 @@ test('local aircraft use their class silhouette and scale in magenta', async (t)
     ),
   );
   assert.equal(entity.billboard.rotation.getValue(), 0);
-  assert.equal(entity.gevLabelModel.title, 'LOCAL1');
-  assert.equal(typeof entity.gevDisplayPosition, 'function');
+  assert.equal(entity.ceLabelModel.title, 'LOCAL1');
+  assert.equal(typeof entity.ceDisplayPosition, 'function');
 
   const heli = sources[0].entities.getById('local-adsb:a0b702');
   assert.equal(heli.billboard.image.getValue(), aircraftIcon('helicopter'));
@@ -265,7 +265,7 @@ test('local aircraft use their class silhouette and scale in magenta', async (t)
     ),
     'the helicopter keeps the local magenta',
   );
-  assert.equal(heli.gevLabelModel.details[1], 'Helicopter · A7');
+  assert.equal(heli.ceLabelModel.details[1], 'Helicopter · A7');
 
   // On the ground the silhouette shrinks like a grounded public flight.
   receiver.set({
@@ -479,14 +479,14 @@ test('adsbdb type, operator and route reach the card for the selected aircraft o
   await new Promise((resolve) => setTimeout(resolve, 400));
   assert.deepEqual([...queries].sort(), ['route:EVC145', 'type:a0b702']);
   const entity = sources[0].entities.getById('local-adsb:a0b702');
-  assert.deepEqual(entity.gevLabelModel.details.slice(0, 4), [
+  assert.deepEqual(entity.ceLabelModel.details.slice(0, 4), [
     'ICAO A0B702 · EVC145',
     'Helicopter · A7',
     'Air Evac · Bell 407',
     'AUS → SAT',
   ]);
   assert.equal(
-    entity.gevLabelModel.details.at(-1),
+    entity.ceLabelModel.details.at(-1),
     'Heard by your receiver · 1090 MHz · browser SDR',
   );
   layer.selectAircraft('a0b702');
@@ -760,7 +760,7 @@ test('feed records merge with browser SDR records by ICAO and UAT-only aircraft 
   );
   assert.equal(shared.point, undefined, 'heard on 1090 too: no UAT ring');
   assert.equal(
-    shared.gevLabelModel.details.at(-1),
+    shared.ceLabelModel.details.at(-1),
     'Heard by your receiver · 1090 MHz + 978 MHz UAT · browser SDR + decoder feed',
   );
   assert.ok(uat.point, 'a UAT-only aircraft carries the ring');
@@ -776,7 +776,7 @@ test('feed records merge with browser SDR records by ICAO and UAT-only aircraft 
     'same magenta marker family',
   );
   assert.equal(
-    uat.gevLabelModel.details.at(-1),
+    uat.ceLabelModel.details.at(-1),
     'Heard by your receiver · 978 MHz UAT · decoder feed',
   );
   const stats = layer.getStats();
@@ -1128,7 +1128,7 @@ test('a click on a local aircraft under an unowned or trail pick still selects i
       },
     },
   });
-  owners.set('trails', (id) => String(id).startsWith('gev-trail:'));
+  owners.set('trails', (id) => String(id).startsWith('ce-trail:'));
   owners.set('flights', (id) => id === 'abc123');
   t.after(() => layer.destroy());
   receiver.set({
@@ -1148,7 +1148,7 @@ test('a click on a local aircraft under an unowned or trail pick still selects i
   assert.deepEqual(calls.selected, ['local-adsb:abc123']);
 
   // The selected aircraft's trail crosses another local aircraft's marker.
-  harness.scene.pickResult = { id: { id: 'gev-trail:local-adsb-head-1' } };
+  harness.scene.pickResult = { id: { id: 'ce-trail:local-adsb-head-1' } };
   harness.scene.drillResult = [
     harness.scene.pickResult,
     { id: second, primitive: {} },

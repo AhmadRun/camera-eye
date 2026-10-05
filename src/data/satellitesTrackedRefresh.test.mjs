@@ -96,7 +96,7 @@ test('selected satellite params survive delayed arrival and yield to newer expli
   try {
     assert.doesNotThrow(() => satellitesLayer.setParams({ selectedSatTrackingId: 25544 }));
     assert.equal(satellitesLayer.getParams().selectedSatTrackingId, 25544);
-    assert.equal(viewer.trackedEntity?.gevTrackedId, 'satellites:25544');
+    assert.equal(viewer.trackedEntity?.ceTrackedId, 'satellites:25544');
 
     satellitesLayer.stopTracking();
     _removeSatelliteTrackingCandidateForTest(25544);
@@ -165,7 +165,7 @@ test('a tracked docked cluster consolidates its companions onto one card', () =>
   // so their ambient labels stack underneath the tracked card. Owner ruling:
   // consolidate them as secondary info on that card, and suppress only those
   // members — never unrelated satellites that merely happen to be nearby.
-  const entity = { gevLabelModel: { title: 'OLD', details: ['? km'] } };
+  const entity = { ceLabelModel: { title: 'OLD', details: ['? km'] } };
   const point = { position: new Cesium.Cartesian3() };
   const viewer = { camera: null, scene: { frameState: { frameNumber: 1 } } };
   let nowMs = Date.UTC(2008, 8, 20, 12, 30);
@@ -200,7 +200,7 @@ test('a tracked docked cluster consolidates its companions onto one card', () =>
   viewer.scene.frameState.frameNumber = 2;
   _runSatellitePreRenderForTest();
 
-  const details = entity.gevLabelModel.details;
+  const details = entity.ceLabelModel.details;
   // Class leads the detail block; the altitude line follows it, and the
   // consolidated companions stay last.
   assert.equal(details[0], 'STATION · ISS', 'the class line names what this is');
@@ -216,7 +216,7 @@ test('a tracked docked cluster consolidates its companions onto one card', () =>
   assert.doesNotMatch(details[2], /\+2/);
 });
 test('satellite pre-render refreshes the tracked altitude on each propagated frame', () => {
-  const entity = { gevLabelModel: { title: 'OLD', details: ['? km'] } };
+  const entity = { ceLabelModel: { title: 'OLD', details: ['? km'] } };
   const point = { position: new Cesium.Cartesian3() };
   const viewer = {
     camera: null,
@@ -238,15 +238,15 @@ test('satellite pre-render refreshes the tracked altitude on each propagated fra
   });
 
   _runSatellitePreRenderForTest();
-  assert.equal(entity.gevLabelModel.title, 'ISS (ZARYA)');
-  assert.equal(entity.gevLabelModel.details[0], 'STATION · ISS');
-  assert.equal(entity.gevLabelModel.details[1], '353 km · NORAD 25544');
+  assert.equal(entity.ceLabelModel.title, 'ISS (ZARYA)');
+  assert.equal(entity.ceLabelModel.details[0], 'STATION · ISS');
+  assert.equal(entity.ceLabelModel.details[1], '353 km · NORAD 25544');
 
   epochIndex = 1;
   viewer.scene.frameState.frameNumber = 2;
   _runSatellitePreRenderForTest();
-  assert.equal(entity.gevLabelModel.details[1], '366 km · NORAD 25544');
-  assert.equal(entity.gevLabelModel.details[0], 'STATION · ISS',
+  assert.equal(entity.ceLabelModel.details[1], '366 km · NORAD 25544');
+  assert.equal(entity.ceLabelModel.details[0], 'STATION · ISS',
     'the class line survives an altitude-only republish');
 });
 

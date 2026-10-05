@@ -55,7 +55,7 @@ const RENDER_HOLD_ID = 'local-adsb';
 /** Picks looked through under a click for a local aircraft. */
 const CLICK_DRILL_LIMIT = 8;
 /** Trail lines pass through their aircraft; a click never stops on one. */
-const TRAIL_PICK_PREFIX = 'gev-trail:';
+const TRAIL_PICK_PREFIX = 'ce-trail:';
 /** The DISPLAY rail's first-run 3D preference, used when no reader is wired. */
 const DEFAULT_DISPLAY = Object.freeze({
   models3d: true,
@@ -387,9 +387,9 @@ export function createLocalAdsbLayer({
     };
     // Live head: last heard fix → the extrapolated marker, every frame.
     selectedTrail.head = viewer.entities.add({
-      // 'gev-trail' namespace: claimed by the trail pick owner so a click on
+      // 'ce-trail' namespace: claimed by the trail pick owner so a click on
       // the head segment never reads as empty space.
-      id: `gev-trail:local-adsb-head-${++trailHeadSeq}`,
+      id: `ce-trail:local-adsb-head-${++trailHeadSeq}`,
       polyline: {
         positions: new Cesium.CallbackProperty(() => {
           const current = markers.get(selectedTrail?.id);
@@ -466,14 +466,14 @@ export function createLocalAdsbLayer({
           ),
         },
       });
-      marker.entity.gevTrackedId = id;
-      marker.entity.gevDisplayPosition = () => marker.position;
+      marker.entity.ceTrackedId = id;
+      marker.entity.ceDisplayPosition = () => marker.position;
     }
     refreshClass(marker);
     const uat = localAdsbIsUat(record);
     if (uat !== Boolean(marker.entity.point))
       marker.entity.point = uat ? uatRing(marker) : undefined;
-    marker.entity.gevLabelModel = cardModel(marker, at);
+    marker.entity.ceLabelModel = cardModel(marker, at);
     registerEntityContext(marker.entity, contextMetadata(id, marker));
     if (newFix && id === selectedId) refreshTrail();
     return id;
@@ -489,7 +489,7 @@ export function createLocalAdsbLayer({
   function refreshSelectedCard() {
     const marker = selectedId ? markers.get(selectedId) : null;
     if (!marker) return;
-    marker.entity.gevLabelModel = cardModel(marker, now());
+    marker.entity.ceLabelModel = cardModel(marker, now());
     services.overlays?.refreshReadout?.(marker.entity);
   }
 
@@ -575,7 +575,7 @@ export function createLocalAdsbLayer({
     const reselect = id === selectedId && selectedTrail?.id === id;
     selectedId = id;
     enrichment.request(marker.record, { selected: true });
-    marker.entity.gevLabelModel = cardModel(marker, now());
+    marker.entity.ceLabelModel = cardModel(marker, now());
     selectEntityContext(marker.entity);
     if (!reselect) startTrail(marker);
     governorRequestRender('local-adsb-selection');

@@ -1,6 +1,6 @@
 ---
 name: community-pr
-description: Review and integrate community pull requests in God's Eye View using its maintainer acceptance workflow. Use for contribution triage, PR acceptance reviews, or authorized integration; not for ordinary implementation work or opening the user's own PR.
+description: Review and integrate community pull requests in Camera Eye using its maintainer acceptance workflow. Use for contribution triage, PR acceptance reviews, or authorized integration; not for ordinary implementation work or opening the user's own PR.
 ---
 
 # Community PR
@@ -13,7 +13,7 @@ record; read it before reviewing or executing the PR.
 ## Load the trusted procedure
 
 Work from a trusted checkout before entering the contributor's tree. Confirm the
-upstream is `bilawalsidhu/gods-eye-view`, fetch its `main`, and record the fetched
+upstream is `AhmadRun/camera-eye`, fetch its `main`, and record the fetched
 commit SHA. Read `docs/MAINTAINER_WORKFLOW.md` and
 `.agents/skills/community-pr/SKILL.md` from that SHA with `git show SHA:path`,
 then follow the workflow's related-document instructions. The relative link above

@@ -386,13 +386,13 @@ function harness(
     /** What the style manager dispatches when the user picks a preset. */
     style(name) {
       globalThis.window.dispatchEvent(
-        new CustomEvent('gev:style-change', { detail: { style: name } }),
+        new CustomEvent('ce:style-change', { detail: { style: name } }),
       );
     },
     /** What the style manager dispatches after every sync, cockpit included. */
     vision(style, cockpit) {
       globalThis.window.dispatchEvent(
-        new CustomEvent('gev:vision-change', { detail: { style, cockpit } }),
+        new CustomEvent('ce:vision-change', { detail: { style, cockpit } }),
       );
     },
     /** Move the camera's view rectangle, the way a real camera move would. */
@@ -643,7 +643,7 @@ test('a snapshot the proxy replayed from its own cache for six minutes is refuse
   // not the same as the buses being where they say.
   app.serve('mbta', () => ({
     status: 200,
-    headers: { 'x-gev-cache': 'STALE-ERROR' },
+    headers: { 'x-ce-cache': 'STALE-ERROR' },
     body: snapshot('mbta', 'MBTA', vehicles, { fetchedAt }),
   }));
   for (let tick = 0; tick < 24; tick += 1) {

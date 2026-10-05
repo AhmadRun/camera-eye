@@ -105,7 +105,7 @@ test('Radio listeners and subscriptions are revoked once before tuning teardown'
     f.controls._setRadioDisclosure(true);
     f.controls._setCockpitDisclosure('display', true);
     f.next.dispatchEvent(new Event('click'));
-    f.document.dispatchEvent(new Event('gev:radio-selected'));
+    f.document.dispatchEvent(new Event('ce:radio-selected'));
     f.subscribers[0]({ enabled: true });
     f.controls.connect();
     assert.deepEqual(f.calls, snapshot);

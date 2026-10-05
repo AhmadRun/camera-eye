@@ -6,13 +6,13 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function checkInstallationPan(page, dir) {
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('local-datacenters', true),
+    window.__cameraEye.dataManager.setEnabled('local-datacenters', true),
   );
   await sleep(3000);
   await page.evaluate(async () => {
     const { getOverlayPaintRect } =
       await import('/src/overlays/worldOverlay.js');
-    const g = window.__godsEyeView;
+    const g = window.__cameraEye;
     const installations = g.dataManager.layers.get(
       'military-installations',
     ).module;
@@ -96,7 +96,7 @@ export async function checkInstallationPan(page, dir) {
   );
   await page.screenshot({ path: `${dir}/slow-pan-side-by-side.png` });
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('local-datacenters', false),
+    window.__cameraEye.dataManager.setEnabled('local-datacenters', false),
   );
   return result;
 }
@@ -131,7 +131,7 @@ export async function checkInstallationSelection(
       await moveCamera(page, { ...site, pitch: -80 }, 1.5);
       await page.waitForFunction(
         () => {
-          const s = window.__godsEyeView.dataManager.layers
+          const s = window.__cameraEye.dataManager.layers
             .get('military-installations')
             .module.getStats();
           return !s.loading && s.count > 0;
@@ -141,7 +141,7 @@ export async function checkInstallationSelection(
       await sleep(1500);
       const picked = await page.evaluate(async (site) => {
         const C = await import('/node_modules/cesium/Build/Cesium/index.js');
-        const g = window.__godsEyeView,
+        const g = window.__cameraEye,
           layer = g.dataManager.layers.get('military-installations').module;
         const record = layer
           .getNearby(C.Cartesian3.fromDegrees(site.lon, site.lat), 100000, 1000)
@@ -258,7 +258,7 @@ export async function checkInstallationSelection(
         .catch(async (error) => {
           await page.screenshot({ path: `${dir}/selection-failure.png` });
           const diagnostic = await page.evaluate(() => {
-            const g = window.__godsEyeView;
+            const g = window.__cameraEye;
             const describe = (p) => ({
               type: p.constructor.name,
               ready: p.ready,
@@ -298,7 +298,7 @@ export async function checkInstallationSelection(
           async (site, heading) => {
             const C =
               await import('/node_modules/cesium/Build/Cesium/index.js');
-            const g = window.__godsEyeView;
+            const g = window.__cameraEye;
             const target = C.Cartesian3.fromDegrees(
               site.lon,
               site.lat,
@@ -329,11 +329,11 @@ export async function checkInstallationSelection(
       await moveCamera(page, { ...site, pitch: -80 }, 1);
       await sleep(900);
       const empty = await page.evaluate(() => {
-        const g = window.__godsEyeView;
+        const g = window.__cameraEye;
         for (let y = 250; y < 650; y += 75)
           for (let x = 400; x < 850; x += 75) {
             const pick = g.viewer.scene.pick({ x, y });
-            if (!pick?.id?.installationId && !pick?.id?.gevTrackedId)
+            if (!pick?.id?.installationId && !pick?.id?.ceTrackedId)
               return { x, y };
           }
         throw new Error('No empty map point');

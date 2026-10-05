@@ -207,7 +207,7 @@ export class RealtimeInput {
     this.stopVoiceVisualizer();
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     const bars = Array.from(
-      this.ui.root.querySelectorAll('.gev-voice-visualizer span'),
+      this.ui.root.querySelectorAll('.ce-voice-visualizer span'),
     );
     if (!AudioContextClass || !stream || !bars.length) return;
     try {
@@ -340,7 +340,7 @@ export class RealtimeInput {
       this.visualizerAudioContext = null;
     }
     resetVoiceVisualizerBars(
-      this.ui?.root?.querySelectorAll('.gev-voice-visualizer span'),
+      this.ui?.root?.querySelectorAll('.ce-voice-visualizer span'),
     );
   }
 

@@ -40,7 +40,7 @@ page.on('request', (request) => {
 const action = (id) => `[data-director-action="${id}"]`;
 const load = () =>
   page.evaluate(() =>
-    window.__godsEyeView.sceneDirector.loadShot('interactive', 'one', {
+    window.__cameraEye.sceneDirector.loadShot('interactive', 'one', {
       flyDuration: 0.2,
     }),
   );
@@ -52,12 +52,12 @@ try {
   );
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.sceneDirector &&
+      window.__cameraEye?.sceneDirector &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 60000 },
   );
   await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const camera = {
       lat: 30.2672,
       lon: -97.742,
@@ -149,7 +149,7 @@ try {
     'import installs no action handlers or UI',
     await page.evaluate(
       () =>
-        !window.__godsEyeView.sceneDirector.getInteractionState().active &&
+        !window.__cameraEye.sceneDirector.getInteractionState().active &&
         !document.querySelector('[data-director-interactions]'),
     ),
   );
@@ -157,17 +157,16 @@ try {
   check(
     'settled LOAD activates four actions',
     await page.evaluate(
-      () =>
-        window.__godsEyeView.sceneDirector.getInteractionState().count === 4,
+      () => window.__cameraEye.sceneDirector.getInteractionState().count === 4,
     ),
   );
   await page.waitForFunction(
-    () => window.__godsEyeView.tileset?.tilesLoaded === true,
+    () => window.__cameraEye.tileset?.tilesLoaded === true,
     { timeout: 60000 },
   );
   await new Promise((r) => setTimeout(r, 2000));
   const point = await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const entity = d.viewer.entities.values.find(
       (e) => e.name === 'data / point',
     );
@@ -204,7 +203,7 @@ try {
     `${output}/report.json`,
     JSON.stringify(
       await page.evaluate(() => ({
-        tilesSettled: window.__godsEyeView.tileset?.tilesLoaded === true,
+        tilesSettled: window.__cameraEye.tileset?.tilesLoaded === true,
       })),
       null,
       2,
@@ -217,7 +216,7 @@ try {
     await page.evaluate(
       () =>
         Math.abs(
-          window.__godsEyeView.sceneDirector.viewer.camera.positionCartographic
+          window.__cameraEye.sceneDirector.viewer.camera.positionCartographic
             .height - 5000,
         ) < 1,
     ),
@@ -241,7 +240,7 @@ try {
   await page.evaluate(() => window.__inputOwner.releasePointer(window.__lease));
   // Hold the actual manager admission call to exercise Stop before an enable settles.
   await page.evaluate(() => {
-    const d = window.__godsEyeView.sceneDirector,
+    const d = window.__cameraEye.sceneDirector,
       m = d.dataManager;
     window.__originalEnable = m.setEnabled;
     m.setEnabled = function (id, enabled, options) {
@@ -258,33 +257,33 @@ try {
   });
   await page.click(action('layer'));
   await page.waitForFunction(() => window.__actionSignal);
-  await page.evaluate(() => window.__godsEyeView.sceneDirector.stopScene());
+  await page.evaluate(() => window.__cameraEye.sceneDirector.stopScene());
   check(
     'Stop aborts pending layer admission and removes handlers/cards/selection',
     await page.evaluate(
       () =>
         window.__actionSignal.aborted &&
-        !window.__godsEyeView.sceneDirector.getInteractionState().active &&
+        !window.__cameraEye.sceneDirector.getInteractionState().active &&
         !document.querySelector('[data-director-interactions]'),
     ),
   );
   await page.evaluate(() => {
     window.__lateAction();
-    window.__godsEyeView.sceneDirector.dataManager.setEnabled =
+    window.__cameraEye.sceneDirector.dataManager.setEnabled =
       window.__originalEnable;
   });
   await load();
   await page.evaluate(() =>
-    window.__godsEyeView.sceneDirector.seekScene('interactive', 0.1),
+    window.__cameraEye.sceneDirector.seekScene('interactive', 0.1),
   );
   check(
     'same-shot seek restores pack geometry and resets action state',
     await page.evaluate(
       () =>
-        window.__godsEyeView.sceneDirector.getInteractionState().count === 4 &&
-        window.__godsEyeView.sceneDirector.getInteractionState().selected ===
+        window.__cameraEye.sceneDirector.getInteractionState().count === 4 &&
+        window.__cameraEye.sceneDirector.getInteractionState().selected ===
           null &&
-        window.__godsEyeView.sceneDirector.getDataPackState().count === 1,
+        window.__cameraEye.sceneDirector.getDataPackState().count === 1,
     ),
   );
   await page.evaluate(() => {
@@ -294,14 +293,14 @@ try {
   });
   await page.click(action('next'));
   await page.waitForFunction(
-    () => window.__godsEyeView.sceneDirector._selectedShotId === 'two',
+    () => window.__cameraEye.sceneDirector._selectedShotId === 'two',
   );
   check(
     'explicit shot transition replaces resources and removes actions',
     await page.evaluate(
       () =>
-        !window.__godsEyeView.sceneDirector.getInteractionState().active &&
-        window.__godsEyeView.sceneDirector.getDataPackState().count === 0,
+        !window.__cameraEye.sceneDirector.getInteractionState().active &&
+        window.__cameraEye.sceneDirector.getDataPackState().count === 0,
     ),
   );
   await load();
@@ -310,26 +309,26 @@ try {
     'detached buttons cannot invoke replacement actions with the same ID',
     await page.evaluate(
       () =>
-        window.__godsEyeView.sceneDirector.getInteractionState().selected ===
+        window.__cameraEye.sceneDirector.getInteractionState().selected ===
           null &&
         !document.querySelector('[data-director-action-card]').textContent,
     ),
   );
   await page.evaluate(() => {
-    window.__godsEyeView.sceneDirector._interactionTransitions = 64;
+    window.__cameraEye.sceneDirector._interactionTransitions = 64;
   });
   await page.click(action('next'));
   check(
     'bounded transition chain cannot take another branch',
     await page.evaluate(
-      () => window.__godsEyeView.sceneDirector._selectedShotId === 'one',
+      () => window.__cameraEye.sceneDirector._selectedShotId === 'one',
     ),
   );
   await load();
   await page.evaluate(async () => {
     const p = structuredClone(window.__interactionProject);
     p.scenes[0].shots[0].interactions[0].target.featureId = 'missing';
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     await d.importProjectFile(new File([JSON.stringify(p)], 'missing.json'));
     await d.loadShot('interactive', 'one', { flyDuration: 0.2 });
   });
@@ -337,12 +336,12 @@ try {
     'unknown loaded feature refuses the whole action set',
     await page.evaluate(
       () =>
-        !window.__godsEyeView.sceneDirector.getInteractionState().active &&
+        !window.__cameraEye.sceneDirector.getInteractionState().active &&
         !document.querySelector('[data-director-interactions]'),
     ),
   );
   await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     await d.importProjectFile(
       new File([JSON.stringify(window.__interactionProject)], 'restore.json'),
     );
@@ -353,7 +352,7 @@ try {
     'teardown releases interactive resources',
     await page.evaluate(
       () =>
-        window.__godsEyeView.sceneDirector.getInteractionState().count === 0 &&
+        window.__cameraEye.sceneDirector.getInteractionState().count === 0 &&
         !document.querySelector('[data-director-interactions]'),
     ),
   );

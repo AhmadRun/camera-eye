@@ -31,7 +31,7 @@ test('doctor distinguishes supported, usable EOL, and unsupported Node versions'
 });
 
 test('doctor rejects an empty node_modules and requires every direct package', () => {
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-doctor-deps-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-doctor-deps-'));
   try {
     writeFileSync(path.join(root, 'package.json'), JSON.stringify({
       dependencies: { vite: '1.0.0' },
@@ -92,7 +92,7 @@ test('doctor recognizes every OpenSky OAuth keychain alias used by dev-fresh', (
 });
 
 test('Pinokio-scoped diagnosis ignores Keychain items its start path does not import', () => {
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-pinokio-doctor-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-pinokio-doctor-'));
   try {
     const spec = credential('OPENAI_API_KEY');
     const keychainLookup = () => true;
@@ -113,7 +113,7 @@ test('Pinokio-scoped diagnosis ignores Keychain items its start path does not im
 });
 
 test('Pinokio-scoped diagnosis does not count dotenv values shadowed by blank app fields', () => {
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-pinokio-doctor-env-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-pinokio-doctor-env-'));
   try {
     const spec = credential('GOOGLE_MAPS_API_KEY');
     writeFileSync(path.join(root, '.env.local'), 'GOOGLE_MAPS_API_KEY=dotenv-only\n');
@@ -134,12 +134,12 @@ test('Pinokio-scoped diagnosis does not count dotenv values shadowed by blank ap
 });
 
 test('doctor reads the dotenv ladder without requiring Vite to be installed', () => {
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-doctor-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-doctor-'));
   try {
-    writeFileSync(path.join(root, '.env'), 'GEV_TEST_KEY=base\n');
-    writeFileSync(path.join(root, '.env.local'), 'GEV_TEST_KEY=local\n');
-    writeFileSync(path.join(root, '.env.development.local'), 'GEV_TEST_KEY=mode-local\n');
-    assert.equal(readDoctorDotenvValue('GEV_TEST_KEY', root), 'mode-local');
+    writeFileSync(path.join(root, '.env'), 'CE_TEST_KEY=base\n');
+    writeFileSync(path.join(root, '.env.local'), 'CE_TEST_KEY=local\n');
+    writeFileSync(path.join(root, '.env.development.local'), 'CE_TEST_KEY=mode-local\n');
+    assert.equal(readDoctorDotenvValue('CE_TEST_KEY', root), 'mode-local');
     assert.equal(readDoctorDotenvValue('not valid', root), '');
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -147,7 +147,7 @@ test('doctor reads the dotenv ladder without requiring Vite to be installed', ()
 });
 
 test('doctor resolves OpenSky auth mode with launcher-compatible precedence', () => {
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-doctor-opensky-mode-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-doctor-opensky-mode-'));
   try {
     writeFileSync(path.join(root, '.env'), 'OPENSKY_AUTH_MODE=anon\n');
     assert.equal(resolveOpenSkyAuthMode({ environment: {}, rootDir: root }), 'anon');

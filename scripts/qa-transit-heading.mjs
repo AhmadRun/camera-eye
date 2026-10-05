@@ -16,12 +16,12 @@ export async function runTransitHeadingRegression(base, check) {
       { waitUntil: 'domcontentloaded' },
     );
     await page.waitForFunction(
-      () => window.__godsEyeView?.dataManager?.layers?.has('transit'),
+      () => window.__cameraEye?.dataManager?.layers?.has('transit'),
       { timeout: 90000 },
     );
     await new Promise((resolve) => setTimeout(resolve, 6000));
     await page.evaluate(async () => {
-      const app = window.__godsEyeView;
+      const app = window.__cameraEye;
       await app.dataManager.setEnabled('transit', true, { source: 'qa' });
       const layer = app.dataManager.layers.get('transit').module;
       layer._loadTransitFleetForTest(4, { lat: 42.3601, lon: -71.0589 }, 100);
@@ -61,7 +61,7 @@ export async function runTransitHeadingRegression(base, check) {
     });
     const pose = async (heading) => {
       await page.evaluate((heading) => {
-        const camera = window.__godsEyeView.viewer.camera;
+        const camera = window.__cameraEye.viewer.camera;
         const C = camera.positionCartographic.constructor;
         camera.setView({
           destination: C.toCartesian(C.fromDegrees(-71.0589, 42.3601, 1200)),
@@ -72,7 +72,7 @@ export async function runTransitHeadingRegression(base, check) {
     };
     const sample = () =>
       page.evaluate(async () => {
-        const app = window.__godsEyeView,
+        const app = window.__cameraEye,
           scene = app.viewer.scene;
         const state = app.dataManager.layers
           .get('transit')

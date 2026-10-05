@@ -99,7 +99,7 @@ export function adsbLolProxy() {
           return;
         }
         const upstream = await fetch('https://api.adsb.lol/v2/mil', {
-          headers: { 'User-Agent': 'gods-eye-view-adsblol-proxy/1.0' },
+          headers: { 'User-Agent': 'camera-eye-adsblol-proxy/1.0' },
         });
         if (upstream.ok) {
           const body = await upstream.text();

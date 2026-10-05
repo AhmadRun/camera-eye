@@ -1,10 +1,10 @@
 import { toFunctionOutput } from '../tools/functions.js';
-import { GEV_ACTION_SCHEMAS } from './actionSchemas.js';
-import { createGevActionRunner } from './gevActions.js';
+import { CE_ACTION_SCHEMAS } from './actionSchemas.js';
+import { createGevActionRunner } from './ceActions.js';
 import { createVoiceCommands } from './commands.js';
 export * from './realtimeController.js';
 
-const ACTION_NAMES = new Set(GEV_ACTION_SCHEMAS.map((schema) => schema.name));
+const ACTION_NAMES = new Set(CE_ACTION_SCHEMAS.map((schema) => schema.name));
 
 /**
  * Run app actions through `runner` and every other tool the catalog has

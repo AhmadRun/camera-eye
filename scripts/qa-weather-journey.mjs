@@ -89,13 +89,13 @@ try {
   // The Data Layers panel remembers its collapsed state; start it open.
   await page.evaluateOnNewDocument(() => {
     try {
-      localStorage.setItem('godsEyeView.v6.panelCollapsed.data-panel', '0');
+      localStorage.setItem('cameraEye.v6.panelCollapsed.data-panel', '0');
     } catch {
       /* storage may be unavailable */
     }
   });
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !!window.__godsEyeView?.viewer, {
+  await page.waitForFunction(() => !!window.__cameraEye?.viewer, {
     timeout: 120_000,
   });
   await sleep(12_000);
@@ -103,12 +103,12 @@ try {
   const diagnostics = () =>
     page.evaluate(
       ({ WEATHER }) => {
-        const gev = window.__godsEyeView;
-        const dm = gev.dataManager;
+        const ce = window.__cameraEye;
+        const dm = ce.dataManager;
         const out = {
-          basemap: gev.tileset ? 'google-3d' : 'keyless-globe',
-          globeShown: gev.viewer.scene.globe.show,
-          heightM: Math.round(gev.viewer.camera.positionCartographic.height),
+          basemap: ce.tileset ? 'google-3d' : 'keyless-globe',
+          globeShown: ce.viewer.scene.globe.show,
+          heightM: Math.round(ce.viewer.camera.positionCartographic.height),
           summaryHeight: Math.round(
             document.querySelector('.weather-summary')?.getBoundingClientRect()
               .height ?? 0,
@@ -151,7 +151,7 @@ try {
     page.evaluate(
       (ms) =>
         new Promise((resolve) => {
-          const scene = window.__godsEyeView.viewer.scene;
+          const scene = window.__cameraEye.viewer.scene;
           let n = 0;
           const off = scene.postRender.addEventListener(() => {
             n += 1;
@@ -207,7 +207,7 @@ try {
     page
       .waitForFunction(
         (ids) => {
-          const dm = window.__godsEyeView.dataManager;
+          const dm = window.__cameraEye.dataManager;
           for (const id of ids) {
             const entry = dm.layers.get(id);
             if (!entry?.enabled) return false;
@@ -237,7 +237,7 @@ try {
   ) => {
     await page.evaluate(
       ({ lon, lat, height, pitch, heading, duration }) => {
-        const v = window.__godsEyeView.viewer;
+        const v = window.__cameraEye.viewer;
         const d2r = Math.PI / 180;
         v.camera.cancelFlight();
         v.camera.flyTo({
@@ -257,10 +257,10 @@ try {
 
   console.log(`\nqa-weather-journey · ${label} · ${url}`);
   await page.evaluate(async () => {
-    const gev = window.__godsEyeView;
-    for (const [id, entry] of gev.dataManager.layers)
+    const ce = window.__cameraEye;
+    for (const [id, entry] of ce.dataManager.layers)
       if (entry.enabled)
-        await gev.dataManager.setEnabled(id, false, { origin: 'user' });
+        await ce.dataManager.setEnabled(id, false, { origin: 'user' });
     document.querySelector('#data-panel')?.classList.remove('collapsed');
   });
 
@@ -333,7 +333,7 @@ try {
       await sleep(6000);
       await shot('storm-view', `View storm: ${storm}`);
       await page.evaluate(() =>
-        window.__godsEyeView.viewer.camera.zoomIn(400_000),
+        window.__cameraEye.viewer.camera.zoomIn(400_000),
       );
       await sleep(4000);
       await shot('storm-closer', 'Zoomed toward the storm');

@@ -180,7 +180,7 @@ test('DriveBC loader fails soft on HTTP errors, unexpected payloads and network 
 test('CCTV catalog merges DriveBC cameras and CCTV_DRIVEBC_ENABLED=0 skips the request', async (t) => {
   quiet(t);
   const sourceRoot = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'gev-cctv-catalog-'),
+    path.join(os.tmpdir(), 'ce-cctv-catalog-'),
   );
   t.after(() => fs.rmSync(sourceRoot, { recursive: true, force: true }));
   withEnv(t, {

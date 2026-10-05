@@ -93,7 +93,7 @@ async function openPage({ aircraft = false } = {}) {
     ).push(`${response.status()} ${url.pathname}${url.search}`);
   });
   await page.evaluateOnNewDocument((aircraft) => {
-    sessionStorage.setItem('gev:first-run-mission-session:v1', 'dismissed');
+    sessionStorage.setItem('ce:first-run-mission-session:v1', 'dismissed');
     if (!aircraft) return;
     // Synthetic traffic through the app's own feed endpoints: one aircraft
     // flying north over Camp Mabry, one loitering near Fort Cavazos.
@@ -171,12 +171,12 @@ async function openPage({ aircraft = false } = {}) {
   await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 90_000 });
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.dataManager &&
+      window.__cameraEye?.dataManager &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 120_000 },
   );
   await page.evaluate(
-    () => window.__godsEyeView.styleManager.initialRestorePromise,
+    () => window.__cameraEye.styleManager.initialRestorePromise,
   );
   await page.keyboard.press('Escape');
   return page;
@@ -186,7 +186,7 @@ async function waitTiles(page, maxMs = 30_000) {
   await page
     .waitForFunction(
       () => {
-        const { scene } = window.__godsEyeView.viewer;
+        const { scene } = window.__cameraEye.viewer;
         if (scene.globe.show) return scene.globe.tilesLoaded;
         for (let i = 0; i < scene.primitives.length; i++) {
           const p = scene.primitives.get(i);
@@ -202,7 +202,7 @@ async function waitTiles(page, maxMs = 30_000) {
 /** Camera height above the rendered surface under it and under the view centre. */
 function clearance(page) {
   return page.evaluate(() => {
-    const { viewer } = window.__godsEyeView;
+    const { viewer } = window.__cameraEye;
     const { scene, camera } = viewer;
     const carto = camera.positionCartographic.clone();
     const sample = (c) => {
@@ -259,7 +259,7 @@ async function arrivals() {
     let stillSince = null;
     while (Date.now() - landed < 30_000) {
       const now = await page.evaluate(() => {
-        const c = window.__godsEyeView.viewer.camera.positionWC;
+        const c = window.__cameraEye.viewer.camera.positionWC;
         return [c.x, c.y, c.z];
       });
       const moved =
@@ -283,7 +283,7 @@ async function arrivals() {
     await page.screenshot({ path: path.join(dir, `arrival-${slug}.png`) });
     // Look around: a gentle orbit, then check the eye still clears the ground.
     const view = await page.evaluate(() => {
-      const c = window.__godsEyeView.viewer.camera;
+      const c = window.__cameraEye.viewer.camera;
       return {
         lat: (c.positionCartographic.latitude * 180) / Math.PI,
         lon: (c.positionCartographic.longitude * 180) / Math.PI,
@@ -311,7 +311,7 @@ async function contacts() {
   const dir = path.join(outDir, 'contacts');
   fs.mkdirSync(dir, { recursive: true });
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('flights', true, {
+    window.__cameraEye.dataManager.setEnabled('flights', true, {
       origin: 'user',
     }),
   );
@@ -325,7 +325,7 @@ async function contacts() {
   // In-page probe: row text and installation entity churn every 250 ms.
   await page.evaluate(() => {
     const samples = [];
-    window.__gevContextSamples = samples;
+    window.__ceContextSamples = samples;
     let created = 0;
     const seen = new WeakSet();
     setInterval(() => {
@@ -338,7 +338,7 @@ async function contacts() {
           candidate.querySelector('strong')?.textContent?.trim() ===
           'Mapped installations',
       );
-      const ds = window.__godsEyeView.viewer.dataSources.getByName(
+      const ds = window.__cameraEye.viewer.dataSources.getByName(
         'military-installations',
       )[0];
       for (const entity of ds?.entities.values || [])
@@ -359,8 +359,7 @@ async function contacts() {
         })),
         entities: ds?.entities.values.length ?? 0,
         created,
-        tracked:
-          window.__godsEyeView.viewer.trackedEntity?.gevTrackedId ?? null,
+        tracked: window.__cameraEye.viewer.trackedEntity?.ceTrackedId ?? null,
         cockpit: document.body.classList.contains('cockpit-mode'),
       });
       if (samples.length > 5000) samples.splice(0, 1000);
@@ -375,14 +374,14 @@ async function contacts() {
   await page
     .waitForFunction(
       () =>
-        window.__godsEyeView.viewer.trackedEntity?.gevTrackedId ===
+        window.__cameraEye.viewer.trackedEntity?.ceTrackedId ===
         'flights:aaa051',
       { timeout: 60_000 },
     )
     .catch(() => {});
   const readSamples = (from) =>
     page.evaluate(
-      (a) => window.__gevContextSamples.filter((s) => s.t >= a),
+      (a) => window.__ceContextSamples.filter((s) => s.t >= a),
       from,
     );
   const numeric = (s) => /^\d+/.test(String(s.count ?? ''));
@@ -436,7 +435,7 @@ async function contacts() {
 
   // Cockpit: the same context must hold with a horizon view.
   const cockpit = await page.evaluate(() => {
-    const view = window.__godsEyeView.styleManager.cockpitView;
+    const view = window.__cameraEye.styleManager.cockpitView;
     view.syncEntry();
     return view.enter();
   });
@@ -468,7 +467,7 @@ async function contacts() {
     inCockpit.at(-1)?.text || 'no cockpit samples',
   );
   await page.evaluate(() =>
-    window.__godsEyeView.styleManager.cockpitView.exit?.(),
+    window.__cameraEye.styleManager.cockpitView.exit?.(),
   );
   await sleep(2000);
 
@@ -503,7 +502,7 @@ async function contacts() {
   );
   await sleep(2000);
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.layers
+    window.__cameraEye.dataManager.layers
       .get('flights')
       .module.trackById('aaa052'),
   );

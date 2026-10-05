@@ -984,7 +984,7 @@
   right: 0.75rem;
 }
 
-:root[data-ui-theme='cyber'] #command-dock > #gev-voice-control {
+:root[data-ui-theme='cyber'] #command-dock > #ce-voice-control {
   --cyber-voice-wave: 105, 203, 209;
   --cyber-voice-peak: 226, 240, 240;
   --cyber-voice-alert: 196, 84, 84;
@@ -999,7 +999,7 @@
   -webkit-backdrop-filter: none;
 }
 
-:root[data-ui-theme='cyber'] #command-dock > #gev-voice-control::before {
+:root[data-ui-theme='cyber'] #command-dock > #ce-voice-control::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -1031,7 +1031,7 @@
   );
 }
 
-:root[data-ui-theme='cyber'] #command-dock #gev-voice-button {
+:root[data-ui-theme='cyber'] #command-dock #ce-voice-button {
   border: 1px solid rgba(226, 235, 236, 0.24);
   background: rgba(8, 13, 15, 0.32);
   box-shadow: 0 0 0 3px rgba(196, 84, 84, 0.08) inset;
@@ -1045,7 +1045,7 @@
   );
 }
 
-:root[data-ui-theme='cyber'] #command-dock .gev-mic-orbit {
+:root[data-ui-theme='cyber'] #command-dock .ce-mic-orbit {
   position: relative;
   border-color: rgba(196, 84, 84, 0.58);
   border-radius: 0;
@@ -1056,7 +1056,7 @@
   transform: rotate(45deg) scale(0.8);
 }
 
-:root[data-ui-theme='cyber'] #command-dock .gev-mic-orbit::before {
+:root[data-ui-theme='cyber'] #command-dock .ce-mic-orbit::before {
   position: absolute;
   inset: -0.3rem;
   border: 1px solid rgba(var(--cyber-voice-wave), 0.26);
@@ -1070,34 +1070,34 @@
 
 :root[data-ui-theme='cyber']
   #command-dock
-  #gev-voice-control:is(
+  #ce-voice-control:is(
     [data-status='connecting'],
     [data-status='listening'],
     [data-status='executing']
   )
-  .gev-mic-orbit::before {
-  animation: gev-cyber-voice-lock 1.45s ease-in-out infinite;
+  .ce-mic-orbit::before {
+  animation: ce-cyber-voice-lock 1.45s ease-in-out infinite;
 }
 
-:root[data-ui-theme='cyber'] #command-dock .gev-mic-orbit > * {
+:root[data-ui-theme='cyber'] #command-dock .ce-mic-orbit > * {
   transform: rotate(-45deg) scale(1.25);
 }
 
 :root[data-ui-theme='cyber']
   #command-dock
-  #gev-voice-control[data-speaker='user'] {
+  #ce-voice-control[data-speaker='user'] {
   --cyber-voice-wave: 232, 157, 78;
   --cyber-voice-peak: 255, 218, 154;
 }
 
 :root[data-ui-theme='cyber']
   #command-dock
-  #gev-voice-control[data-speaker='ai'] {
+  #ce-voice-control[data-speaker='ai'] {
   --cyber-voice-wave: 105, 203, 209;
   --cyber-voice-peak: 211, 247, 248;
 }
 
-:root[data-ui-theme='cyber'] #command-dock .gev-voice-visualizer {
+:root[data-ui-theme='cyber'] #command-dock .ce-voice-visualizer {
   position: relative;
   isolation: isolate;
   align-items: center;
@@ -1138,7 +1138,7 @@
   );
 }
 
-:root[data-ui-theme='cyber'] #command-dock .gev-voice-visualizer::before {
+:root[data-ui-theme='cyber'] #command-dock .ce-voice-visualizer::before {
   position: absolute;
   top: 50%;
   right: 0.2rem;
@@ -1157,7 +1157,7 @@
   pointer-events: none;
 }
 
-:root[data-ui-theme='cyber'] #command-dock .gev-voice-visualizer::after {
+:root[data-ui-theme='cyber'] #command-dock .ce-voice-visualizer::after {
   position: absolute;
   top: 2px;
   bottom: 2px;
@@ -1176,13 +1176,13 @@
   opacity: 0.42;
   pointer-events: none;
   transform: skewX(-10deg);
-  animation: gev-cyber-voice-scan 2.8s linear infinite;
+  animation: ce-cyber-voice-scan 2.8s linear infinite;
 }
 
-:root[data-ui-theme='cyber'] #command-dock .gev-voice-visualizer span,
+:root[data-ui-theme='cyber'] #command-dock .ce-voice-visualizer span,
 :root[data-ui-theme='cyber']
   #command-dock
-  .gev-voice-visualizer
+  .ce-voice-visualizer
   span:nth-child(n) {
   position: relative;
   z-index: 1;
@@ -1206,12 +1206,12 @@
 
 :root[data-ui-theme='cyber']
   #command-dock
-  #gev-voice-control:is(
+  #ce-voice-control:is(
     [data-status='connecting'],
     [data-status='listening'],
     [data-status='executing']
   )
-  .gev-voice-visualizer {
+  .ce-voice-visualizer {
   border-color: rgba(var(--cyber-voice-wave), 0.58);
   border-left-color: rgba(var(--cyber-voice-alert), 0.9);
   opacity: 1;
@@ -1223,13 +1223,13 @@
 
 :root[data-ui-theme='cyber']
   #command-dock
-  #gev-voice-control:is([data-status='listening'], [data-status='executing'])
-  .gev-voice-visualizer::after {
+  #ce-voice-control:is([data-status='listening'], [data-status='executing'])
+  .ce-voice-visualizer::after {
   opacity: 0.72;
   animation-duration: 1.65s;
 }
 
-@keyframes gev-cyber-voice-scan {
+@keyframes ce-cyber-voice-scan {
   from {
     left: -34%;
   }
@@ -1239,7 +1239,7 @@
   }
 }
 
-@keyframes gev-cyber-voice-lock {
+@keyframes ce-cyber-voice-lock {
   0%,
   100% {
     opacity: 0.34;
@@ -1253,19 +1253,19 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root[data-ui-theme='cyber'] #command-dock .gev-voice-visualizer::after,
+  :root[data-ui-theme='cyber'] #command-dock .ce-voice-visualizer::after,
   :root[data-ui-theme='cyber']
     #command-dock
-    #gev-voice-control:is(
+    #ce-voice-control:is(
       [data-status='connecting'],
       [data-status='listening'],
       [data-status='executing']
     )
-    .gev-mic-orbit::before {
+    .ce-mic-orbit::before {
     animation: none;
   }
 
-  :root[data-ui-theme='cyber'] #command-dock .gev-voice-visualizer::after {
+  :root[data-ui-theme='cyber'] #command-dock .ce-voice-visualizer::after {
     left: 52%;
     opacity: 0.2;
   }
@@ -1391,7 +1391,7 @@
 
 :root[data-ui-theme='cyber']
   #command-dock
-  :where(.panel-title, .location-toolbar-label, .gev-voice-kicker) {
+  :where(.panel-title, .location-toolbar-label, .ce-voice-kicker) {
   color: var(--cyber-red-bright);
 }
 

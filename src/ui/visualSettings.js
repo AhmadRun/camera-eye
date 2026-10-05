@@ -39,7 +39,7 @@ import {
   setCyberSonarEnabled,
 } from '../cyberSonar.js';
 import { cyberVisualDefaultsForHudTransition } from '../hudLayouts.js';
-const DETECTION_ALLOCATION_STORAGE_KEY = 'gev:detection-allocation:v1';
+const DETECTION_ALLOCATION_STORAGE_KEY = 'ce:detection-allocation:v1';
 
 /** Own visual preferences, detection overrides and display-control state. */
 export class VisualSettings {
@@ -198,7 +198,7 @@ export class VisualSettings {
     this.activeStyle = 'normal';
     this._preCyberStyle = null;
     this._cyberStyleUserSelected = false;
-    document.documentElement.dataset.gevStyle = this.activeStyle;
+    document.documentElement.dataset.ceStyle = this.activeStyle;
     this._detectionUserOverridden = false;
     this._cockpitVisionMode = 'optical';
     this._cockpitVisionRestore = null;
@@ -378,7 +378,7 @@ export class VisualSettings {
     // EFFECTIVE style — a cockpit vision override sets no map style, so the
     // map's own style event never fires for it.
     window.dispatchEvent(
-      new CustomEvent('gev:vision-change', {
+      new CustomEvent('ce:vision-change', {
         detail: {
           style: effective,
           cockpit: Boolean(cockpitMode),
@@ -1560,7 +1560,7 @@ export class VisualSettings {
 
     const previousStyle = this.activeStyle;
     this.activeStyle = styleName;
-    document.documentElement.dataset.gevStyle = styleName;
+    document.documentElement.dataset.ceStyle = styleName;
 
     // The celestial optics treatment belongs to the unfiltered globe only.
     // Leaving Normal turns it off; returning merely re-enables the control.
@@ -1610,7 +1610,7 @@ export class VisualSettings {
     setDetectionStyle(styleName);
     this._syncIrBoost();
     window.dispatchEvent(
-      new CustomEvent('gev:style-change', {
+      new CustomEvent('ce:style-change', {
         detail: { style: styleName },
       }),
     );

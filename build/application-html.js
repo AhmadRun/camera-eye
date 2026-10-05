@@ -16,7 +16,7 @@ const allowed = new Set(APPLICATION_TEMPLATES);
 /** Expand only known component templates; markers cannot name filesystem paths. */
 export function expandApplicationHtml(html) {
   return html.replace(
-    /^[ \t]*<!-- gev:template ([^\s]+) -->\r?\n?/gm,
+    /^[ \t]*<!-- ce:template ([^\s]+) -->\r?\n?/gm,
     (_, name) => {
       if (!allowed.has(name))
         throw new Error(`Unknown application template: ${name}`);

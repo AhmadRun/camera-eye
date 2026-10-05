@@ -218,7 +218,7 @@
   display: none;
 }
 
-#command-dock > #gev-voice-control {
+#command-dock > #ce-voice-control {
   position: relative;
   inset: auto;
   z-index: 3;
@@ -237,7 +237,7 @@
   transform: none;
 }
 
-#command-dock .gev-voice-kicker {
+#command-dock .ce-voice-kicker {
   position: static;
   grid-column: 2 / 4;
   grid-row: 1;
@@ -248,7 +248,7 @@
   text-align: center;
 }
 
-#command-dock #gev-voice-button {
+#command-dock #ce-voice-button {
   grid-column: 1;
   grid-row: 1 / 4;
   display: flex;
@@ -266,25 +266,25 @@
     0 0 1rem rgba(0, 212, 255, 0.12);
 }
 
-#command-dock .gev-mic-orbit {
+#command-dock .ce-mic-orbit {
   display: grid;
   place-items: center;
   width: 1.7rem;
   height: 1.7rem;
 }
 
-#command-dock .gev-mic-orbit img {
+#command-dock .ce-mic-orbit img {
   width: 1.55rem;
   height: 1.55rem;
 }
 
-#command-dock .gev-mic-label {
+#command-dock .ce-mic-label {
   font-size: 0.35rem;
   color: rgba(190, 221, 230, 0.72);
   letter-spacing: 0.02rem;
 }
 
-#command-dock .gev-voice-visualizer {
+#command-dock .ce-voice-visualizer {
   grid-column: 2;
   grid-row: 2;
   display: flex;
@@ -296,7 +296,7 @@
   border-bottom: 1px solid rgba(54, 220, 255, 0.34);
 }
 
-#command-dock .gev-voice-visualizer span {
+#command-dock .ce-voice-visualizer span {
   width: 0.18rem;
   height: 0.55rem;
   background: linear-gradient(to top, #28b9db, #71eaff);
@@ -304,36 +304,36 @@
   transform-origin: bottom;
 }
 
-#command-dock .gev-voice-visualizer span:nth-child(3n) {
+#command-dock .ce-voice-visualizer span:nth-child(3n) {
   height: 1.35rem;
 }
-#command-dock .gev-voice-visualizer span:nth-child(4n) {
+#command-dock .ce-voice-visualizer span:nth-child(4n) {
   height: 0.95rem;
 }
-#command-dock .gev-voice-visualizer span:nth-child(5n) {
+#command-dock .ce-voice-visualizer span:nth-child(5n) {
   height: 1.7rem;
 }
-#command-dock .gev-voice-visualizer span:nth-child(7n) {
+#command-dock .ce-voice-visualizer span:nth-child(7n) {
   height: 0.75rem;
 }
 
 #command-dock
-  #gev-voice-control[data-status='listening']
-  .gev-voice-visualizer
+  #ce-voice-control[data-status='listening']
+  .ce-voice-visualizer
   span,
 #command-dock
-  #gev-voice-control[data-status='executing']
-  .gev-voice-visualizer
+  #ce-voice-control[data-status='executing']
+  .ce-voice-visualizer
   span {
-  animation: gev-voice-bar 680ms ease-in-out infinite alternate;
+  animation: ce-voice-bar 680ms ease-in-out infinite alternate;
   animation-delay: calc(var(--bar) * -45ms);
 }
 
-#command-dock .gev-voice-readout {
+#command-dock .ce-voice-readout {
   display: contents;
 }
 
-#command-dock #gev-voice-status {
+#command-dock #ce-voice-status {
   grid-column: 3;
   grid-row: 2;
   align-self: start;
@@ -342,7 +342,7 @@
   text-align: right;
 }
 
-#command-dock #gev-voice-detail {
+#command-dock #ce-voice-detail {
   grid-column: 2 / 4;
   grid-row: 3;
   align-self: center;
@@ -364,7 +364,7 @@
   }
 }
 
-@keyframes gev-voice-bar {
+@keyframes ce-voice-bar {
   from {
     transform: scaleY(0.35);
     opacity: 0.5;
@@ -412,18 +412,18 @@ body:not(.ui-clean-view):not(.recording-mode) #cesium-credits {
     border: 0;
   }
 
-  #command-dock:has(#location-bar:not(.collapsed)) > #gev-voice-control,
-  #command-dock:has(#control-panel:not(.collapsed)) > #gev-voice-control {
+  #command-dock:has(#location-bar:not(.collapsed)) > #ce-voice-control,
+  #command-dock:has(#control-panel:not(.collapsed)) > #ce-voice-control {
     flex-basis: 4.75rem;
     width: 4.75rem;
   }
 
-  #command-dock:has(#location-bar:not(.collapsed)) .gev-voice-visualizer,
-  #command-dock:has(#location-bar:not(.collapsed)) .gev-voice-kicker,
-  #command-dock:has(#location-bar:not(.collapsed)) .gev-voice-readout,
-  #command-dock:has(#control-panel:not(.collapsed)) .gev-voice-visualizer,
-  #command-dock:has(#control-panel:not(.collapsed)) .gev-voice-kicker,
-  #command-dock:has(#control-panel:not(.collapsed)) .gev-voice-readout {
+  #command-dock:has(#location-bar:not(.collapsed)) .ce-voice-visualizer,
+  #command-dock:has(#location-bar:not(.collapsed)) .ce-voice-kicker,
+  #command-dock:has(#location-bar:not(.collapsed)) .ce-voice-readout,
+  #command-dock:has(#control-panel:not(.collapsed)) .ce-voice-visualizer,
+  #command-dock:has(#control-panel:not(.collapsed)) .ce-voice-kicker,
+  #command-dock:has(#control-panel:not(.collapsed)) .ce-voice-readout {
     visibility: hidden;
   }
 

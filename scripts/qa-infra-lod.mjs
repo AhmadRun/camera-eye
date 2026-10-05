@@ -81,13 +81,13 @@ try {
   const testUrl = new URL(APP_URL);
   testUrl.searchParams.set('welcome', '0');
   await page.goto(testUrl.href, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__godsEyeView?.styleManager
+  await page.waitForFunction(() => window.__cameraEye?.styleManager
     && document.getElementById('loading-screen')?.classList.contains('hidden'), { timeout: 90_000 });
   check('first-run chooser does not cover the test surface', await page.evaluate(() => (
     !document.querySelector('#first-run-launcher:not([hidden])')
   )));
   report('renderer', await page.evaluate(() => {
-    const gl = window.__godsEyeView.viewer.scene.context._gl;
+    const gl = window.__cameraEye.viewer.scene.context._gl;
     const debug = gl.getExtension('WEBGL_debug_renderer_info');
     return debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
   }));
@@ -95,8 +95,8 @@ try {
   // Park at a full-earth view and disable every layer so infra is measured
   // in isolation.
   await page.evaluate(async () => {
-    const gev = window.__godsEyeView;
-    const v = gev.viewer;
+    const ce = window.__cameraEye;
+    const v = ce.viewer;
     v.camera.cancelFlight();
     const ell = v.scene.globe.ellipsoid;
     v.camera.setView({
@@ -105,9 +105,9 @@ try {
       }),
       orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
     });
-    for (const [id, entry] of gev.dataManager.layers) {
+    for (const [id, entry] of ce.dataManager.layers) {
       if (entry.enabled) {
-        try { await gev.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* measured via counts */ }
+        try { await ce.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* measured via counts */ }
       }
     }
   });
@@ -117,13 +117,13 @@ try {
   // measures the empty scene for attribution).
   if (!CONTROL) {
     const loaded = await page.evaluate(async (infraIds, cableId) => {
-      const gev = window.__godsEyeView;
+      const ce = window.__cameraEye;
       const ids = [...infraIds, cableId];
       for (const id of ids) {
-        try { await gev.dataManager.setEnabled(id, true, { origin: 'user' }); } catch { /* reported below */ }
+        try { await ce.dataManager.setEnabled(id, true, { origin: 'user' }); } catch { /* reported below */ }
       }
       const deadline = performance.now() + 60_000;
-      const stat = (id) => gev.dataManager.layers.get(id)?.module?.getStats?.() || {};
+      const stat = (id) => ce.dataManager.layers.get(id)?.module?.getStats?.() || {};
       while (performance.now() < deadline) {
         // Every id, cables included. The cable layer's enable() only starts
         // `void load()`, and the manager's immediate update() returns early
@@ -135,7 +135,7 @@ try {
           return (s.count || 0) > 0 || s.error;
         });
         if (done) break;
-        gev.viewer.scene.requestRender?.();
+        ce.viewer.scene.requestRender?.();
         await new Promise((r) => setTimeout(r, 200));
       }
       const out = {};
@@ -147,16 +147,16 @@ try {
       check(`${id} loaded its bundled dataset`, (loaded[id]?.count || 0) > 0, loaded[id]);
     }
     // Nudge a render pass so the first post-enable LOD walk runs.
-    await page.evaluate(() => window.__godsEyeView?.viewer?.scene?.requestRender?.());
+    await page.evaluate(() => window.__cameraEye?.viewer?.scene?.requestRender?.());
     await new Promise((r) => setTimeout(r, 2_000));
   }
 
   // ── GATE a: full-earth budget engaged ─────────────────────────────────
   const readLod = (label) => page.evaluate((infraIds) => {
-    const gev = window.__godsEyeView;
+    const ce = window.__cameraEye;
     const out = {};
     for (const id of infraIds) {
-      out[id] = gev.dataManager.layers.get(id)?.module?.getLodDiagnostics?.() || null;
+      out[id] = ce.dataManager.layers.get(id)?.module?.getLodDiagnostics?.() || null;
     }
     return out;
   }, INFRA_LAYER_IDS).then((lod) => { report(label, lod); return lod; });
@@ -187,7 +187,7 @@ try {
 
     // ── GATE b: zoom in widens the budget ───────────────────────────────
     await page.evaluate(() => {
-      const v = window.__godsEyeView.viewer;
+      const v = window.__cameraEye.viewer;
       const ell = v.scene.globe.ellipsoid;
       v.camera.cancelFlight();
       v.camera.setView({
@@ -215,11 +215,11 @@ try {
 
     // ── GATE c: no churn between camera moves ───────────────────────────
     const churn = await page.evaluate(async (infraIds) => {
-      const gev = window.__godsEyeView;
+      const ce = window.__cameraEye;
       const snap = () => infraIds.map((id) => {
         const visibleIds = [];
-        for (let i = 0; i < gev.viewer.dataSources.length; i++) {
-          for (const entity of gev.viewer.dataSources.get(i).entities.values) {
+        for (let i = 0; i < ce.viewer.dataSources.length; i++) {
+          for (const entity of ce.viewer.dataSources.get(i).entities.values) {
             if (entity.__localLayerId === id && entity.show) visibleIds.push(String(entity.id));
           }
         }
@@ -227,7 +227,7 @@ try {
       });
       const before = snap();
       for (let i = 0; i < 5; i++) {
-        gev.viewer.scene.requestRender?.();
+        ce.viewer.scene.requestRender?.();
         await new Promise((r) => setTimeout(r, 120));
       }
       return { before, after: snap() };
@@ -239,7 +239,7 @@ try {
 
     // Back to full-earth for the frame-cost measurement.
     await page.evaluate(() => {
-      const v = window.__godsEyeView.viewer;
+      const v = window.__cameraEye.viewer;
       const ell = v.scene.globe.ellipsoid;
       v.camera.setView({
         destination: ell.cartographicToCartesian({
@@ -255,7 +255,7 @@ try {
 
   // Count actual rendered frames: scene.render() can return without drawing.
   const frameCost = await page.evaluate(() => new Promise((resolve) => {
-    const v = window.__godsEyeView.viewer;
+    const v = window.__cameraEye.viewer;
     const scene = v.scene;
     const durations = [];
     let frames = 0;
@@ -299,7 +299,7 @@ try {
   const idle = await page.evaluate(async () => {
     const { getRenderGovernorDiagnostics } = await import('/src/renderGovernor.js');
     return new Promise((resolve) => {
-      const scene = window.__godsEyeView.viewer.scene;
+      const scene = window.__cameraEye.viewer.scene;
       const startedAt = Date.now();
       const tilesLoadedBefore = scene.globe.tilesLoaded;
       let renders = 0;

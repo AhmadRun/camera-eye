@@ -12,8 +12,8 @@ dist
 screenshots/
 qa-shots/
 output/
-.gev-logs/
-.gev-cache/
+.ce-logs/
+.ce-cache/
 .DS_Store
 .gstack/
 3d-models/

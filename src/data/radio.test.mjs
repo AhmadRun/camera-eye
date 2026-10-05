@@ -1659,10 +1659,10 @@ test('Radio recovery preserves closer altitude and caps extreme full-globe zoom'
 test('Radio camera navigation yields to every live tracked-entity owner', () => {
   const viewer = { camera: {} };
   assert.equal(radioCameraNavigationAllowed(viewer), true);
-  for (const gevTrackedId of ['flights:abc123', 'military:def456']) {
-    const trackedEntity = { gevTrackedId };
+  for (const ceTrackedId of ['flights:abc123', 'military:def456']) {
+    const trackedEntity = { ceTrackedId };
     viewer.trackedEntity = trackedEntity;
-    assert.equal(radioCameraNavigationAllowed(viewer), false, gevTrackedId);
+    assert.equal(radioCameraNavigationAllowed(viewer), false, ceTrackedId);
     assert.equal(viewer.trackedEntity, trackedEntity);
   }
   viewer.trackedEntity = undefined;

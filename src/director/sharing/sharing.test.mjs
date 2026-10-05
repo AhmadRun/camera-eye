@@ -189,7 +189,7 @@ test('oversized files fail before reading and cancellation settles a stalled fil
   );
   await assert.rejects(
     readSceneShare({
-      name: 'large.gevbundle.json',
+      name: 'large.cebundle.json',
       size: SHARE_LIMITS.bytes + 1,
       text: () => {
         reads++;

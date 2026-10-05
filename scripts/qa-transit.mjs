@@ -160,7 +160,7 @@ const sampleRendered = (page) => sampleTransitPixels(page, palette);
  */
 async function sampleScreen(page) {
   return page.evaluate(() => {
-    const app = window.__godsEyeView;
+    const app = window.__cameraEye;
     const layer = app.dataManager.layers.get('transit').module;
     const state = layer._transitStateForTest();
     const scene = app.viewer.scene;
@@ -204,7 +204,7 @@ async function sampleScreen(page) {
 
 async function sampleVisible(page) {
   return page.evaluate(() => {
-    const app = window.__godsEyeView;
+    const app = window.__cameraEye;
     const layer = app.dataManager.layers.get('transit').module;
     const state = layer._transitStateForTest();
     const Cartographic = app.viewer.camera.positionCartographic.constructor;
@@ -304,7 +304,7 @@ try {
   // was waiting for something that no longer exists.)
   await page.waitForFunction(
     () =>
-      Boolean(window.__godsEyeView?.dataManager?.layers?.size) &&
+      Boolean(window.__cameraEye?.dataManager?.layers?.size) &&
       Boolean(document.querySelector('[data-layer-id="transit"]')),
     { timeout: 90_000 },
   );
@@ -331,14 +331,14 @@ try {
   // Record what the layer hands the shared overlay host, so the card check can
   // quote the operator's own words rather than assert an internal key was set.
   await page.evaluate(() => {
-    window.__gevTransitCards = new Map();
-    const layer = window.__godsEyeView.dataManager.layers.get('transit').module;
+    window.__ceTransitCards = new Map();
+    const layer = window.__cameraEye.dataManager.layers.get('transit').module;
     const state = layer._transitStateForTest();
     const host = state.DEFAULT_OVERLAY_HOST;
     layer._setTransitOverlayHostForTest({
       setEntries(sourceId, entries, options) {
         for (const entry of entries || []) {
-          window.__gevTransitCards.set(entry.id, {
+          window.__ceTransitCards.set(entry.id, {
             title: entry.title,
             details: entry.details,
           });
@@ -347,7 +347,7 @@ try {
       },
       setVisible: host.setVisible,
       clearSource(sourceId) {
-        window.__gevTransitCards.clear();
+        window.__ceTransitCards.clear();
         return host.clearSource(sourceId);
       },
     });
@@ -363,7 +363,7 @@ try {
   const before = transitRequests.length;
   await page.click(`${row} .data-toggle-btn`);
   await page.waitForFunction(
-    () => window.__godsEyeView.dataManager.isEnabled('transit'),
+    () => window.__cameraEye.dataManager.isEnabled('transit'),
     { timeout: 20_000 },
   );
   check(
@@ -374,7 +374,7 @@ try {
 
   await page.evaluate(() => {
     window.__transitRenderErrors = [];
-    window.__godsEyeView.viewer.scene.renderError.addEventListener(
+    window.__cameraEye.viewer.scene.renderError.addEventListener(
       (scene, error) => window.__transitRenderErrors.push(error.message),
     );
   });
@@ -382,7 +382,7 @@ try {
     console.log(`\n== ${city.label} ==`);
     // City-wide first: enough altitude to see the fleet as a fleet.
     await page.evaluate((c) => {
-      const camera = window.__godsEyeView.viewer.camera;
+      const camera = window.__cameraEye.viewer.camera;
       const Cartographic = camera.positionCartographic.constructor;
       camera.setView({
         destination: Cartographic.toCartesian(
@@ -393,15 +393,13 @@ try {
     }, city);
     await page.waitForFunction(
       () =>
-        (window.__godsEyeView.dataManager.layers
-          .get('transit')
-          .module.getStats().count || 0) > 0,
+        (window.__cameraEye.dataManager.layers.get('transit').module.getStats()
+          .count || 0) > 0,
       { timeout: 90_000 },
     );
     await wait(9_000);
     const fleet = await page.evaluate(() => {
-      const layer =
-        window.__godsEyeView.dataManager.layers.get('transit').module;
+      const layer = window.__cameraEye.dataManager.layers.get('transit').module;
       return {
         count: layer._transitStateForTest()._vehicles.size,
         stats: layer.getStats(),
@@ -420,7 +418,7 @@ try {
     // Street level: 600 m up, 45 degrees down, framed on a real vehicle so the
     // shot shows what a user sees when they drop in on one.
     const framed = await page.evaluate((c) => {
-      const app = window.__godsEyeView;
+      const app = window.__cameraEye;
       const camera = app.viewer.camera;
       const Cartographic = camera.positionCartographic.constructor;
       const state = app.dataManager.layers
@@ -457,7 +455,7 @@ try {
     await wait(9_000);
 
     const first = await page.evaluate(() => {
-      const app = window.__godsEyeView;
+      const app = window.__cameraEye;
       const layer = app.dataManager.layers.get('transit').module;
       const state = layer._transitStateForTest();
       const Cartographic = app.viewer.camera.positionCartographic.constructor;
@@ -491,7 +489,7 @@ try {
     let selected = null;
     for (let attempt = 0; attempt < 6 && !selected; attempt += 1) {
       const target = await page.evaluate((skip) => {
-        const app = window.__godsEyeView;
+        const app = window.__cameraEye;
         const state = app.dataManager.layers
           .get('transit')
           .module._transitStateForTest();
@@ -521,7 +519,7 @@ try {
       await page.mouse.click(target.x, target.y);
       await wait(900);
       selected = await page.evaluate(() => {
-        const app = window.__godsEyeView;
+        const app = window.__cameraEye;
         const key = app.dataManager.layers
           .get('transit')
           .module._transitStateForTest()._selectedKey;
@@ -530,7 +528,7 @@ try {
         // card, and these cards are painted onto the shared overlay CANVAS
         // rather than built from DOM nodes — so the proof is the operator's own
         // words the layer published, plus pixels that actually landed there.
-        const published = window.__gevTransitCards?.get(key) || null;
+        const published = window.__ceTransitCards?.get(key) || null;
         const canvas = document.getElementById('world-overlay-canvas');
         let painted = 0;
         if (canvas?.width) {
@@ -568,8 +566,8 @@ try {
     // labels transit contacts rather than ignoring them, which is what the
     // owner found: the layer drew dots and the sensor overlay looked past them.
     const detect = await page.evaluate(() => {
-      const gev = window.__godsEyeView;
-      const layer = gev.dataManager.layers.get('transit').module;
+      const ce = window.__cameraEye;
+      const layer = ce.dataManager.layers.get('transit').module;
       const objects = layer.getDetectableObjects({ maxCount: 200 });
       const button = document.getElementById('detection-toggle');
       return {
@@ -597,7 +595,7 @@ try {
 
     // The glyphs themselves: modes must not all be one shape.
     const sprites = await page.evaluate(() => {
-      const state = window.__godsEyeView.dataManager.layers
+      const state = window.__cameraEye.dataManager.layers
         .get('transit')
         .module._transitStateForTest();
       const images = new Map();
@@ -680,7 +678,7 @@ try {
         const how = await selectStyle(page, preset.style, preset.params);
         await wait(1_200);
         const styling = await page.evaluate(() =>
-          window.__godsEyeView.dataManager.layers
+          window.__cameraEye.dataManager.layers
             .get('transit')
             .module._transitStylingForTest(),
         );
@@ -751,7 +749,7 @@ try {
           await page.mouse.click(clickTarget.x, clickTarget.y);
           await wait(100);
           const picked = await page.evaluate((key) => {
-            const state = window.__godsEyeView.dataManager.layers
+            const state = window.__cameraEye.dataManager.layers
               .get('transit')
               .module._transitStateForTest();
             return {
@@ -786,7 +784,7 @@ try {
         await wait(800);
         const underFlir = await page.evaluate((key) => {
           const layer =
-            window.__godsEyeView.dataManager.layers.get('transit').module;
+            window.__cameraEye.dataManager.layers.get('transit').module;
           const state = layer._transitStateForTest();
           const entry = state._vehicles.get(key);
           return {
@@ -794,9 +792,9 @@ try {
             color: entry?.marker.color.toCssColorString(),
             width: entry?.marker.width,
             pickOwner: (() => {
-              const p = window.__godsEyeView.viewer.scene.pick(
+              const p = window.__cameraEye.viewer.scene.pick(
                 entry.marker.computeScreenSpacePosition(
-                  window.__godsEyeView.viewer.scene,
+                  window.__cameraEye.viewer.scene,
                 ),
               );
               return {
@@ -848,7 +846,7 @@ try {
     // Motion acceptance uses known report-time playback even when live fleets park.
     await selectStyle(page, 'normal');
     await page.evaluate((city) => {
-      const app = window.__godsEyeView,
+      const app = window.__cameraEye,
         camera = app.viewer.camera;
       const C = camera.positionCartographic.constructor;
       camera.setView({
@@ -859,7 +857,7 @@ try {
     await wait(2000);
     await page.evaluate(
       (city) =>
-        window.__godsEyeView.dataManager.layers
+        window.__cameraEye.dataManager.layers
           .get('transit')
           .module._loadTransitFleetForTest(16, city, 25),
       city,
@@ -868,7 +866,7 @@ try {
     const motionFirst = await sampleVisible(page);
     await wait(30_000);
     const second = await page.evaluate(() => {
-      const app = window.__godsEyeView;
+      const app = window.__cameraEye;
       const layer = app.dataManager.layers.get('transit').module;
       const state = layer._transitStateForTest();
       const Cartographic = app.viewer.camera.positionCartographic.constructor;
@@ -1022,7 +1020,7 @@ try {
     try {
       await recovery.goto(view(BOSTON), { waitUntil: 'domcontentloaded' });
       await recovery.waitForFunction(
-        () => window.__godsEyeView?.dataManager?.layers?.has('transit'),
+        () => window.__cameraEye?.dataManager?.layers?.has('transit'),
         { timeout: 90000 },
       );
       // Leave enough time for two snapshots, priming and reload in one minute.
@@ -1067,12 +1065,12 @@ try {
       }, first);
       await recovery.reload({ waitUntil: 'domcontentloaded' });
       await recovery.waitForFunction(
-        () => window.__godsEyeView?.dataManager?.layers?.has('transit'),
+        () => window.__cameraEye?.dataManager?.layers?.has('transit'),
         { timeout: 90000 },
       );
       await recovery.evaluate(() => {
         window.__transitRenderErrors = [];
-        window.__godsEyeView.viewer.scene.renderError.addEventListener(
+        window.__cameraEye.viewer.scene.renderError.addEventListener(
           (scene, error) => window.__transitRenderErrors.push(error.message),
         );
       });
@@ -1083,7 +1081,7 @@ try {
       if (restored.key) {
         await recovery.waitForFunction(
           () =>
-            !window.__godsEyeView.dataManager.layers
+            !window.__cameraEye.dataManager.layers
               .get('transit')
               .module._transitPartsForTest()
               .trails.requestDiagnostics().pending,
@@ -1093,7 +1091,7 @@ try {
         const proof = await recovery.evaluate(
           ({ key, oldest }) => {
             const layer =
-              window.__godsEyeView.dataManager.layers.get('transit').module;
+              window.__cameraEye.dataManager.layers.get('transit').module;
             const entry = layer._transitStateForTest()._vehicles.get(key),
               parts = layer._transitPartsForTest();
             if (!entry) return { gone: true };
@@ -1155,7 +1153,7 @@ try {
   if (runs('playback')) {
     console.log('\n== deterministic playback ==');
     await page.evaluate((c) => {
-      const camera = window.__godsEyeView.viewer.camera;
+      const camera = window.__cameraEye.viewer.camera;
       const Cartographic = camera.positionCartographic.constructor;
       camera.setView({
         destination: Cartographic.toCartesian(
@@ -1165,7 +1163,7 @@ try {
       });
     }, BOSTON);
     await page.evaluate(() => {
-      window.__godsEyeView.dataManager.layers
+      window.__cameraEye.dataManager.layers
         .get('transit')
         .module._setTransitFixtureFloorsForTest(
           ['straight', 'corner', 'stop', 'gap', 'late', 'dup'].map(
@@ -1286,7 +1284,7 @@ try {
     // Wait for the scripted fleet to replace the live one.
     await page.waitForFunction(
       () => {
-        const state = window.__godsEyeView.dataManager.layers
+        const state = window.__cameraEye.dataManager.layers
           .get('transit')
           .module._transitStateForTest();
         return state._vehicles.has('mbta:sim-straight');
@@ -1295,7 +1293,7 @@ try {
     );
     const simState = () =>
       page.evaluate(() => {
-        const state = window.__godsEyeView.dataManager.layers
+        const state = window.__cameraEye.dataManager.layers
           .get('transit')
           .module._transitStateForTest();
         const now = Date.now();
@@ -1313,7 +1311,7 @@ try {
     const trace = await page.evaluate(
       (durationMs) =>
         new Promise((resolve) => {
-          const app = window.__godsEyeView;
+          const app = window.__cameraEye;
           const layer = app.dataManager.layers.get('transit').module;
           const state = layer._transitStateForTest();
           const Cartographic =
@@ -1518,7 +1516,7 @@ try {
     // ---- Card anchor synchronisation ---------------------------------------
     console.log('\n== card anchor ==');
     await page.evaluate(() => {
-      const app = window.__godsEyeView,
+      const app = window.__cameraEye,
         camera = app.viewer.camera;
       const entry = app.dataManager.layers
         .get('transit')
@@ -1536,7 +1534,7 @@ try {
     await wait(1500);
     await reportTransitVisibility(page, 'scripted visibility before click');
     const target = await page.evaluate(() => {
-      const app = window.__godsEyeView;
+      const app = window.__cameraEye;
       const layer = app.dataManager.layers.get('transit').module;
       const state = layer._transitStateForTest();
       const entry = state._vehicles.get('mbta:sim-straight');
@@ -1584,7 +1582,7 @@ try {
       anchor = await page.evaluate(
         async (key, durationMs) => {
           const overlay = await import('/src/overlays/worldOverlay.js');
-          const app = window.__godsEyeView;
+          const app = window.__cameraEye;
           const layer = app.dataManager.layers.get('transit').module;
           const state = layer._transitStateForTest();
           if (state._selectedKey !== key)
@@ -1730,7 +1728,7 @@ try {
     // card must go with it.
     intercepting = false;
     await page.evaluate(() =>
-      window.__godsEyeView.dataManager.layers
+      window.__cameraEye.dataManager.layers
         .get('transit')
         .module._setTransitFixtureFloorsForTest([], null),
     );
@@ -1739,7 +1737,7 @@ try {
     await page
       .waitForFunction(
         () => {
-          const state = window.__godsEyeView.dataManager.layers
+          const state = window.__cameraEye.dataManager.layers
             .get('transit')
             .module._transitStateForTest();
           return !state._vehicles.has('mbta:sim-straight');
@@ -1748,7 +1746,7 @@ try {
       )
       .catch(() => {});
     const afterRemoval = await page.evaluate(() => {
-      const state = window.__godsEyeView.dataManager.layers
+      const state = window.__cameraEye.dataManager.layers
         .get('transit')
         .module._transitStateForTest();
       return {
@@ -1762,7 +1760,7 @@ try {
       JSON.stringify(afterRemoval),
     );
     await page.evaluate((c) => {
-      const camera = window.__godsEyeView.viewer.camera;
+      const camera = window.__cameraEye.viewer.camera;
       const Cartographic = camera.positionCartographic.constructor;
       camera.setView({
         destination: Cartographic.toCartesian(
@@ -1806,12 +1804,12 @@ try {
   );
   await page.click(`${row} .data-toggle-btn`);
   await page.waitForFunction(
-    () => !window.__godsEyeView.dataManager.isEnabled('transit'),
+    () => !window.__cameraEye.dataManager.isEnabled('transit'),
     { timeout: 20_000 },
   );
   const afterDisable = transitRequests.length;
   const teardown = await page.evaluate(() => {
-    const layer = window.__godsEyeView.dataManager.layers.get('transit').module;
+    const layer = window.__cameraEye.dataManager.layers.get('transit').module;
     const state = layer._transitStateForTest();
     return {
       vehicles: state._vehicles.size,
@@ -1831,7 +1829,7 @@ try {
       shown: state._markers ? state._markers.show : null,
       inFlight: state._inFlight.size,
       activeFeeds: state._activeFeeds.size,
-      holds: window.__godsEyeView.getRenderGovernorDiagnostics().holds,
+      holds: window.__cameraEye.getRenderGovernorDiagnostics().holds,
     };
   });
   check(
@@ -1876,9 +1874,9 @@ try {
   );
 
   const isOn = () =>
-    page.evaluate(() => window.__godsEyeView.dataManager.isEnabled('transit'));
+    page.evaluate(() => window.__cameraEye.dataManager.isEnabled('transit'));
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('transit', true, {
+    window.__cameraEye.dataManager.setEnabled('transit', true, {
       origin: 'user',
     }),
   );
@@ -1892,7 +1890,7 @@ try {
     transit: await isOn(),
     vehicles: await page.evaluate(
       () =>
-        window.__godsEyeView.dataManager.layers.get('transit').module.getStats()
+        window.__cameraEye.dataManager.layers.get('transit').module.getStats()
           .count,
     ),
   };
@@ -1909,7 +1907,7 @@ try {
 
   // SPACE MISSIONS
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('transit', false, {
+    window.__cameraEye.dataManager.setEnabled('transit', false, {
       origin: 'user',
     }),
   );
@@ -1917,14 +1915,14 @@ try {
   await page.click('#global-context-missions-btn');
   await wait(20_000);
   const blocked = await page.evaluate(async () => {
-    const settled = await window.__godsEyeView.dataManager.setEnabled(
+    const settled = await window.__cameraEye.dataManager.setEnabled(
       'transit',
       true,
       { origin: 'user' },
     );
     return {
       settled,
-      enabled: window.__godsEyeView.dataManager.isEnabled('transit'),
+      enabled: window.__cameraEye.dataManager.isEnabled('transit'),
     };
   });
   check(

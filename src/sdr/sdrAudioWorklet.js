@@ -45,4 +45,4 @@ class GevSdrAudioPlayer extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('gev-sdr-audio-player', GevSdrAudioPlayer);
+registerProcessor('ce-sdr-audio-player', GevSdrAudioPlayer);

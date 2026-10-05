@@ -406,7 +406,7 @@ function loadXWidgets(documentRef, globalRef = globalThis) {
       script.src = X_WIDGET_URL;
       script.async = true;
       script.charset = 'utf-8';
-      script.dataset.gevXWidgets = 'true';
+      script.dataset.ceXWidgets = 'true';
       documentRef.head?.append(script);
     }
     script.addEventListener?.(
@@ -428,12 +428,12 @@ function loadXWidgets(documentRef, globalRef = globalThis) {
     script.addEventListener?.('load', waitForApi, { once: true });
     if (typeof globalRef.twttr?.ready === 'function')
       globalRef.twttr.ready(ready);
-    if (script.dataset?.gevXLoaded === 'true') waitForApi();
+    if (script.dataset?.ceXLoaded === 'true') waitForApi();
     else
       script.addEventListener?.(
         'load',
         () => {
-          script.dataset.gevXLoaded = 'true';
+          script.dataset.ceXLoaded = 'true';
         },
         {
           once: true,
@@ -468,14 +468,14 @@ function isPortraitMedia(media = {}) {
 function ensureProviderConnections(documentRef, provider) {
   for (const origin of MEDIA_PRECONNECT_ORIGINS[provider] || []) {
     if (
-      documentRef.querySelector?.(`link[data-gev-media-preconnect="${origin}"]`)
+      documentRef.querySelector?.(`link[data-ce-media-preconnect="${origin}"]`)
     )
       continue;
     const link = documentRef.createElement('link');
     link.rel = 'preconnect';
     link.href = origin;
     link.crossOrigin = 'anonymous';
-    link.dataset.gevMediaPreconnect = origin;
+    link.dataset.ceMediaPreconnect = origin;
     documentRef.head?.append(link);
   }
 }

@@ -73,7 +73,7 @@ export async function parseSceneShare(text, { signal } = {}) {
   } catch {
     fail('$', 'invalid JSON');
   }
-  if (input?.format !== 'gev-scene-bundle')
+  if (input?.format !== 'ce-scene-bundle')
     return { project: parseSceneDocument(text), assets: new Map() };
   fields(input, '$', ['format', 'version', 'project', 'assets']);
   if (input.version !== 1) fail('version', 'unsupported bundle version');
@@ -114,7 +114,7 @@ export async function parseSceneShare(text, { signal } = {}) {
 
 /** File reads have a known budget before text decoding; large bundles use a distinct suffix. */
 export async function readSceneShare(file, options) {
-  const limit = file.name?.endsWith('.gevbundle.json')
+  const limit = file.name?.endsWith('.cebundle.json')
     ? SHARE_LIMITS.bytes
     : 5 * 1024 * 1024;
   if (file.size > limit)
@@ -184,7 +184,7 @@ export async function createSceneBundle(
     pack.sha256 = entry.sha256;
   }
   const text = JSON.stringify({
-    format: 'gev-scene-bundle',
+    format: 'ce-scene-bundle',
     version: 1,
     project: copy,
     assets: assets.map(({ byteLength, ...entry }) => entry),

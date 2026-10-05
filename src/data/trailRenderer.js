@@ -25,11 +25,11 @@ import { registerPickOwner } from './pickRegistry.js';
 // Round 6: trail ENTITIES are pickable (the old Primitive had
 // allowPicking:false). A trail hugs its aircraft, so an unclaimed pick would
 // read as "empty space" in every layer's click handler and deselect the very
-// plane being tracked. Claiming the 'gev-trail:' id namespace makes
+// plane being tracked. Claiming the 'ce-trail:' id namespace makes
 // isOwnedByOtherLayer() true for every layer — clicking a trail is a no-op
 // everywhere. Registered once at module load; the predicate is pure.
 registerPickOwner('trails', (pickedId) =>
-  String(pickedId).startsWith('gev-trail:'),
+  String(pickedId).startsWith('ce-trail:'),
 );
 
 /** @type {number} Uniquifier for trail entity ids (Cesium requires unique entity ids). */
@@ -66,7 +66,7 @@ export function createTrail(viewer, { color, width = 2.5 }) {
   function ensureEntity() {
     if (entity || destroyed || !viewer || viewer.isDestroyed()) return;
     entity = viewer.entities.add({
-      id: `gev-trail:${++_trailSeq}`,
+      id: `ce-trail:${++_trailSeq}`,
       show: visible,
       polyline: {
         // CallbackProperty so a positions swap never rebuilds the entity —

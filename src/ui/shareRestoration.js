@@ -274,7 +274,7 @@ export class ShareRestoration {
     this._resolveInitialShareRestore = null;
     resolve(result);
     window.dispatchEvent(
-      new CustomEvent('gev:initial-share-restore-settled', { detail: result }),
+      new CustomEvent('ce:initial-share-restore-settled', { detail: result }),
     );
   }
   destroy() {

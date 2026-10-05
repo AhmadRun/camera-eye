@@ -23,8 +23,8 @@ const PROVIDER_FIELDS = [
   'LL2_API_TOKEN',
 ];
 const RATE_LIMIT_FIELDS = [
-  'GEV_RATELIMIT_OPENAI_PER_MIN',
-  'GEV_RATELIMIT_GOOGLE_PER_MIN',
+  'CE_RATELIMIT_OPENAI_PER_MIN',
+  'CE_RATELIMIT_GOOGLE_PER_MIN',
 ];
 const APP_VALUE_FIELDS = [...PROVIDER_FIELDS, ...RATE_LIMIT_FIELDS];
 const SHARING_FIELDS = [
@@ -56,7 +56,7 @@ test('Pinokio start has one fail-closed launcher process', () => {
   );
   assert.equal(
     script.run[0].params.env.PINOKIO_SHARE_VAR,
-    '{{env.PINOKIO_SHARE_VAR || "__gev_sharing_disabled__"}}',
+    '{{env.PINOKIO_SHARE_VAR || "__ce_sharing_disabled__"}}',
   );
 });
 
@@ -79,7 +79,7 @@ test('Pinokio install records success explicitly instead of trusting node_module
 });
 
 test('Pinokio menu resolves the nested install marker and exposes each lifecycle state', async (t) => {
-  const fixture = await mkdtemp(path.join(os.tmpdir(), 'gev-pinokio-menu-'));
+  const fixture = await mkdtemp(path.join(os.tmpdir(), 'ce-pinokio-menu-'));
   t.after(() => rm(fixture, { recursive: true, force: true }));
   const launcherDir = path.join(fixture, 'app', 'pinokio');
   const launcherPath = path.join(launcherDir, 'pinokio.js');
@@ -141,7 +141,7 @@ test('Pinokio menu resolves the nested install marker and exposes each lifecycle
     running: 'start.js',
     url: 'http://127.0.0.1:4173/',
   }), [
-    { text: "Open God's Eye View", href: 'http://127.0.0.1:4173/', default: true },
+    { text: "Open Camera Eye", href: 'http://127.0.0.1:4173/', default: true },
     { text: 'Server', href: 'start.js', default: false },
   ]);
   assert.ok(existsCalls.length >= 7);
@@ -152,7 +152,7 @@ test('Pinokio menu resolves the nested install marker and exposes each lifecycle
 });
 
 test('Pinokio install recognizes direct execution through a linked app directory', async (t) => {
-  const fixture = await mkdtemp(path.join(os.tmpdir(), 'gev-pinokio-entry-'));
+  const fixture = await mkdtemp(path.join(os.tmpdir(), 'ce-pinokio-entry-'));
   t.after(() => rm(fixture, { recursive: true, force: true }));
   const target = path.join(fixture, 'candidate');
   const linked = path.join(fixture, 'installed-app');
@@ -171,8 +171,8 @@ test('Pinokio install recognizes direct execution through a linked app directory
 });
 
 test('Pinokio direct execution fallback remains exact and Update-safe', () => {
-  const missing = path.join(os.tmpdir(), 'gev-missing-pinokio-install.mjs');
-  const differentMissing = path.join(os.tmpdir(), 'gev-other-missing-pinokio-install.mjs');
+  const missing = path.join(os.tmpdir(), 'ce-missing-pinokio-install.mjs');
+  const differentMissing = path.join(os.tmpdir(), 'ce-other-missing-pinokio-install.mjs');
   const updatePath = path.resolve('scripts/pinokio-update.mjs');
   const installPath = path.resolve('scripts/pinokio-install.mjs');
 
@@ -205,7 +205,7 @@ test('Pinokio start runner emits an ANSI-independent ready URL', async () => {
 });
 
 test('Pinokio start enters the canonical app root before loading Vite', async (t) => {
-  const fixture = await mkdtemp(path.join(os.tmpdir(), 'gev-pinokio-root-'));
+  const fixture = await mkdtemp(path.join(os.tmpdir(), 'ce-pinokio-root-'));
   const originalCwd = process.cwd();
   t.after(async () => {
     process.chdir(originalCwd);
@@ -234,6 +234,6 @@ test('Pinokio keeps the supported local.url readiness key while disabling its sh
   assert.match(menuSource, /local\?\.url/);
   assert.equal(
     script.run[0].params.env.PINOKIO_SHARE_VAR,
-    '{{env.PINOKIO_SHARE_VAR || "__gev_sharing_disabled__"}}',
+    '{{env.PINOKIO_SHARE_VAR || "__ce_sharing_disabled__"}}',
   );
 });

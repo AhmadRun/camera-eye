@@ -13,9 +13,9 @@
  *    budget on model turns, JSONL evidence log per run.
  *
  *  LAYER 2 — BEHAVIOR (free, deterministic, no model):
- *    Drives window.__gevVoiceCommands.runner(toolName, args) in a headless
- *    page against the dev server and asserts world state via __godsEyeView /
- *    __gevAnnotations (camera altitude bands, annotation counts, route
+ *    Drives window.__ceVoiceCommands.runner(toolName, args) in a headless
+ *    page against the dev server and asserts world state via __cameraEye /
+ *    __ceAnnotations (camera altitude bands, annotation counts, route
  *    geometry, framing modes). This is the instrument that later gates new
  *    tools (analyst queries, camera verbs) without anyone speaking.
  *
@@ -292,7 +292,7 @@ function matchArgs(expected, actual) {
 
 async function runRoutingLayer() {
   console.log(`\nLAYER 1 — routing assertions (budget ${TURN_BUDGET} model turns)`);
-  const logDir = path.join(ROOT, '.gev-logs', 'qa-voice-routing');
+  const logDir = path.join(ROOT, '.ce-logs', 'qa-voice-routing');
   fs.mkdirSync(logDir, { recursive: true });
   const evidence = fs.createWriteStream(path.join(logDir, `run-${Date.now()}.jsonl`));
 
@@ -396,19 +396,19 @@ async function runBehaviorLayer() {
   try {
     await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(
-      () => window.__godsEyeView?.viewer && window.__gevVoiceCommands?.runner && window.__gevAnnotations,
+      () => window.__cameraEye?.viewer && window.__ceVoiceCommands?.runner && window.__ceAnnotations,
       { timeout: 120000, polling: 250 },
     );
     // House rule: the intro flight clobbers teleports issued mid-flight.
-    await page.evaluate(() => window.__godsEyeView.viewer.camera.cancelFlight());
+    await page.evaluate(() => window.__cameraEye.viewer.camera.cancelFlight());
 
     const run = (name, args) => page.evaluate(
-      (n, a) => Promise.resolve(window.__gevVoiceCommands.runner(n, a))
+      (n, a) => Promise.resolve(window.__ceVoiceCommands.runner(n, a))
         .catch((e) => ({ ok: false, error: String(e?.message || e), _threw: true })),
       name, args,
     );
     const camState = () => page.evaluate(() => {
-      const c = window.__godsEyeView.viewer.camera;
+      const c = window.__cameraEye.viewer.camera;
       const p = c.positionCartographic;
       return { lat: p.latitude * 180 / Math.PI, lon: p.longitude * 180 / Math.PI, altKm: p.height / 1000, pitchDeg: c.pitch * 180 / Math.PI };
     });
@@ -430,7 +430,7 @@ async function runBehaviorLayer() {
     // `fly_to_location` may finish its promise just before Cesium drains the
     // final tween frame. Cancel that already-arrived flight so the assertion
     // measures Radio's camera ownership, not residual navigation motion.
-    await page.evaluate(() => window.__godsEyeView.viewer.camera.cancelFlight());
+    await page.evaluate(() => window.__cameraEye.viewer.camera.cancelFlight());
     await settle(250);
     const radioCameraBefore = await camState();
     r = await run('control_radio', { action: 'select', category: 'news', locationId: 'austin' });
@@ -459,7 +459,7 @@ async function runBehaviorLayer() {
       ],
     });
     await settle(2500);
-    let annoCount = await page.evaluate(() => window.__gevAnnotations?.list?.().length ?? window.__gevAnnotations?.count?.() ?? -1);
+    let annoCount = await page.evaluate(() => window.__ceAnnotations?.list?.().length ?? window.__ceAnnotations?.count?.() ?? -1);
     report((r?.drawn ?? 0) >= 2 && (annoCount >= 2 || annoCount === -1),
       'behavior: two pins drawn near camera', `result.drawn=${r?.drawn} failed=${r?.failed} listCount=${annoCount}`);
 
@@ -492,8 +492,8 @@ async function runBehaviorLayer() {
     // camera policy with synthetic target records only. This proves ordering
     // without claiming that the live AIS stream delivered a vessel.
     const ownerTransfer = await page.evaluate(async () => {
-      const app = window.__godsEyeView;
-      const runner = window.__gevVoiceCommands?.runner;
+      const app = window.__cameraEye;
+      const runner = window.__ceVoiceCommands?.runner;
       const { viewer, dataManager, styleManager } = app || {};
       const fireEntry = dataManager?.layers?.get('local-firms');
       const vesselEntry = dataManager?.layers?.get('ais-live-vessels');
@@ -650,7 +650,7 @@ async function runBehaviorLayer() {
     // (5) zoom_to_globe is ABSOLUTE full-earth (>12,000 km band)
     r = await run('zoom_to_globe', {});
     await page.waitForFunction(
-      () => window.__godsEyeView.viewer.camera.positionCartographic.height / 1000 > 12000,
+      () => window.__cameraEye.viewer.camera.positionCartographic.height / 1000 > 12000,
       { timeout: 30_000, polling: 250 },
     ).catch(() => {});
     cam = await camState();
@@ -659,7 +659,7 @@ async function runBehaviorLayer() {
     // (6) natural-region swath: overview of the Alps must CAP the range
     r = await run('fly_to_location', { query: 'the Alps', viewMode: 'overview' });
     await page.waitForFunction(
-      () => window.__godsEyeView.viewer.camera.positionCartographic.height / 1000 < 900,
+      () => window.__cameraEye.viewer.camera.positionCartographic.height / 1000 < 900,
       { timeout: 40_000, polling: 250 },
     ).catch(() => {});
     cam = await camState();
@@ -681,7 +681,7 @@ async function runBehaviorLayer() {
       alpsOutline = await page.evaluate(() => {
         // list() returns RAW annotation objects: outline presence = ring array
         // (the `outline` boolean exists only in the tool-result mapping).
-        const items = window.__gevAnnotations?.list?.() || [];
+        const items = window.__ceAnnotations?.list?.() || [];
         const alps = items.find((it) => /alps/i.test(it.label || ''));
         return Array.isArray(alps?.ring) && alps.ring.length >= 8;
       });
@@ -708,7 +708,7 @@ async function runBehaviorLayer() {
     await settle(1500);
 
     // (6c) move_camera orbit ONCE: bounded eased ~30° heading advance.
-    const heading = () => page.evaluate(() => window.__godsEyeView.viewer.camera.heading * 180 / Math.PI);
+    const heading = () => page.evaluate(() => window.__cameraEye.viewer.camera.heading * 180 / Math.PI);
     let h0 = await heading();
     r = await run('move_camera', { motion: 'orbit', mode: 'once' });
     await settle(5000);
@@ -796,7 +796,7 @@ async function runBehaviorLayer() {
     r = trackId ? await run('track_entity', { query: trackId, layerId: 'flights' }) : { ok: false, error: 'no contacts in view' };
     if (r?.ok) {
       const orbitRes = await run('move_camera', { motion: 'orbit', mode: 'continuous' });
-      const trackingReleased = await page.evaluate(() => !window.__godsEyeView.viewer.trackedEntity);
+      const trackingReleased = await page.evaluate(() => !window.__cameraEye.viewer.trackedEntity);
       const orbitStop = await run('move_camera', { motion: 'stop' });
       report(orbitRes?.ok === true && trackingReleased && orbitStop?.stopped === true,
         'behavior: move_camera releases tracking before taking the camera',
@@ -815,7 +815,7 @@ async function runBehaviorLayer() {
       await settle(2000);
       await run('fly_to_location', { query: 'Austin, Texas' });
       await settle(6000);
-      const stillTracked = await page.evaluate(() => Boolean(window.__godsEyeView.viewer.trackedEntity));
+      const stillTracked = await page.evaluate(() => Boolean(window.__cameraEye.viewer.trackedEntity));
       const camHere = await camState();
       const nearAustin = Math.hypot(camHere.lat - 30.2672, camHere.lon + 97.7431) < 1.5;
       report(!stillTracked && nearAustin,
@@ -827,7 +827,7 @@ async function runBehaviorLayer() {
 
     // (6e5) tilt at the clamp answers honestly instead of silently no-oping.
     await page.evaluate(() => {
-      const c = window.__godsEyeView.viewer.camera;
+      const c = window.__cameraEye.viewer.camera;
       c.setView({ orientation: { heading: c.heading, pitch: -5.2 * Math.PI / 180, roll: 0 } });
     });
     r = await run('move_camera', { motion: 'tilt', direction: 'up', mode: 'once' });
@@ -846,7 +846,7 @@ async function runBehaviorLayer() {
     // (7) clear_annotations empties the board
     r = await run('clear_annotations', {});
     await settle(800);
-    annoCount = await page.evaluate(() => window.__gevAnnotations?.list?.().length ?? window.__gevAnnotations?.count?.() ?? -1);
+    annoCount = await page.evaluate(() => window.__ceAnnotations?.list?.().length ?? window.__ceAnnotations?.count?.() ?? -1);
     report(r?.ok !== false && (annoCount === 0 || annoCount === -1), 'behavior: clear_annotations empties board', `listCount=${annoCount}`);
 
     // (8) get_entity_context returns basemap context
@@ -860,7 +860,7 @@ async function runBehaviorLayer() {
     r = await run('set_context_mode', { mode: 'contacts' });
     await settle(2500);
     const contextEntered = await page.evaluate(
-      () => window.__godsEyeView?.styleManager?.getContextModeState?.() || null,
+      () => window.__cameraEye?.styleManager?.getContextModeState?.() || null,
     );
     report(r?.ok === true && contextEntered?.mode === 'flights',
       'behavior: set_context_mode enters Contacts',
@@ -875,12 +875,12 @@ async function runBehaviorLayer() {
     // (9b) Cockpit entry with nothing to fly is an honest failure, never a
     // silent success that leaves the operator staring at an unchanged map.
     const cockpitBefore = await page.evaluate(
-      () => Boolean(window.__godsEyeView?.styleManager?.cockpitView?.active),
+      () => Boolean(window.__cameraEye?.styleManager?.cockpitView?.active),
     );
     r = await run('control_cockpit', { action: 'enter' });
     await settle(1200);
     const cockpitAfter = await page.evaluate(
-      () => Boolean(window.__godsEyeView?.styleManager?.cockpitView?.active),
+      () => Boolean(window.__cameraEye?.styleManager?.cockpitView?.active),
     );
     // Either it genuinely entered (an aircraft was tracked) or it refused with
     // a reason — the one thing it must never do is claim success while inert.
@@ -898,7 +898,7 @@ async function runBehaviorLayer() {
     // (9d) An unavailable context mode is refused, and the live mode survives.
     r = await run('set_context_mode', { mode: 'orbital-weather' });
     const contextAfterRefusal = await page.evaluate(
-      () => window.__godsEyeView?.styleManager?.getContextModeState?.() || null,
+      () => window.__cameraEye?.styleManager?.getContextModeState?.() || null,
     );
     report(r?.ok === false && /unknown context mode/i.test(r?.error || '')
       && contextAfterRefusal?.mode === 'flights',
@@ -916,7 +916,7 @@ async function runBehaviorLayer() {
       limit: 3,
     });
     const awarenessFlights = await page.evaluate(() => {
-      const snap = window.__godsEyeView?.dataManager?.layers
+      const snap = window.__cameraEye?.dataManager?.layers
         ?.get('military-awareness')?.module?.getContextSnapshot?.();
       const cohort = snap?.cohorts?.find((c) => c.id === 'flights');
       return cohort ? cohort.count : null;
@@ -938,7 +938,7 @@ async function runBehaviorLayer() {
     // Field case: enter{targetLayer:"military"} reported ok:true on a FLIGHTS
     // subject, so "cockpit in that military helicopter" put the operator in an
     // airliner.
-    if (await page.evaluate(() => Boolean(window.__godsEyeView?.styleManager?.cockpitView?.active))) {
+    if (await page.evaluate(() => Boolean(window.__cameraEye?.styleManager?.cockpitView?.active))) {
       await run('control_cockpit', { action: 'exit' });
       await settle(600);
     }
@@ -946,7 +946,7 @@ async function runBehaviorLayer() {
     await settle(1200);
     const layerAfter = r?.state?.subject?.layerId ?? null;
     const cockpitOn = await page.evaluate(
-      () => Boolean(window.__godsEyeView?.styleManager?.cockpitView?.active),
+      () => Boolean(window.__cameraEye?.styleManager?.cockpitView?.active),
     );
     report(
       (r?.ok === true && layerAfter === 'military' && cockpitOn)
@@ -959,7 +959,7 @@ async function runBehaviorLayer() {
     // (9d-3) A non-aircraft layer can never be entered — Cockpit flies aircraft.
     r = await run('control_cockpit', { action: 'enter', targetLayer: 'ais-live-vessels' });
     const vesselCockpit = await page.evaluate(
-      () => Boolean(window.__godsEyeView?.styleManager?.cockpitView?.active),
+      () => Boolean(window.__cameraEye?.styleManager?.cockpitView?.active),
     );
     report(r?.ok === false && /aircraft only/i.test(r?.error || '') && !vesselCockpit,
       'behavior: control_cockpit refuses to enter a non-aircraft layer',
@@ -969,7 +969,7 @@ async function runBehaviorLayer() {
     r = await run('set_context_mode', { mode: 'off' });
     await settle(2000);
     const contextExited = await page.evaluate(
-      () => window.__godsEyeView?.styleManager?.getContextModeState?.() || null,
+      () => window.__cameraEye?.styleManager?.getContextModeState?.() || null,
     );
     report(r?.ok !== false && !contextExited?.mode,
       'behavior: set_context_mode exits back to the neutral map',
@@ -981,7 +981,7 @@ async function runBehaviorLayer() {
     r = await run('control_cockpit', { action: 'status' });
     const gateReport = r?.state || {};
     const cockpitBeforeGate = await page.evaluate(
-      () => Boolean(window.__godsEyeView?.styleManager?.cockpitView?.active),
+      () => Boolean(window.__cameraEye?.styleManager?.cockpitView?.active),
     );
     report(gateReport.active === false && gateReport.entryAllowed === false
       && gateReport.entryBlockedReason === 'contacts-inactive' && !cockpitBeforeGate,
@@ -991,10 +991,10 @@ async function runBehaviorLayer() {
     // The runner calls controlCockpit directly, so this exercises the app gate
     // rather than the voice tool's own Contacts bootstrap.
     const gated = await page.evaluate(
-      () => window.__godsEyeView?.styleManager?.controlCockpit?.('enter') || null,
+      () => window.__cameraEye?.styleManager?.controlCockpit?.('enter') || null,
     );
     const cockpitAfterGate = await page.evaluate(
-      () => Boolean(window.__godsEyeView?.styleManager?.cockpitView?.active),
+      () => Boolean(window.__cameraEye?.styleManager?.cockpitView?.active),
     );
     report(gated?.ok === false && /contacts/i.test(gated?.error || '') && !cockpitAfterGate,
       'behavior: cockpit entry with Contacts off is refused, not half-entered',

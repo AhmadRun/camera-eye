@@ -58,9 +58,9 @@ test('keyless Places routes stay successful after the Google quota is exhausted'
   const previousServerKey = process.env.GOOGLE_MAPS_SERVER_API_KEY;
   process.env.GOOGLE_MAPS_SERVER_API_KEY = '';
   const previousKey = process.env.GOOGLE_MAPS_API_KEY;
-  const previousLimit = process.env.GEV_RATELIMIT_GOOGLE_PER_MIN;
+  const previousLimit = process.env.CE_RATELIMIT_GOOGLE_PER_MIN;
   process.env.GOOGLE_MAPS_API_KEY = '';
-  process.env.GEV_RATELIMIT_GOOGLE_PER_MIN = '1';
+  process.env.CE_RATELIMIT_GOOGLE_PER_MIN = '1';
   try {
     const routes = installGooglePlacesRoutes();
     const nearby = routes.get('/api/google/nearby-places');
@@ -87,7 +87,7 @@ test('keyless Places routes stay successful after the Google quota is exhausted'
     else process.env.GOOGLE_MAPS_SERVER_API_KEY = previousServerKey;
     if (previousKey === undefined) delete process.env.GOOGLE_MAPS_API_KEY;
     else process.env.GOOGLE_MAPS_API_KEY = previousKey;
-    if (previousLimit === undefined) delete process.env.GEV_RATELIMIT_GOOGLE_PER_MIN;
-    else process.env.GEV_RATELIMIT_GOOGLE_PER_MIN = previousLimit;
+    if (previousLimit === undefined) delete process.env.CE_RATELIMIT_GOOGLE_PER_MIN;
+    else process.env.CE_RATELIMIT_GOOGLE_PER_MIN = previousLimit;
   }
 });

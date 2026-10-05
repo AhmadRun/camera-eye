@@ -145,17 +145,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // few frames so the real press/drag still exercises Cesium's input + pick path.
 async function positionPointerForGizmoDrag(page, point, frameCount = 3) {
   await page.evaluate(() => {
-    window.__godsEyeView.dataManager.layers
+    window.__cameraEye.dataManager.layers
       .get('cctv')
       .module.setParams({ calibrationMode: false });
   });
   await page.mouse.move(point.x, point.y);
   return page.evaluate(async (count) => {
-    const gev = window.__godsEyeView;
-    gev.dataManager.layers
+    const ce = window.__cameraEye;
+    ce.dataManager.layers
       .get('cctv')
       .module.setParams({ calibrationMode: true });
-    const scene = gev.viewer.scene;
+    const scene = ce.viewer.scene;
     let rendered = 0;
     return new Promise((resolve) => {
       let settled = false;
@@ -188,7 +188,7 @@ async function positionPointerForGizmoDrag(page, point, frameCount = 3) {
 // and the viewer's own clock.currentTime is a valid live instance of one).
 const SERIALIZE_GEOM_SRC = `
   function serializeGeom(camId) {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     const time = viewer.clock.currentTime;
     const roles = ['ray-tl', 'ray-tr', 'ray-br', 'ray-bl', 'cap'];
     const poly = {};
@@ -283,7 +283,7 @@ function waitForTilesLoaded(page, timeoutMs = 15000) {
   return page
     .waitForFunction(
       () => {
-        const scene = window.__godsEyeView.viewer.scene;
+        const scene = window.__cameraEye.viewer.scene;
         const prims = scene.primitives;
         for (let i = 0; i < prims.length; i++) {
           const p = prims.get(i);
@@ -399,9 +399,9 @@ async function main() {
     await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(
       () =>
-        window.__godsEyeView &&
-        window.__godsEyeView.viewer &&
-        window.__godsEyeView.dataManager,
+        window.__cameraEye &&
+        window.__cameraEye.viewer &&
+        window.__cameraEye.dataManager,
       { timeout: 60000 },
     );
     // Let the initial fly-to Austin and first tiles settle.
@@ -416,7 +416,7 @@ async function main() {
     // from unrelated subsystems cancels out by construction.
     // -----------------------------------------------------------------------
     const wrapInstalled = await page.evaluate(() => {
-      const scene = window.__godsEyeView?.viewer?.scene;
+      const scene = window.__cameraEye?.viewer?.scene;
       if (
         !scene ||
         typeof scene.pickFromRay !== 'function' ||
@@ -450,7 +450,7 @@ async function main() {
     console.log('Enabling CCTV layer...');
     const c0 = await readCounters();
     await page.evaluate(async () => {
-      const dm = window.__godsEyeView.dataManager;
+      const dm = window.__cameraEye.dataManager;
       const entry = dm.layers.get('cctv');
       if (!entry.enabled) await dm.toggle('cctv');
     });
@@ -463,7 +463,7 @@ async function main() {
     // times out spuriously at the 250-camera default (2026-07-04).
     const camCount = await page.evaluate(
       () =>
-        window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState()
+        window.__cameraEye.dataManager.layers.get('cctv').module.getUIState()
           .count,
     );
     // ~800ms per real ground sample measured under SwiftShader (each
@@ -479,7 +479,7 @@ async function main() {
       .waitForFunction(
         () => {
           const mod =
-            window.__godsEyeView.dataManager.layers.get('cctv').module;
+            window.__cameraEye.dataManager.layers.get('cctv').module;
           const ui = mod.getUIState();
           return ui.loading && ui.loading.active === false;
         },
@@ -516,19 +516,19 @@ async function main() {
     console.log('Activating a camera (focusNearest)...');
     const activeIdBeforeActivation = await page.evaluate(
       () =>
-        window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState()
+        window.__cameraEye.dataManager.layers.get('cctv').module.getUIState()
           .activeCameraId,
     );
     const cBeforeActivate = await readCounters();
     await page.evaluate(() => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.focusNearest({ durationSec: 0.1 });
     });
     await sleep(500); // let the activation's synchronous work (probe + geometry rewrite) land
     const cAfterActivate = await readCounters();
     const activeId = await page.evaluate(
       () =>
-        window.__godsEyeView.dataManager.layers.get('cctv').module.getUIState()
+        window.__cameraEye.dataManager.layers.get('cctv').module.getUIState()
           .activeCameraId,
     );
 
@@ -549,7 +549,7 @@ async function main() {
       return JSON.stringify(serializeGeom(${JSON.stringify(activeId)}));
     })()`);
     await page.evaluate((id) => {
-      window.__godsEyeView.dataManager.layers
+      window.__cameraEye.dataManager.layers
         .get('cctv')
         .module.setParams({ selectedCameraId: id });
     }, activeId);
@@ -661,7 +661,7 @@ async function main() {
     console.log('Applying a calibration patch (heading +30°)...');
     const cBeforeCal = await readCounters();
     await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({
         calibration: { cameraId: camId, patch: { headingDeg: 30 } },
       });
@@ -686,7 +686,7 @@ async function main() {
     // Undo that patch before the geometry-contract assertions below so they
     // observe the record's steady, unpatched frustum.
     await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ calibration: { cameraId: camId, reset: true } });
     }, activeId);
     await sleep(300);
@@ -698,11 +698,11 @@ async function main() {
     const geomInfo = await page.evaluate(`(function(camId){
       ${SERIALIZE_GEOM_SRC}
       const g = serializeGeom(camId);
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       // Overlay unification: the plane label is no longer a native entity —
       // it publishes as a protected host entry under the cctv-projection
       // source. Assert the migrated surface via the host diagnostics.
-      const diag = window.__gevWorldOverlay?.getDiagnostics?.();
+      const diag = window.__ceWorldOverlay?.getDiagnostics?.();
       g.hasLabel = (diag?.entriesBySource?.['cctv-projection'] || 0) >= 1;
       const planeEnt = viewer.entities.getById('cctv-' + camId + '-plane');
       g.planeShow = planeEnt ? planeEnt.show : null;
@@ -738,7 +738,7 @@ async function main() {
     // clear the clamp with margin, run the coincidence check against THAT
     // pose, then reset back to the base pose before the byte-stability check.
     const activeCameraForPatch = await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       return mod.getUIState().cameras.find((c) => c.id === camId);
     }, activeId);
     const basePose = activeCameraForPatch.basePose;
@@ -775,7 +775,7 @@ async function main() {
         await page.evaluate(
           ({ camId, patch }) => {
             const mod =
-              window.__godsEyeView.dataManager.layers.get('cctv').module;
+              window.__cameraEye.dataManager.layers.get('cctv').module;
             mod.setParams({ calibration: { cameraId: camId, patch } });
           },
           { camId: activeId, patch: safePatch },
@@ -874,7 +874,7 @@ async function main() {
     // synthetic clamp-clearing test pose.
     if (safePatch) {
       await page.evaluate((camId) => {
-        const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+        const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
         mod.setParams({ calibration: { cameraId: camId, reset: true } });
       }, activeId);
       await sleep(300);
@@ -911,12 +911,12 @@ async function main() {
     console.log('Checking calibration round-trip (patch -> save -> reset)...');
     const baseGeom = await serializeGeom(activeId);
     const baseBadge = await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       const ui = mod.getUIState();
       return ui.cameras.find((c) => c.id === camId)?.calBadge;
     }, activeId);
     const baseStoreEmpty = await page.evaluate((camId) => {
-      const raw = localStorage.getItem('godsEyeView.cctv.calibration.v2');
+      const raw = localStorage.getItem('cameraEye.cctv.calibration.v2');
       const map = raw ? JSON.parse(raw) : {};
       return !(camId in map);
     }, activeId);
@@ -932,7 +932,7 @@ async function main() {
     );
 
     await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({
         calibration: { cameraId: camId, patch: { headingDeg: 30 } },
       });
@@ -943,9 +943,9 @@ async function main() {
     // only — the store must stay untouched and the camera must read as
     // dirty/EDITED until the explicit save action below.
     const afterPatch = await page.evaluate((camId) => {
-      const raw = localStorage.getItem('godsEyeView.cctv.calibration.v2');
+      const raw = localStorage.getItem('cameraEye.cctv.calibration.v2');
       const map = raw ? JSON.parse(raw) : {};
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       const cam = mod.getUIState().cameras.find((c) => c.id === camId);
       return {
         stored: camId in map,
@@ -972,13 +972,13 @@ async function main() {
     );
 
     await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ calibration: { cameraId: camId, save: true } });
     }, activeId);
     await sleep(200);
 
     const storeEntry = await page.evaluate((camId) => {
-      const raw = localStorage.getItem('godsEyeView.cctv.calibration.v2');
+      const raw = localStorage.getItem('cameraEye.cctv.calibration.v2');
       const map = raw ? JSON.parse(raw) : {};
       return map[camId] || null;
     }, activeId);
@@ -995,7 +995,7 @@ async function main() {
     );
 
     const afterSave = await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       const cam = mod.getUIState().cameras.find((c) => c.id === camId);
       return { calBadge: cam?.calBadge, calDirty: cam?.calDirty };
     }, activeId);
@@ -1022,13 +1022,13 @@ async function main() {
 
     // Reset: entry removed, base geometry restored, badge back to raw-prior.
     await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ calibration: { cameraId: camId, reset: true } });
     }, activeId);
     await sleep(300);
 
     const storeAfterReset = await page.evaluate((camId) => {
-      const raw = localStorage.getItem('godsEyeView.cctv.calibration.v2');
+      const raw = localStorage.getItem('cameraEye.cctv.calibration.v2');
       const map = raw ? JSON.parse(raw) : {};
       return camId in map;
     }, activeId);
@@ -1039,7 +1039,7 @@ async function main() {
     );
 
     const badgeAfterReset = await page.evaluate((camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       return mod.getUIState().cameras.find((c) => c.id === camId)?.calBadge;
     }, activeId);
     record(
@@ -1073,7 +1073,7 @@ async function main() {
     // never null/undefined once the runtime exists, i.e. there's no gap where
     // the plane shows nothing.
     const materialInfo = await page.evaluate((camId) => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       const time = viewer.clock.currentTime;
       const planeEnt = viewer.entities.getById('cctv-' + camId + '-plane');
       const mat = planeEnt?.plane?.material;
@@ -1100,7 +1100,7 @@ async function main() {
     // (upstream / streetview / synthetic fallback all count as "the frame
     // loop is healthy" — a hard 5xx/network failure would not).
     const frameFetch = await page.evaluate(async (camId) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       const cam = mod.getUIState().cameras.find((c) => c.id === camId);
       const res = await fetch(cam.frameUrl);
       return {
@@ -1138,8 +1138,8 @@ async function main() {
       'Checking installed canvas click ownership and empty-space deselection...',
     );
     const emptyClickPoint = await page.evaluate(async () => {
-      const gev = window.__godsEyeView;
-      const viewer = gev.viewer;
+      const ce = window.__cameraEye;
+      const viewer = ce.viewer;
       const scene = viewer.scene;
       const canvas = scene.canvas;
       const rect = canvas.getBoundingClientRect();
@@ -1187,9 +1187,9 @@ async function main() {
     );
 
     const clickEvidenceSetup = await page.evaluate(() => {
-      const gev = window.__godsEyeView;
-      const viewer = gev.viewer;
-      const mod = gev.dataManager.layers.get('cctv').module;
+      const ce = window.__cameraEye;
+      const viewer = ce.viewer;
+      const mod = ce.dataManager.layers.get('cctv').module;
       const snapshotPose = () => ({
         position: [
           viewer.camera.positionWC.x,
@@ -1264,10 +1264,10 @@ async function main() {
       evidence.onFocus = () => {
         evidence.focusEvents += 1;
       };
-      window.addEventListener('gev:cctv-request-focus', evidence.onFocus);
+      window.addEventListener('ce:cctv-request-focus', evidence.onFocus);
       evidence.dispose = () => {
         evidence.unsubscribe?.();
-        window.removeEventListener('gev:cctv-request-focus', evidence.onFocus);
+        window.removeEventListener('ce:cctv-request-focus', evidence.onFocus);
       };
       window.__qaCctvClickEvidence = evidence;
       return {
@@ -1278,7 +1278,7 @@ async function main() {
 
     if (emptyClickPoint) {
       await page.evaluate(() => {
-        window.__godsEyeView.dataManager.layers
+        window.__cameraEye.dataManager.layers
           .get('cctv')
           .module.setParams({ calibrationMode: true });
       });
@@ -1286,7 +1286,7 @@ async function main() {
       await sleep(250);
       const adjustClick = await page.evaluate(() => {
         const evidence = window.__qaCctvClickEvidence;
-        const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+        const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
         mod.setParams({ calibrationMode: false });
         evidence.siblingBaselineTransitions = evidence.activeTransitions.length;
         return {
@@ -1316,8 +1316,8 @@ async function main() {
 
     const siblingTarget = await page.evaluate(async (emptyPoint) => {
       if (!emptyPoint) return null;
-      const gev = window.__godsEyeView;
-      const viewer = gev.viewer;
+      const ce = window.__cameraEye;
+      const viewer = ce.viewer;
       const scene = viewer.scene;
       const Cesium = await import('/node_modules/cesium/Build/Cesium/index.js');
       const canvasPoint = new Cesium.Cartesian2(
@@ -1407,10 +1407,10 @@ async function main() {
     }
     const siblingClick = await page.evaluate(() => {
       const evidence = window.__qaCctvClickEvidence;
-      const gev = window.__godsEyeView;
-      const mod = gev.dataManager.layers.get('cctv').module;
+      const ce = window.__cameraEye;
+      const mod = ce.dataManager.layers.get('cctv').module;
       if (window.__qaCctvSiblingOwner) {
-        gev.viewer.entities.remove(window.__qaCctvSiblingOwner);
+        ce.viewer.entities.remove(window.__qaCctvSiblingOwner);
         delete window.__qaCctvSiblingOwner;
       }
       return {
@@ -1442,7 +1442,7 @@ async function main() {
     }
     const firstEmptyClick = await page.evaluate(() => {
       const evidence = window.__qaCctvClickEvidence;
-      const state = window.__godsEyeView.dataManager.layers
+      const state = window.__cameraEye.dataManager.layers
         .get('cctv')
         .module.getUIState();
       return {
@@ -1483,7 +1483,7 @@ async function main() {
     }
     const repeatEmptyClick = await page.evaluate(() => {
       const evidence = window.__qaCctvClickEvidence;
-      const state = window.__godsEyeView.dataManager.layers
+      const state = window.__cameraEye.dataManager.layers
         .get('cctv')
         .module.getUIState();
       evidence.dispose();
@@ -1508,7 +1508,7 @@ async function main() {
     // Explicit navigation from null must remain available for the remaining
     // coverage and gizmo groups. NEXT is the product route pinned by N4.
     const resumedId = await page.evaluate(() => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.cycleCamera(1);
       return mod.getUIState().activeCameraId;
     });
@@ -1526,17 +1526,17 @@ async function main() {
     );
     const countVolumes = () =>
       page.evaluate(() => {
-        const prims = window.__godsEyeView.viewer.scene.primitives;
+        const prims = window.__cameraEye.viewer.scene.primitives;
         let n = 0;
         for (let i = 0; i < prims.length; i++) {
-          if (prims.get(i) && prims.get(i)._gevViewshed) n += 1;
+          if (prims.get(i) && prims.get(i)._ceViewshed) n += 1;
         }
         return n;
       });
 
     const cBeforeViewshed = await readCounters();
     const modeAfterSet = await page.evaluate(() => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ coverageMode: 'viewshed' });
       return mod.getUIState().coverageMode;
     });
@@ -1557,7 +1557,7 @@ async function main() {
     // Boolean back-compat shim: showCoverage=false → 'off' (0 volumes),
     // showCoverage=true → 'on' (wireframes, still 0 volumes).
     const compat = await page.evaluate(() => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ showCoverage: false });
       const off = mod.getUIState().coverageMode;
       mod.setParams({ showCoverage: true });
@@ -1581,24 +1581,24 @@ async function main() {
     // rebuild sites are pose edits and style refreshes only). Object identity
     // over 8s proves nothing recreated them.
     await page.evaluate(() => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ coverageMode: 'viewshed' });
     });
     await sleep(400);
     await page.evaluate(() => {
-      const prims = window.__godsEyeView.viewer.scene.primitives;
+      const prims = window.__cameraEye.viewer.scene.primitives;
       window.__qaViewshedRefs = [];
       for (let i = 0; i < prims.length; i++) {
-        if (prims.get(i) && prims.get(i)._gevViewshed)
+        if (prims.get(i) && prims.get(i)._ceViewshed)
           window.__qaViewshedRefs.push(prims.get(i));
       }
     });
     await sleep(8000);
     const viewshedIdle = await page.evaluate(() => {
-      const prims = window.__godsEyeView.viewer.scene.primitives;
+      const prims = window.__cameraEye.viewer.scene.primitives;
       const now = [];
       for (let i = 0; i < prims.length; i++) {
-        if (prims.get(i) && prims.get(i)._gevViewshed) now.push(prims.get(i));
+        if (prims.get(i) && prims.get(i)._ceViewshed) now.push(prims.get(i));
       }
       const before = window.__qaViewshedRefs || [];
       const sameCount = now.length === before.length;
@@ -1646,9 +1646,9 @@ async function main() {
       'handle-fov-r',
     ];
     const gizmoStates = await page.evaluate((parts) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ calibrationMode: true });
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       return parts.map((p) => {
         const e = viewer.entities.getById('cctv-gizmo-' + p);
         return e ? (e.show ? 'shown' : 'hidden') : 'missing';
@@ -1664,7 +1664,7 @@ async function main() {
     // regression. Sample effective elevation after every mouse move: it must
     // stay frozen until release, with no transient sampleHeight calls.
     const eastDrag = await page.evaluate(() => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       const e = viewer.entities.getById('cctv-gizmo-move-east');
       if (!e) return null;
       const pts = e.polyline.positions.getValue(viewer.clock.currentTime);
@@ -1699,7 +1699,7 @@ async function main() {
     });
 
     const calBeforeDrag = await page.evaluate(() => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       const cam = mod.getUIState().activeCamera;
       return cam
         ? {
@@ -1722,7 +1722,7 @@ async function main() {
         const pickBufferReady = await positionPointerForGizmoDrag(page, grab);
         if (!pickBufferReady) continue;
         const ownsPick = await page.evaluate((point) => {
-          const scene = window.__godsEyeView.viewer.scene;
+          const scene = window.__cameraEye.viewer.scene;
           const partFrom = (picked) => {
             const id = picked?.id?.id ?? picked?.id;
             return typeof id === 'string' && id.startsWith('cctv-gizmo-')
@@ -1747,7 +1747,7 @@ async function main() {
           transientDragStates.push(
             await page.evaluate(() => {
               const mod =
-                window.__godsEyeView.dataManager.layers.get('cctv').module;
+                window.__cameraEye.dataManager.layers.get('cctv').module;
               const cam = mod.getUIState().activeCamera;
               return cam
                 ? {
@@ -1765,7 +1765,7 @@ async function main() {
         await sleep(400);
         const candidateEast = await page.evaluate(() => {
           const mod =
-            window.__godsEyeView.dataManager.layers.get('cctv').module;
+            window.__cameraEye.dataManager.layers.get('cctv').module;
           return (
             mod.getUIState().activeCamera?.calibration?.offsetEastM ?? null
           );
@@ -1783,10 +1783,10 @@ async function main() {
     }
 
     const dragOutcome = await page.evaluate((pt) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
-      const viewer = window.__godsEyeView.viewer;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
+      const viewer = window.__cameraEye.viewer;
       const cam = mod.getUIState().activeCamera;
-      const raw = localStorage.getItem('godsEyeView.cctv.calibration.v2');
+      const raw = localStorage.getItem('cameraEye.cctv.calibration.v2');
       const map = raw ? JSON.parse(raw) : {};
       let pickable = null;
       let ownsPick = null;
@@ -1942,10 +1942,10 @@ async function main() {
 
     // ADJUST off: parts hidden; leave a clean calibration for the next group.
     const gizmoOff = await page.evaluate((parts) => {
-      const mod = window.__godsEyeView.dataManager.layers.get('cctv').module;
+      const mod = window.__cameraEye.dataManager.layers.get('cctv').module;
       mod.setParams({ calibrationMode: false });
       mod.setParams({ calibration: { reset: true } });
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       return parts.map((p) => {
         const e = viewer.entities.getById('cctv-gizmo-' + p);
         return e ? (e.show ? 'shown' : 'hidden') : 'missing';

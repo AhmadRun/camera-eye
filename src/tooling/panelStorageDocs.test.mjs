@@ -10,13 +10,13 @@ const root = fileURLToPath(new URL('../..', import.meta.url));
 // is the key the code writes. Whether deleting one has the effect the document
 // claims is not checked here.
 const DOCUMENTED_KEYS = [
-  ['docs/KNOWN-ISSUES.md', 'godsEyeView.{layout}.panelCollapsed.cctv-panel'],
-  ['docs/KNOWN-ISSUES.md', 'godsEyeView.{layout}.panelCollapsed.<panel-id>'],
-  ['docs/KNOWN-ISSUES.md', 'godsEyeView.{position}.panelPos.<panel-id>'],
-  ['scripts/dev-fresh.sh', 'godsEyeView.{layout}.panelCollapsed.cctv-panel'],
-  ['docs/CURRENT-STATE.md', 'godsEyeView.{position}.panelPos.<panel-id>'],
-  ['docs/CURRENT-STATE.md', 'godsEyeView.{position}.panelPos.<id>'],
-  ['docs/CURRENT-STATE.md', 'godsEyeView.{layout}.panelCollapsed.<panel-id>'],
+  ['docs/KNOWN-ISSUES.md', 'cameraEye.{layout}.panelCollapsed.cctv-panel'],
+  ['docs/KNOWN-ISSUES.md', 'cameraEye.{layout}.panelCollapsed.<panel-id>'],
+  ['docs/KNOWN-ISSUES.md', 'cameraEye.{position}.panelPos.<panel-id>'],
+  ['scripts/dev-fresh.sh', 'cameraEye.{layout}.panelCollapsed.cctv-panel'],
+  ['docs/CURRENT-STATE.md', 'cameraEye.{position}.panelPos.<panel-id>'],
+  ['docs/CURRENT-STATE.md', 'cameraEye.{position}.panelPos.<id>'],
+  ['docs/CURRENT-STATE.md', 'cameraEye.{layout}.panelCollapsed.<panel-id>'],
 ];
 
 test('documented panel storage keys are the keys the code writes', async () => {
@@ -49,9 +49,7 @@ test('documented panel storage keys are the keys the code writes', async () => {
   // A document that still names a superseded version sends the reader to a key
   // nothing writes.
   for (const [file, content] of seen) {
-    const stalePositions = [
-      ...content.matchAll(/godsEyeView\.(v\d+)\.panelPos/g),
-    ]
+    const stalePositions = [...content.matchAll(/cameraEye\.(v\d+)\.panelPos/g)]
       .map(([, found]) => found)
       .filter((found) => found !== position);
     assert.deepEqual(
@@ -60,7 +58,7 @@ test('documented panel storage keys are the keys the code writes', async () => {
       `${file} names superseded position keys`,
     );
     const staleCollapsed = [
-      ...content.matchAll(/godsEyeView\.(v\d+)\.panelCollapsed/g),
+      ...content.matchAll(/cameraEye\.(v\d+)\.panelCollapsed/g),
     ]
       .map(([, found]) => found)
       .filter((found) => found !== layout);
@@ -122,19 +120,19 @@ test('the documented outcomes hold: default, stored open, stored shut, and a sha
     assert.equal(classes.has('collapsed'), true);
 
     // The value the documents tell a reader to set.
-    store.set('godsEyeView.v6.panelCollapsed.cctv-panel', '0');
+    store.set('cameraEye.v6.panelCollapsed.cctv-panel', '0');
     controls._restorePanelCollapsedState('cctv-panel');
     assert.equal(classes.has('collapsed'), false);
 
     // ...and the opposite value keeps it shut, so '0' is doing the work.
-    store.set('godsEyeView.v6.panelCollapsed.cctv-panel', '1');
+    store.set('cameraEye.v6.panelCollapsed.cctv-panel', '1');
     controls._restorePanelCollapsedState('cctv-panel');
     assert.equal(classes.has('collapsed'), true);
 
     // A view opened from a share link is laid out from the link: the shell
     // restores with allowStored false, and the stored value is not consulted.
     // This is why the console workaround is documented for ordinary loads only.
-    store.set('godsEyeView.v6.panelCollapsed.cctv-panel', '0');
+    store.set('cameraEye.v6.panelCollapsed.cctv-panel', '0');
     controls._restorePanelCollapsedState('cctv-panel', { allowStored: false });
     assert.equal(
       classes.has('collapsed'),

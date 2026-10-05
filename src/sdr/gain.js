@@ -24,7 +24,7 @@ export const SDR_GAIN_DEFAULTS = Object.freeze({
   adsb: 28.0,
 });
 
-export const SDR_GAIN_STORAGE_KEY = 'gev:sdr:gain:v1';
+export const SDR_GAIN_STORAGE_KEY = 'ce:sdr:gain:v1';
 
 /**
  * Normalize a requested gain to `'auto'` or the nearest listed R820T step.

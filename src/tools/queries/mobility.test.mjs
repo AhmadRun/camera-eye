@@ -376,7 +376,7 @@ test('traffic reports a missing key, empty areas and areas that are too wide', a
 });
 
 test('transit marks stale feeds and drops expired positions', async () => {
-  const headers = new Headers({ 'x-gev-cache': 'STALE-ERROR' });
+  const headers = new Headers({ 'x-ce-cache': 'STALE-ERROR' });
   const snapshot = (extra) => ({
     ok: true,
     status: 200,

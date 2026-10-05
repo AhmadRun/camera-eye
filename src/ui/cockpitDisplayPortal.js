@@ -43,7 +43,7 @@ export class CockpitDisplayPortal {
       options,
     );
     window.addEventListener(
-      'gev:cockpit-mode-changed',
+      'ce:cockpit-mode-changed',
       (event) => {
         this.setActive(event?.detail?.active === true);
       },

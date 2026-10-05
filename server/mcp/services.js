@@ -1,6 +1,6 @@
 /**
  * Local composition of tool services: Core's default services, pointed at a
- * running God's Eye View server's `/api` routes.
+ * running Camera Eye server's `/api` routes.
  */
 
 import { readFile } from 'node:fs/promises';

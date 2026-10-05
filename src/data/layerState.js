@@ -29,7 +29,7 @@ const TRACKING_ID_GRAMMAR = /^[0-9a-z~_-]{1,16}$/;
  */
 const MAX_ENABLED_LAYERS_CHARS = 4_096;
 const MAX_LAYER_OPTIONS_CHARS = 512;
-export const LAYER_STATE_STORAGE_KEY = 'gev:layer-state:v2';
+export const LAYER_STATE_STORAGE_KEY = 'ce:layer-state:v2';
 export const LAYER_RESTORE_ORIGINS = Object.freeze({
   share: 'share-restore',
   local: 'local-restore',

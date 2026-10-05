@@ -518,7 +518,7 @@ export function createWindRendering({
     listen(media, 'change', motionChanged);
     listen(globalThis.document, 'visibilitychange', motionChanged);
     listen(globalThis, 'resize', cameraMoved);
-    listen(eventTarget, 'gev:map-stack-changed', rehome);
+    listen(eventTarget, 'ce:map-stack-changed', rehome);
     const viewer = viewerReady();
     const camera = viewer?.scene?.camera;
     listenScene(viewer?.scene?.preRender, viewChanged);
@@ -674,7 +674,7 @@ export function createWindRendering({
     attach() {
       if (canvas) return;
       canvas = document.createElement('canvas');
-      canvas.dataset.gevWind = '1';
+      canvas.dataset.ceWind = '1';
       Object.assign(canvas.style, {
         position: 'absolute',
         inset: '0',

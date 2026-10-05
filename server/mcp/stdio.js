@@ -4,7 +4,7 @@
  *   npm run mcp -- [--api-base http://localhost:4173]
  *
  * Reads newline-delimited JSON-RPC from stdin and writes responses to stdout.
- * Tools read data from a running God's Eye View server (`npm run dev` or
+ * Tools read data from a running Camera Eye server (`npm run dev` or
  * `npm run preview`) at the API base. Diagnostics go to stderr.
  */
 
@@ -95,7 +95,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try {
     const options = parseArgs(process.argv.slice(2));
     console.error(
-      `God's Eye View MCP server reading ${options.apiBase || DEFAULT_API_BASE}`,
+      `Camera Eye MCP server reading ${options.apiBase || DEFAULT_API_BASE}`,
     );
     await serveStdio(createLocalMcpServer(options), {
       input: process.stdin,

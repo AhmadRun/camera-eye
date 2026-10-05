@@ -31,7 +31,7 @@ test('the boot provenance snapshot survives in-process Vite config re-evaluation
   const source = readFileSync(new URL('../server/standalone/key-setup.js', import.meta.url), 'utf8');
   assert.match(
     source,
-    /const PROVIDER_ENV_AT_BOOT\s*=\s*\(?globalThis\.__GEV_PROVIDER_ENV_AT_BOOT\s*\?\?=\s*Object\.freeze\(/,
+    /const PROVIDER_ENV_AT_BOOT\s*=\s*\(?globalThis\.__CE_PROVIDER_ENV_AT_BOOT\s*\?\?=\s*Object\.freeze\(/,
   );
 });
 
@@ -215,7 +215,7 @@ test('upsert is idempotent for a repeated save', () => {
 test('a real .env.example round-trip: the curated file keeps its shape', () => {
   // A representative slice of the shipped .env.example.
   const example = [
-    '# God\'s Eye View — environment variables',
+    '# Camera Eye — environment variables',
     'GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here',
     '',
     '# Optional: OpenAI Realtime voice control. Do not prefix with VITE_.',
@@ -309,7 +309,7 @@ test('the sharing gate treats a real PINOKIO_SHARE_VAR as sharing, but not the e
   // The ordinary launch states: unset, empty, or the explicit disabled sentinel.
   assert.equal(admitKeySetupRequest({ ...base, env: {} }).ok, true, 'unset SHARE_VAR is normal');
   assert.equal(admitKeySetupRequest({ ...base, env: { PINOKIO_SHARE_VAR: '' } }).ok, true, 'empty SHARE_VAR is normal');
-  assert.equal(admitKeySetupRequest({ ...base, env: { PINOKIO_SHARE_VAR: '__gev_sharing_disabled__' } }).ok, true, 'the disabled sentinel is normal');
+  assert.equal(admitKeySetupRequest({ ...base, env: { PINOKIO_SHARE_VAR: '__ce_sharing_disabled__' } }).ok, true, 'the disabled sentinel is normal');
   // A real tunnel var disables the surface.
   assert.equal(admitKeySetupRequest({ ...base, env: { PINOKIO_SHARE_VAR: 'MY_TUNNEL_TOKEN' } }).ok, false, 'a real share var is sharing');
 });

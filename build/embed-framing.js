@@ -1,7 +1,7 @@
 /**
  * Lets chosen pages frame the app in embed mode (`?embed=1`). Every
  * document keeps the server's `X-Frame-Options: DENY` and
- * `frame-ancestors 'none'` unless `GEV_EMBED_FRAME_ANCESTORS` names who may
+ * `frame-ancestors 'none'` unless `CE_EMBED_FRAME_ANCESTORS` names who may
  * frame embed-mode documents: CSP frame-ancestors sources, or `*` for any
  * page. A framing page can change what the app shows, so no page may frame
  * it by default. Other documents, including Provider Settings, are never
@@ -36,7 +36,7 @@ export function isEmbedDocumentRequest(url) {
 
 /** Vite plugin applying the embed framing policy on dev and preview servers. */
 export function embedFramingPlugin({
-  ancestors = process.env.GEV_EMBED_FRAME_ANCESTORS || '',
+  ancestors = process.env.CE_EMBED_FRAME_ANCESTORS || '',
 } = {}) {
   const allowed = ancestors.trim();
   // Unset: embed documents keep the server's framing protection.

@@ -180,7 +180,7 @@ export function createRendering({ state }) {
       },
     });
 
-    entity.__gevTeleGeography = info;
+    entity.__ceTeleGeography = info;
     state._pickByEntity.set(entity, info);
     const record = {
       id: entity.id,

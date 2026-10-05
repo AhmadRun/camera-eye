@@ -7,7 +7,7 @@ test('links open the app looking straight down on the area', async () => {
     tools: coreTools,
     services: { app: { baseUrl: 'https://maps.example/view?x=1' } },
   });
-  const result = await catalog.call('show_in_gods_eye_view', {
+  const result = await catalog.call('show_in_camera_eye', {
     area: { lat: 30.2672, lon: -97.7431, radius_km: 5 },
   });
   const url = new URL(result.data.url);
@@ -26,7 +26,7 @@ test('links open the app looking straight down on the area', async () => {
   });
   assert.equal(
     result.summary,
-    `Open 5 km around 30.267, -97.743 in God's Eye View: ${url.href}`,
+    `Open 5 km around 30.267, -97.743 in Camera Eye: ${url.href}`,
   );
 });
 
@@ -35,11 +35,11 @@ test('altitude is bounded for tiny and planet-sized areas', async () => {
     tools: coreTools,
     services: { app: { baseUrl: 'http://localhost:4173/' } },
   });
-  const tiny = await catalog.call('show_in_gods_eye_view', {
+  const tiny = await catalog.call('show_in_camera_eye', {
     area: { lat: 0, lon: 0, radius_km: 0.1 },
   });
   assert.equal(tiny.data.view.camera.altitude_m, 500);
-  const world = await catalog.call('show_in_gods_eye_view', {
+  const world = await catalog.call('show_in_camera_eye', {
     area: { bbox: [-180, -85, 180, 85] },
   });
   assert.equal(world.data.view.camera.altitude_m, 15000000);
@@ -48,7 +48,7 @@ test('altitude is bounded for tiny and planet-sized areas', async () => {
     services: { app: { baseUrl: 'not a url' } },
   });
   await assert.rejects(
-    broken.call('show_in_gods_eye_view', {
+    broken.call('show_in_camera_eye', {
       area: { lat: 0, lon: 0, radius_km: 1 },
     }),
     (error) => error.code === 'unavailable',
@@ -61,7 +61,7 @@ test('links turn on the requested layers with the app share-link codec', async (
     tools: coreTools,
     services: { app: { baseUrl: 'http://localhost:4173/' } },
   });
-  const result = await catalog.call('show_in_gods_eye_view', {
+  const result = await catalog.call('show_in_camera_eye', {
     area: { lat: 30.27, lon: -97.74, radius_km: 10 },
     layers: ['earthquakes', 'flights', 'flights'],
   });
@@ -72,7 +72,7 @@ test('links turn on the requested layers with the app share-link codec', async (
     'flights',
   ]);
   await assert.rejects(
-    catalog.call('show_in_gods_eye_view', {
+    catalog.call('show_in_camera_eye', {
       area: { lat: 0, lon: 0, radius_km: 1 },
       layers: ['not-a-layer'],
     }),
@@ -86,7 +86,7 @@ test('links carry a camera, style, map and an entity to follow', async () => {
     tools: coreTools,
     services: { app: { baseUrl: 'http://localhost:4173/' } },
   });
-  const result = await catalog.call('show_in_gods_eye_view', {
+  const result = await catalog.call('show_in_camera_eye', {
     area: { lat: 25, lon: 121, radius_km: 200 },
     camera: { pitch_deg: -40, heading_deg: 350 },
     layers: ['ais-live-vessels'],
@@ -103,13 +103,13 @@ test('links carry a camera, style, map and an entity to follow', async () => {
     id: 'ae1234',
   });
   assert.equal(result.data.view.camera.pitch_deg, -40);
-  const camera = await catalog.call('show_in_gods_eye_view', {
+  const camera = await catalog.call('show_in_camera_eye', {
     camera: { lat: 48.8584, lon: 2.2945, altitude_m: 1200, pitch_deg: -30 },
   });
   assert.equal(camera.data.view.camera.altitude_m, 1200);
-  assert.match(camera.summary, /^Open 48\.858, 2\.295 in God's Eye View: /);
+  assert.match(camera.summary, /^Open 48\.858, 2\.295 in Camera Eye: /);
   await assert.rejects(
-    catalog.call('show_in_gods_eye_view', { layers: ['flights'] }),
+    catalog.call('show_in_camera_eye', { layers: ['flights'] }),
     /Give a view, an area, or a camera with lat and lon/,
   );
 });

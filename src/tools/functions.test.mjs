@@ -4,10 +4,10 @@ import { coreTools, toFunctionOutput, toFunctionTools } from './index.js';
 
 test('catalog tools become independent function records', () => {
   const records = toFunctionTools(coreTools, {
-    exclude: ['show_in_gods_eye_view'],
+    exclude: ['show_in_camera_eye'],
   });
   assert.equal(records.length, coreTools.length - 1);
-  assert.ok(!records.some((tool) => tool.name === 'show_in_gods_eye_view'));
+  assert.ok(!records.some((tool) => tool.name === 'show_in_camera_eye'));
   const weather = records.find((tool) => tool.name === 'get_weather');
   const source = coreTools.find((tool) => tool.name === 'get_weather');
   assert.deepEqual(Object.keys(weather), [

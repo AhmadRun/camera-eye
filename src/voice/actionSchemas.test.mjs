@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { GEV_ACTION_SCHEMAS, createActionTools } from './actionSchemas.js';
-import { GEV_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
+import { CE_ACTION_SCHEMAS, createActionTools } from './actionSchemas.js';
+import { CE_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
 
 const stable = (value) =>
   Array.isArray(value)
@@ -20,16 +20,16 @@ test('the complete Realtime tool payload pins the additive analyst, satellite, L
     .update(
       JSON.stringify(
         stable(
-          GEV_REALTIME_TOOLS.filter((tool) => tool.name !== 'set_cyber_sonar'),
+          CE_REALTIME_TOOLS.filter((tool) => tool.name !== 'set_cyber_sonar'),
         ),
       ),
     )
     .digest('hex');
   assert.equal(
     digest,
-    // Re-derived for the additive `local-adsb` set_layer_visibility value and
+    // Re-derived for Camera Eye branding and the additive `local-adsb` set_layer_visibility value and
     // the Cyber HUD layout; the separate sonar tool is excluded above.
-    '590d537d93e132ac64ac5e211ad5bb9d7d1b1f22e2dd963dda5465fab4510a3b',
+    '75a05a4d00f290e203663f9441c5cfd1cd3a5e2d67ace40f93d02b89f8f91a39',
   );
 });
 
@@ -51,10 +51,10 @@ test('descriptions customize wording without changing immutable shared arguments
     'string',
   );
   assert.throws(() => {
-    GEV_ACTION_SCHEMAS[0].parameters.properties.query.type = 'number';
+    CE_ACTION_SCHEMAS[0].parameters.properties.query.type = 'number';
   }, TypeError);
   assert.equal(
-    JSON.stringify(GEV_ACTION_SCHEMAS).includes('"description"'),
+    JSON.stringify(CE_ACTION_SCHEMAS).includes('"description"'),
     false,
   );
 });
@@ -86,7 +86,7 @@ test('metadata cannot add tools, fields, types or enum values', () => {
 });
 
 test('all legacy action arguments are byte-identical after removing the deliberate additions', () => {
-  const legacy = structuredClone(GEV_ACTION_SCHEMAS).filter(
+  const legacy = structuredClone(CE_ACTION_SCHEMAS).filter(
     (tool) => !['next_satellite_pass', 'set_cyber_sonar'].includes(tool.name),
   );
   const layers = legacy.find((tool) => tool.name === 'analyst_query').parameters

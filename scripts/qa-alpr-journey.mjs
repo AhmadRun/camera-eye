@@ -181,7 +181,7 @@ try {
   page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900 });
   await page.evaluateOnNewDocument(() =>
-    sessionStorage.setItem('gev:first-run-mission-session:v1', 'dismissed'),
+    sessionStorage.setItem('ce:first-run-mission-session:v1', 'dismissed'),
   );
   page.on('console', (message) => {
     if (message.type() === 'error') result.consoleErrors.push(message.text());
@@ -192,12 +192,12 @@ try {
   await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 90_000 });
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.dataManager &&
+      window.__cameraEye?.dataManager &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 120_000 },
   );
   await page.evaluate(
-    () => window.__godsEyeView.styleManager.initialRestorePromise,
+    () => window.__cameraEye.styleManager.initialRestorePromise,
   );
   await page.keyboard.press('Escape');
   await installFrameProbe(page);
@@ -205,9 +205,9 @@ try {
   // visibility) as a cheap hash, so structural churn while still is visible.
   await page.evaluate(() => {
     const samples = [];
-    window.__gevAlprSamples = samples;
+    window.__ceAlprSamples = samples;
     setInterval(() => {
-      const entry = window.__godsEyeView.dataManager.layers.get('alpr-cameras');
+      const entry = window.__cameraEye.dataManager.layers.get('alpr-cameras');
       const stats = entry?.module?.getStats?.() || {};
       // Layers that publish a render revision are measured by it; otherwise
       // hash the rendered entity ids and their visibility.
@@ -219,9 +219,8 @@ try {
       } else {
         const entities =
           entry?.module && entry.enabled
-            ? window.__godsEyeView.viewer.dataSources.getByName(
-                'alpr-cameras',
-              )[0]?.entities.values || []
+            ? window.__cameraEye.viewer.dataSources.getByName('alpr-cameras')[0]
+                ?.entities.values || []
             : [];
         for (const entity of entities) {
           if (entity.show === false) continue;
@@ -252,7 +251,7 @@ try {
     await page
       .waitForFunction(
         () => {
-          const { scene } = window.__godsEyeView.viewer;
+          const { scene } = window.__cameraEye.viewer;
           if (scene.globe.show) return scene.globe.tilesLoaded;
           for (let i = 0; i < scene.primitives.length; i++) {
             const p = scene.primitives.get(i);
@@ -274,13 +273,13 @@ try {
     if (
       alpr !==
       (await page.evaluate(() =>
-        window.__godsEyeView.dataManager.isEnabled('alpr-cameras'),
+        window.__cameraEye.dataManager.isEnabled('alpr-cameras'),
       ))
     ) {
       // The user's switch: the layer row, not a private API.
       await page.evaluate(
         (enabled) =>
-          window.__godsEyeView.dataManager.setEnabled('alpr-cameras', enabled, {
+          window.__cameraEye.dataManager.setEnabled('alpr-cameras', enabled, {
             origin: 'user',
           }),
         alpr,
@@ -290,7 +289,7 @@ try {
       // Self-test: drop explicit render requests so markers reach the screen
       // only with the next camera move. The rendered-pixel checks must fail.
       await page.evaluate(() => {
-        window.__godsEyeView.viewer.scene.requestRender = () => {};
+        window.__cameraEye.viewer.scene.requestRender = () => {};
       });
     const pass = { name: passName, alpr, stops: [] };
     for (const stop of STOPS) {
@@ -310,7 +309,7 @@ try {
       if (alpr) {
         const shown = await cyanCount(await page.screenshot({ type: 'png' }));
         await page.evaluate(async () => {
-          const { scene } = window.__godsEyeView.viewer;
+          const { scene } = window.__cameraEye.viewer;
           const mode = scene.requestRenderMode;
           scene.requestRenderMode = false;
           for (let i = 0; i < 4; i++)
@@ -327,7 +326,7 @@ try {
       const moving = frameStats(await readFrames(page, moveStart, holdStart));
       const holding = frameStats(await readFrames(page, holdStart, holdEnd));
       const samples = await page.evaluate(
-        (a, b) => window.__gevAlprSamples.filter((s) => s.t >= a && s.t < b),
+        (a, b) => window.__ceAlprSamples.filter((s) => s.t >= a && s.t < b),
         holdStart,
         holdEnd,
       );

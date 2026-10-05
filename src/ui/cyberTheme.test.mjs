@@ -8,8 +8,8 @@ import {
   HUD_LAYOUTS,
   normalizeHudLayout,
 } from '../hudLayouts.js';
-import { GEV_ACTION_SCHEMAS } from '../voice/actionSchemas.js';
-import { createGevActionRunner } from '../voice/gevActions.js';
+import { CE_ACTION_SCHEMAS } from '../voice/actionSchemas.js';
+import { createGevActionRunner } from '../voice/ceActions.js';
 import { StyleManager } from './applicationShell.js';
 import { bindDisplayControls } from './displayControls.js';
 import { VisualSettings } from './visualSettings.js';
@@ -356,7 +356,7 @@ function cssRuleBody(styles, selector) {
 test('Cyber Voice clips its decoration without clipping descendant help and errors', () => {
   const owner = cssRuleBody(
     cyberStyles,
-    /:root\[data-ui-theme='cyber'\] #command-dock > #gev-voice-control/,
+    /:root\[data-ui-theme='cyber'\] #command-dock > #ce-voice-control/,
   );
   assert.match(owner, /isolation:\s*isolate;/);
   assert.match(owner, /overflow:\s*visible;/);
@@ -364,7 +364,7 @@ test('Cyber Voice clips its decoration without clipping descendant help and erro
 
   const decoration = cssRuleBody(
     cyberStyles,
-    /:root\[data-ui-theme='cyber'\] #command-dock > #gev-voice-control::before/,
+    /:root\[data-ui-theme='cyber'\] #command-dock > #ce-voice-control::before/,
   );
   assert.match(decoration, /clip-path:\s*polygon\(/);
   assert.match(decoration, /pointer-events:\s*none;/);
@@ -615,7 +615,7 @@ test('the Display selector, voice schema and final stylesheet expose Cyber', () 
   const detection = read('../data/detection.js');
   const civilRendering = read('../layers/flights/rendering.js');
   const militaryRendering = read('../layers/military/rendering.js');
-  const setHud = GEV_ACTION_SCHEMAS.find((schema) => schema.name === 'set_hud');
+  const setHud = CE_ACTION_SCHEMAS.find((schema) => schema.name === 'set_hud');
 
   assert.match(display, /<option value="cyber">Cyber<\/option>/);
   assert.match(display, /id="cyber-sonar-toggle"/);
@@ -766,17 +766,17 @@ test('the Display selector, voice schema and final stylesheet expose Cyber', () 
 test('Cyber voice telemetry renders a live scan scope without replacing audio ownership', () => {
   assert.match(
     cyberStyles,
-    /#gev-voice-control\s*\{[\s\S]*?--cyber-voice-wave:/,
+    /#ce-voice-control\s*\{[\s\S]*?--cyber-voice-wave:/,
   );
-  assert.match(cyberStyles, /\.gev-voice-visualizer::before/);
-  assert.match(cyberStyles, /\.gev-voice-visualizer::after/);
-  assert.match(cyberStyles, /@keyframes gev-cyber-voice-scan/);
-  assert.match(cyberStyles, /@keyframes gev-cyber-voice-lock/);
+  assert.match(cyberStyles, /\.ce-voice-visualizer::before/);
+  assert.match(cyberStyles, /\.ce-voice-visualizer::after/);
+  assert.match(cyberStyles, /@keyframes ce-cyber-voice-scan/);
+  assert.match(cyberStyles, /@keyframes ce-cyber-voice-lock/);
   assert.match(cyberStyles, /\[data-speaker='user'\]/);
   assert.match(cyberStyles, /\[data-speaker='ai'\]/);
   assert.match(
     cyberStyles,
-    /prefers-reduced-motion: reduce[\s\S]*?gev-voice-visualizer::after[\s\S]*?animation: none/,
+    /prefers-reduced-motion: reduce[\s\S]*?ce-voice-visualizer::after[\s\S]*?animation: none/,
   );
 });
 

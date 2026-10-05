@@ -80,7 +80,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function cardCanvasInk(page) {
   return page.evaluate(() => {
     const canvas = document.getElementById('world-overlay-canvas');
-    const diagnostics = window.__gevWorldOverlay?.getDiagnostics?.();
+    const diagnostics = window.__ceWorldOverlay?.getDiagnostics?.();
     const painted = diagnostics?.paintedBySource?.firms || 0;
     const entries = diagnostics?.entriesBySource?.firms || 0;
     if (!canvas) return {
@@ -112,7 +112,7 @@ async function waitForCardCanvasInk(page, { timeoutMs = 12000 } = {}) {
   let consecutive = 0;
   let sample = null;
   while (Date.now() < deadline) {
-    await page.evaluate(() => window.__godsEyeView?.viewer?.scene?.requestRender?.());
+    await page.evaluate(() => window.__cameraEye?.viewer?.scene?.requestRender?.());
     await sleep(150);
     sample = await cardCanvasInk(page);
     if (sample.present && sample.entries > 0 && sample.painted > 0 && sample.ink > 500) {
@@ -146,7 +146,7 @@ async function waitForFirmsActionCount(page, expected, { timeoutMs = 12000 } = {
   const deadline = Date.now() + timeoutMs;
   let snapshot = await firmsActionSnapshot(page);
   while (Date.now() < deadline && snapshot.count !== expected) {
-    await page.evaluate(() => window.__godsEyeView?.viewer?.scene?.requestRender?.());
+    await page.evaluate(() => window.__cameraEye?.viewer?.scene?.requestRender?.());
     await sleep(175);
     snapshot = await firmsActionSnapshot(page);
   }
@@ -157,13 +157,13 @@ async function waitForFirmsActionCount(page, expected, { timeoutMs = 12000 } = {
 async function bootAndEnable(page, { timeoutS = 45 } = {}) {
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForFunction(
-    () => window.__godsEyeView?.viewer && window.__godsEyeView?.dataManager,
+    () => window.__cameraEye?.viewer && window.__cameraEye?.dataManager,
     { timeout: 60000 },
   );
   await sleep(5000);
   await page.keyboard.press('Escape');
   return page.evaluate(async (tS) => {
-    const dm = window.__godsEyeView.dataManager;
+    const dm = window.__cameraEye.dataManager;
     await dm.setEnabled('local-firms', true);
     const mod = dm.layers.get('local-firms').module;
     let s = null;
@@ -179,16 +179,16 @@ async function bootAndEnable(page, { timeoutS = 45 } = {}) {
 /** Teleport the camera (duck-typed cartographic — no Cesium global). */
 async function setView(page, lon, lat, height) {
   await page.evaluate((lo, la, h) => {
-    const gev = window.__godsEyeView;
-    const ell = gev.viewer.scene.globe.ellipsoid;
+    const ce = window.__cameraEye;
+    const ell = ce.viewer.scene.globe.ellipsoid;
     const d2r = Math.PI / 180;
     // The app's intro flyTo animation clobbers a setView issued mid-flight.
-    try { gev.viewer.camera.cancelFlight(); } catch { /* no flight active */ }
-    gev.viewer.camera.setView({
+    try { ce.viewer.camera.cancelFlight(); } catch { /* no flight active */ }
+    ce.viewer.camera.setView({
       destination: ell.cartographicToCartesian({ longitude: lo * d2r, latitude: la * d2r, height: h }),
       orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
     });
-    gev.viewer.scene.requestRender?.();
+    ce.viewer.scene.requestRender?.();
   }, lon, lat, height);
 }
 
@@ -302,7 +302,7 @@ async function main() {
     console.log('\n(ii) CARDS — tactical card overlay ink at both LODs...');
     {
       const strongest = await page.evaluate(() => {
-        const mod = window.__godsEyeView.dataManager.layers.get('local-firms').module;
+        const mod = window.__cameraEye.dataManager.layers.get('local-firms').module;
         return mod.getStrongestFire();
       });
       if (!strongest) {
@@ -377,18 +377,18 @@ async function main() {
       exitCode = 1;
     } else {
       const prepared = await page.evaluate(() => {
-        const gev = window.__godsEyeView;
-        const mod = gev.dataManager.layers.get('local-firms').module;
+        const ce = window.__cameraEye;
+        const mod = ce.dataManager.layers.get('local-firms').module;
         const target = mod.getDetectableObjects({ maxCount: 1 })[0];
         if (!target?.position) return null;
 
-        const sentinel = gev.viewer.entities.add({
+        const sentinel = ce.viewer.entities.add({
           id: 'qa-firms-prior-camera-owner',
           position: target.position,
         });
-        gev.viewer.trackedEntity = sentinel;
+        ce.viewer.trackedEntity = sentinel;
 
-        const camera = gev.viewer.camera;
+        const camera = ce.viewer.camera;
         const originalFly = camera.flyToBoundingSphere;
         const proof = {
           sentinel,
@@ -396,7 +396,7 @@ async function main() {
           flightCount: 0,
           trackedAtFlight: 'not-called',
           request: null,
-          generationBefore: gev.styleManager._navigationGeneration,
+          generationBefore: ce.styleManager._navigationGeneration,
         };
         proof.onRequest = (event) => {
           proof.request = {
@@ -404,10 +404,10 @@ async function main() {
             id: event.detail?.id || null,
           };
         };
-        window.addEventListener('gev:world-request-focus', proof.onRequest);
+        window.addEventListener('ce:world-request-focus', proof.onRequest);
         camera.flyToBoundingSphere = function qaFirmsObservedFlight(...args) {
           proof.flightCount += 1;
-          proof.trackedAtFlight = gev.viewer.trackedEntity?.id || null;
+          proof.trackedAtFlight = ce.viewer.trackedEntity?.id || null;
           return originalFly.apply(this, args);
         };
         window.__qaFirmsActionProof = proof;
@@ -429,7 +429,7 @@ async function main() {
 
         for (let i = 0; i < 30; i += 1) {
           const settled = await page.evaluate(() => {
-            window.__godsEyeView?.viewer?.scene?.requestRender?.();
+            window.__cameraEye?.viewer?.scene?.requestRender?.();
             return (window.__qaFirmsActionProof?.flightCount || 0) > 0;
           });
           if (settled) break;
@@ -438,18 +438,18 @@ async function main() {
         await sleep(250);
 
         const proof = await page.evaluate(() => {
-          const gev = window.__godsEyeView;
+          const ce = window.__cameraEye;
           const state = window.__qaFirmsActionProof;
           const actionButtons = [...document.querySelectorAll(
             '#world-overlay-action-list button[data-overlay-action-key]',
           )].filter((button) => String(button.dataset.overlayActionKey || '').startsWith('firms\u0000'));
-          const selectedEntityId = window.__gevContextStore?.selectedEntityId || null;
+          const selectedEntityId = window.__ceContextStore?.selectedEntityId || null;
           const result = {
             flightCount: state?.flightCount || 0,
             trackedAtFlight: state?.trackedAtFlight,
-            trackingReleased: gev.viewer.trackedEntity == null,
+            trackingReleased: ce.viewer.trackedEntity == null,
             generationBefore: state?.generationBefore,
-            generationAfter: gev.styleManager._navigationGeneration,
+            generationAfter: ce.styleManager._navigationGeneration,
             request: state?.request || null,
             selectedEntityId,
             selectedActionCount: actionButtons.filter(
@@ -457,9 +457,9 @@ async function main() {
             ).length,
           };
           if (state) {
-            gev.viewer.camera.flyToBoundingSphere = state.originalFly;
-            window.removeEventListener('gev:world-request-focus', state.onRequest);
-            if (state.sentinel) gev.viewer.entities.remove(state.sentinel);
+            ce.viewer.camera.flyToBoundingSphere = state.originalFly;
+            window.removeEventListener('ce:world-request-focus', state.onRequest);
+            if (state.sentinel) ce.viewer.entities.remove(state.sentinel);
           }
           delete window.__qaFirmsActionProof;
           return result;
@@ -480,17 +480,17 @@ async function main() {
           + `selectedActions=${proof.selectedActionCount}`);
         if (!actionOk) exitCode = 1;
         const refresh = await page.evaluate(async () => {
-          const layer = window.__godsEyeView.dataManager.layers.get('local-firms').module;
+          const layer = window.__cameraEye.dataManager.layers.get('local-firms').module;
           const before = layer.getSelectedInfo();
           let selections = 0;
           const count = () => { selections += 1; };
-          window.addEventListener('gev:entity-selected', count);
+          window.addEventListener('ce:entity-selected', count);
           try {
             await layer.update();
             return { before, after: layer.getSelectedInfo(), selections,
-              contextId: window.__gevContextStore.selectedEntityId };
+              contextId: window.__ceContextStore.selectedEntityId };
           } finally {
-            window.removeEventListener('gev:entity-selected', count);
+            window.removeEventListener('ce:entity-selected', count);
           }
         });
         const refreshOk = Boolean(refresh.before?.id)

@@ -41,7 +41,7 @@ try {
     if (m.type() === 'error') result.errors.push(m.text());
   });
   await page.evaluateOnNewDocument(() =>
-    sessionStorage.setItem('gev:first-run-mission-session:v1', 'dismissed'),
+    sessionStorage.setItem('ce:first-run-mission-session:v1', 'dismissed'),
   );
   await page.goto(
     args.find((a) => /^https?:/.test(a)),
@@ -49,16 +49,16 @@ try {
   );
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.dataManager &&
+      window.__cameraEye?.dataManager &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 120000 },
   );
   await page.evaluate(
-    () => window.__godsEyeView.styleManager.initialRestorePromise,
+    () => window.__cameraEye.styleManager.initialRestorePromise,
   );
   await page.keyboard.press('Escape');
   await page.evaluate(async () => {
-    const g = window.__godsEyeView;
+    const g = window.__cameraEye;
     for (const [id] of g.dataManager.layers)
       await g.dataManager.setEnabled(id, false);
     g.viewer.scene.screenSpaceCameraController.enableCollisionDetection = false;
@@ -79,7 +79,7 @@ try {
     const fits = await page.evaluate(async () => {
       const { installationTileZoom } =
         await import('/src/layers/installations/source.js');
-      const r = window.__godsEyeView.viewer.camera.computeViewRectangle();
+      const r = window.__cameraEye.viewer.camera.computeViewRectangle();
       const d = 180 / Math.PI;
       return (
         r &&
@@ -119,7 +119,7 @@ try {
       const before = tiles.length;
       const previous = await page.evaluate(
         () =>
-          window.__godsEyeView.dataManager.layers
+          window.__cameraEye.dataManager.layers
             .get('military-installations')
             .module.getStats().lastUpdate,
       );
@@ -131,7 +131,7 @@ try {
       const stop = Date.now();
       if (!enabled) {
         await page.evaluate(() =>
-          window.__godsEyeView.dataManager.setEnabled(
+          window.__cameraEye.dataManager.setEnabled(
             'military-installations',
             true,
           ),
@@ -141,7 +141,7 @@ try {
       await page
         .waitForFunction(
           (prev, wide) => {
-            const s = window.__godsEyeView.dataManager.layers
+            const s = window.__cameraEye.dataManager.layers
               .get('military-installations')
               .module.getStats();
             return (
@@ -155,7 +155,7 @@ try {
         )
         .catch(() => {});
       const snapshot = await page.evaluate(() => {
-        const g = window.__godsEyeView;
+        const g = window.__cameraEye;
         const ds = g.viewer.dataSources.getByName('military-installations')[0];
         const points = ds.entities.values.filter((e) => e.point);
         const stable = points.every(
@@ -219,7 +219,7 @@ try {
   ]) {
     let previous = await page.evaluate(
       () =>
-        window.__godsEyeView.dataManager.layers
+        window.__cameraEye.dataManager.layers
           .get('military-installations')
           .module.getStats().lastUpdate,
     );
@@ -245,7 +245,7 @@ try {
       );
       await page.waitForFunction(
         () =>
-          window.__godsEyeView.viewer.dataSources
+          window.__cameraEye.viewer.dataSources
             .getByName('military-installations')[0]
             .entities.values.some((e) => e.point),
         { timeout: 5000 },
@@ -256,7 +256,7 @@ try {
       });
       await page.waitForFunction(
         () => {
-          const g = window.__godsEyeView;
+          const g = window.__cameraEye;
           return (
             g.dataManager.isEffectivelyEnabled('military-awareness') &&
             !g.dataManager.layers.get('military-awareness').module.getParams()
@@ -267,7 +267,7 @@ try {
       );
       await sleep(1000);
       await page.evaluate(async () => {
-        const g = window.__godsEyeView;
+        const g = window.__cameraEye;
         const ds = g.viewer.dataSources.getByName('military-installations')[0];
         const id = ds.entities.values.find((e) => e.point).id;
         window.installationSubjectId = id;
@@ -278,7 +278,7 @@ try {
       await page.waitForFunction(
         () => {
           const a =
-            window.__godsEyeView.dataManager.layers.get(
+            window.__cameraEye.dataManager.layers.get(
               'military-awareness',
             ).module;
           const subject = a.getContextSnapshot()?.subject;
@@ -291,12 +291,12 @@ try {
         { timeout: 15000 },
       );
       await page.waitForFunction(
-        () => !window.__godsEyeView.viewer.camera._currentFlight,
+        () => !window.__cameraEye.viewer.camera._currentFlight,
         { timeout: 10000 },
       );
       await page.waitForFunction(
         () =>
-          window.__godsEyeView.dataManager.layers
+          window.__cameraEye.dataManager.layers
             .get('military-installations')
             .module.getStats().coverage.kind === 'subject',
         { timeout: 10000 },
@@ -309,7 +309,7 @@ try {
         { timeout: 30000 },
       );
       const anchored = await page.evaluate(() =>
-        window.__godsEyeView.dataManager.layers
+        window.__cameraEye.dataManager.layers
           .get('military-installations')
           .module.getStats(),
       );
@@ -323,7 +323,7 @@ try {
           const before = {
             selectedId: store.selectedEntityId,
             record: store.entities.get(store.selectedEntityId)?.id,
-            subject: window.__godsEyeView.dataManager.layers
+            subject: window.__cameraEye.dataManager.layers
               .get('military-awareness')
               .module.getContextSnapshot()?.subject,
           };
@@ -334,7 +334,7 @@ try {
       if (gesture === 'contacts-clear') {
         await page.waitForFunction(
           () =>
-            !window.__godsEyeView.dataManager.layers
+            !window.__cameraEye.dataManager.layers
               .get('military-awareness')
               .module.getContextSnapshot(),
           { timeout: 5000 },
@@ -354,13 +354,13 @@ try {
         );
       }
       await page.waitForFunction(
-        () => !window.__godsEyeView.viewer.camera._currentFlight,
+        () => !window.__cameraEye.viewer.camera._currentFlight,
         { timeout: 10000 },
       );
       await sleep(500);
       previous = await page.evaluate(
         () =>
-          window.__godsEyeView.dataManager.layers
+          window.__cameraEye.dataManager.layers
             .get('military-installations')
             .module.getStats().lastUpdate,
       );
@@ -373,7 +373,7 @@ try {
     await page
       .waitForFunction(
         (prev) => {
-          const s = window.__godsEyeView.dataManager.layers
+          const s = window.__cameraEye.dataManager.layers
             .get('military-installations')
             .module.getStats();
           return (
@@ -385,7 +385,7 @@ try {
       )
       .catch(() => result.failures.push(`${gesture}: no viewport reload`));
     const row = await page.evaluate(() =>
-      window.__godsEyeView.dataManager.layers
+      window.__cameraEye.dataManager.layers
         .get('military-installations')
         .module.getStats(),
     );

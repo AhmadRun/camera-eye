@@ -107,7 +107,7 @@ await page.evaluateOnNewDocument((site, icao) => {
 
 console.log(`\nFloor hold through a terrain outage\n  App  : ${APP_URL}\n  GPU  : ANGLE/${ANGLE}\n  Site : ${SITE.lat}, ${SITE.lon}\n`);
 await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
-await page.waitForFunction(() => window.__godsEyeView?.viewer && window.__godsEyeView?.dataManager,
+await page.waitForFunction(() => window.__cameraEye?.viewer && window.__cameraEye?.dataManager,
   { timeout: 150000 });
 await sleep(12000); // let the boot fly-to settle before pinning
 await page.evaluate(() => {
@@ -117,7 +117,7 @@ await sleep(600); // let the launcher dismissal finish before taking evidence
 
 await page.evaluate((site) => { window.__SITE = site; }, SITE);
 const pin = () => page.evaluate(() => {
-  const v = window.__godsEyeView.viewer;
+  const v = window.__cameraEye.viewer;
   const C = v.camera.positionCartographic.constructor;
   v.camera.cancelFlight();
   v.camera.setView({
@@ -130,7 +130,7 @@ const pin = () => page.evaluate(() => {
 });
 await pin();
 const billboardMode = await page.evaluate(async () => {
-  const manager = window.__godsEyeView.dataManager;
+  const manager = window.__cameraEye.dataManager;
   const flights = manager.layers.get('flights').module;
   // This harness measures billboard positions. A ready 3D model deliberately
   // hides its billboard; that handoff is covered by track-regression instead.
@@ -142,7 +142,7 @@ record('the billboard floor test is explicitly in 2D aircraft mode', billboardMo
 
 /** Reads the contact's rendered height and the rendered mesh beneath it. */
 const measure = () => page.evaluate(async (icao) => {
-  const v = window.__godsEyeView.viewer;
+  const v = window.__cameraEye.viewer;
   const C = v.camera.positionCartographic.constructor;
   const sprites = []; const models = []; let bb = null;
   const walk = (coll) => {
@@ -167,7 +167,7 @@ const measure = () => page.evaluate(async (icao) => {
   // app's own governor hook before each attempt, exactly as the fly_route
   // harness does, and accept the coarse cell centre as a fallback point.
   const pump = () => new Promise((resolve) => {
-    try { window.__godsEyeView.requestRender?.(); } catch { /* no governor */ }
+    try { window.__cameraEye.requestRender?.(); } catch { /* no governor */ }
     try { v.scene.requestRender(); } catch { /* explicit-render off */ }
     requestAnimationFrame(() => requestAnimationFrame(resolve));
   });

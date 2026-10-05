@@ -38,7 +38,7 @@ const page = await browser.newPage();
 await page.setViewport({ width: 1400, height: 900 });
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
-await page.waitForFunction(() => window.__godsEyeView?.dataManager && window.__godsEyeView?.viewer, { timeout: 150000 });
+await page.waitForFunction(() => window.__cameraEye?.dataManager && window.__cameraEye?.viewer, { timeout: 150000 });
 await sleep(2000);
 
 // Let the app's boot fly-to fully settle FIRST (it was overriding an early
@@ -47,7 +47,7 @@ await sleep(2000);
 await sleep(12000);
 await page.evaluate((site) => { window.__QA_SITE = site; }, SITE);
 const camPin = async () => page.evaluate(() => {
-  const v = window.__godsEyeView.viewer;
+  const v = window.__cameraEye.viewer;
   const C = v.camera.positionCartographic.constructor;
   v.camera.cancelFlight();
   v.camera.setView({ destination: v.scene.globe.ellipsoid.cartographicToCartesian(C.fromDegrees(window.__QA_SITE.lon, window.__QA_SITE.lat, 3000)) });
@@ -56,13 +56,13 @@ const camPin = async () => page.evaluate(() => {
   return { lat: +(c.latitude * 180 / Math.PI).toFixed(3), lon: +(c.longitude * 180 / Math.PI).toFixed(3), h: Math.round(c.height) };
 });
 console.log('camera pinned:', JSON.stringify(await camPin()));
-await page.evaluate(async () => { await window.__godsEyeView.dataManager.toggle('flights'); });
+await page.evaluate(async () => { await window.__cameraEye.dataManager.toggle('flights'); });
 console.log('waiting 100s: tiles stream + 3 polls...');
 await sleep(100000);
 // re-pin + report readiness right before probing
 console.log('camera at probe time:', JSON.stringify(await camPin()));
 const ready = await page.evaluate(() => {
-  const v = window.__godsEyeView.viewer;
+  const v = window.__cameraEye.viewer;
   const prims = v.scene.primitives;
   for (let i = 0; i < prims.length; i++) {
     const p = prims.get(i);
@@ -74,9 +74,9 @@ console.log('tileset ready:', JSON.stringify(ready));
 await sleep(8000);
 
 const report = await page.evaluate(() => {
-  const gev = window.__godsEyeView;
-  const v = gev.viewer;
-  const layer = gev.dataManager.layers.get('flights')?.module;
+  const ce = window.__cameraEye;
+  const v = ce.viewer;
+  const layer = ce.dataManager.layers.get('flights')?.module;
   if (!layer) return { err: 'no flights module' };
   const ell = v.scene.globe.ellipsoid;
   const C = v.camera.positionCartographic.constructor;

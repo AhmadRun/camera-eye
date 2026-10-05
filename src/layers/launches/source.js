@@ -13,7 +13,7 @@ export function createLaunchSource({
       throw new Error('Malformed launch snapshot');
     return {
       payload,
-      stale: response.headers?.get?.('x-gev-cache') === 'STALE-ERROR',
+      stale: response.headers?.get?.('x-ce-cache') === 'STALE-ERROR',
     };
   }
   return {

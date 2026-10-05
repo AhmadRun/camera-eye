@@ -26,7 +26,7 @@ const APP_URL = getOpt('--url', 'http://localhost:4173');
 const APP_ORIGIN = new URL(APP_URL).origin;
 const HEADFUL = getFlag('--headful');
 const SHOT_DIR = path.resolve('qa-shots/labels');
-const STORAGE_KEY = 'gev:detection-allocation:v1';
+const STORAGE_KEY = 'ce:detection-allocation:v1';
 const OBSERVATION_COUNT = 12000;
 const SYNTHETIC_SAMPLE_MS = 10000;
 const NORMAL_SAMPLE_MS = 6000;
@@ -271,7 +271,7 @@ async function main() {
 
     await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(
-      () => window.__godsEyeView?.viewer && window.__godsEyeView?.styleManager,
+      () => window.__cameraEye?.viewer && window.__cameraEye?.styleManager,
       { timeout: 60000, polling: 100 },
     );
 
@@ -279,10 +279,10 @@ async function main() {
     // Let that callback start, then cancel it before establishing the global
     // measurement camera so startup motion cannot invalidate the sample.
     await new Promise((resolve) => setTimeout(resolve, 600));
-    await page.evaluate(() => window.__godsEyeView.viewer.camera.cancelFlight());
+    await page.evaluate(() => window.__cameraEye.viewer.camera.cancelFlight());
 
     const stateChecks = await page.evaluate((storageKey) => {
-      const manager = window.__godsEyeView.styleManager;
+      const manager = window.__cameraEye.styleManager;
       const restored = manager.getDetectionState();
       manager._syncDetectionUiFromEngine();
       const storedAfterPassiveSync = localStorage.getItem(storageKey);
@@ -306,7 +306,7 @@ async function main() {
     );
 
     const injected = await page.evaluate(({ fieldCounts, normalCounts }) => {
-      const { viewer, dataManager, styleManager } = window.__godsEyeView;
+      const { viewer, dataManager, styleManager } = window.__cameraEye;
       viewer.camera.cancelFlight();
       const Cartesian3 = viewer.camera.position.constructor;
       const field = { flights: [], military: [], satellites: [] };
@@ -420,7 +420,7 @@ async function main() {
     // -samples gates supersede it — same fix, deterministic instead of timed.)
     await waitForSettledSyntheticField(page);
     await page.evaluate(() => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       const revision = Number(document.querySelector('#world-overlay-canvas')?.dataset?.solveRevision || 0);
       window.__LABEL_QA.solve = [];
       window.__LABEL_QA.frames = [];
@@ -456,11 +456,11 @@ async function main() {
     });
 
     await page.waitForFunction(
-      () => window.__godsEyeView.styleManager.getDetectionDiagnostics()?.observationCount === 5200,
+      () => window.__cameraEye.styleManager.getDetectionDiagnostics()?.observationCount === 5200,
       { timeout: SAMPLE_TIMEOUT_MS, polling: 100 },
     );
     await page.evaluate(() => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       const revision = Number(document.querySelector('#world-overlay-canvas')?.dataset?.solveRevision || 0);
       window.__LABEL_QA.solve = [];
       window.__LABEL_QA.frames = [];

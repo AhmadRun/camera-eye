@@ -566,7 +566,7 @@ export function createGeometry({ state: layerState, services, parts, source }) {
       color,
     );
     // QA tag: the harness counts viewshed volumes by this marker.
-    primitive._gevViewshed = record.camera.id;
+    primitive._ceViewshed = record.camera.id;
     record.viewshedPrimitive =
       layerState._viewer.scene.primitives.add(primitive);
     record.viewshedActiveTint = !!isActive;

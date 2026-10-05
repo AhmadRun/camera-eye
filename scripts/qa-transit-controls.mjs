@@ -75,7 +75,7 @@ export async function selectStyle(page, name, params = {}, wait = pause) {
         .querySelector('.dock-pin-btn[data-pin-target="control-panel"]')
         ?.click();
     }
-    window.__godsEyeView.styleManager.setPanelCollapsed?.(
+    window.__cameraEye.styleManager.setPanelCollapsed?.(
       'control-panel',
       false,
       { explicit: true },
@@ -90,7 +90,7 @@ export async function selectStyle(page, name, params = {}, wait = pause) {
   } catch {
     how = 'styleManager.setStyle (button not clickable)';
     await page.evaluate(
-      (n) => window.__godsEyeView.styleManager.setStyle(n),
+      (n) => window.__cameraEye.styleManager.setStyle(n),
       name,
     );
   }
@@ -98,18 +98,18 @@ export async function selectStyle(page, name, params = {}, wait = pause) {
   // Puppeteer throwing. Verify the active style before querying generated rows.
   if (
     !(await page.evaluate(
-      (n) => document.documentElement.dataset.gevStyle === n,
+      (n) => document.documentElement.dataset.ceStyle === n,
       name,
     ))
   ) {
     how = 'styleManager.setStyle (button did not activate style)';
     await page.evaluate(
-      (n) => window.__godsEyeView.styleManager.setStyle(n),
+      (n) => window.__cameraEye.styleManager.setStyle(n),
       name,
     );
   }
   await page.waitForFunction(
-    (n) => document.documentElement.dataset.gevStyle === n,
+    (n) => document.documentElement.dataset.ceStyle === n,
     { timeout: 10000 },
     name,
   );

@@ -21,12 +21,12 @@ export function createApplicationInstallations({ surface, source }) {
       maps: {
         subscribeMapStack(callback) {
           globalThis.window?.addEventListener?.(
-            'gev:map-stack-changed',
+            'ce:map-stack-changed',
             callback,
           );
           return () =>
             globalThis.window?.removeEventListener?.(
-              'gev:map-stack-changed',
+              'ce:map-stack-changed',
               callback,
             );
         },

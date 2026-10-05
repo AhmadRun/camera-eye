@@ -29,7 +29,7 @@ export function syncCyberSonarCommand(
     record.command = new Cesium.DrawCommand();
     record.uniformMap = {
       ...uniforms,
-      u_gevSonarLabelBackground: () => record.labelBackground,
+      u_ceSonarLabelBackground: () => record.labelBackground,
     };
   }
   const command = record.command;
@@ -39,7 +39,7 @@ export function syncCyberSonarCommand(
   for (const key in record.uniformMap) {
     if (
       !(key in uniforms) &&
-      key !== 'u_gevSonarLabelBackground' &&
+      key !== 'u_ceSonarLabelBackground' &&
       !(key in native.uniformMap)
     ) {
       delete record.uniformMap[key];
@@ -73,38 +73,38 @@ export function sonarVertexSource(source, kind) {
     return null;
   const next = source.clone();
   next.sources = [
-    text.replace(/void\s+main\s*\(\s*\)/, 'void gev_sonar_main()'),
+    text.replace(/void\s+main\s*\(\s*\)/, 'void ce_sonar_main()'),
     `
-uniform vec4 u_gevSonar; // angle, radius, opacity floor, sweep enabled
-uniform vec2 u_gevSonarViewport;
-uniform float u_gevSonarSector;
-uniform float u_gevSonarLabelBackground;
+uniform vec4 u_ceSonar; // angle, radius, opacity floor, sweep enabled
+uniform vec2 u_ceSonarViewport;
+uniform float u_ceSonarSector;
+uniform float u_ceSonarLabelBackground;
 void main() {
-    gev_sonar_main();
+    ce_sonar_main();
     // All corners/glyphs share the contact anchor, before native screen offsets.
     // Leave gl_Position untouched so appearance never changes geometry or picks.
     vec4 anchor = czm_modelViewProjectionRelativeToEye * czm_translateRelativeToEye(${attribute}.xyz, ${lowAttribute}.xyz);
     if (anchor.w <= 0.0) return;
-    vec2 pixel = anchor.xy / anchor.w * u_gevSonarViewport * 0.5;
-    float floorValue = u_gevSonar.z;
+    vec2 pixel = anchor.xy / anchor.w * u_ceSonarViewport * 0.5;
+    float floorValue = u_ceSonar.z;
     float factor = floorValue + (1.0 - floorValue) * 0.46;
-    if (u_gevSonar.w > 0.5) {
+    if (u_ceSonar.w > 0.5) {
         float distanceSquared = dot(pixel, pixel);
-        float radiusSquared = u_gevSonar.y * u_gevSonar.y;
-        float delta = mod(degrees(atan(pixel.x, pixel.y)) - u_gevSonar.x + 360.0, 360.0);
+        float radiusSquared = u_ceSonar.y * u_ceSonar.y;
+        float delta = mod(degrees(atan(pixel.x, pixel.y)) - u_ceSonar.x + 360.0, 360.0);
         if (delta > 359.9999) delta = 0.0;
         factor = floorValue;
         if (distanceSquared < radiusSquared * 0.000625) factor = 1.0;
-        else if (distanceSquared <= radiusSquared && delta <= u_gevSonarSector)
-            factor += (1.0 - floorValue) * min(1.0, (u_gevSonarSector - delta) / min(10.0, u_gevSonarSector * 0.42));
+        else if (distanceSquared <= radiusSquared && delta <= u_ceSonarSector)
+            factor += (1.0 - floorValue) * min(1.0, (u_ceSonarSector - delta) / min(10.0, u_ceSonarSector * 0.42));
     }
     #ifdef SDF
     factor = (1.0 + factor) * 0.5;
     #else
-    if (u_gevSonarLabelBackground > 0.5) factor = (1.0 + factor) * 0.5;
+    if (u_ceSonarLabelBackground > 0.5) factor = (1.0 + factor) * 0.5;
     #endif
     float coverage = floorValue >= 0.9999 ? 1.0 : clamp((factor - floorValue) / (1.0 - floorValue), 0.0, 1.0);
-    if (u_gevSonarLabelBackground < 0.5)
+    if (u_ceSonarLabelBackground < 0.5)
         v_color.rgb = v_color.rgb * 0.28 + (vec3(0.62, 0.68, 0.72) + vec3(0.38, 0.16, 0.12) * coverage) * 0.72;
     // Apply before native fragment pass classification, never after main().
     v_color.a *= factor;
@@ -154,9 +154,9 @@ export function createCyberSonarGpu(scene, readFrame) {
   const viewport = new Cesium.Cartesian2();
   let sector = 24;
   const sonarUniforms = {
-    u_gevSonar: () => uniforms,
-    u_gevSonarViewport: () => viewport,
-    u_gevSonarSector: () => sector,
+    u_ceSonar: () => uniforms,
+    u_ceSonarViewport: () => viewport,
+    u_ceSonarSector: () => sector,
   };
   const culling = new Cesium.CullingVolume();
   const used = new Set();

@@ -8,9 +8,9 @@
  * FOUR INVARIANTS HOLD THIS TOGETHER — do not "fix" any of them:
  *
  * 1. DOM TEXT IS THE TRUTH, AND ITS NODE NEVER MOVES. The first call upgrades
- *    a chip label into a permanent two-child shell: a `.gev-flap-text` span
+ *    a chip label into a permanent two-child shell: a `.ce-flap-text` span
  *    holding one long-lived `Text` node, and an `aria-hidden`
- *    `.gev-flap-cells` sibling. After that the ONLY text operation for the
+ *    `.ce-flap-cells` sibling. After that the ONLY text operation for the
  *    life of the chip is `node.data = next` — a single `characterData`
  *    mutation. Nothing is ever reparented, so the label is never
  *    transiently empty and the `aria-live` region never sees a removal /
@@ -23,7 +23,7 @@
  *
  * 2. NO ANIMATION LOOP, AND EXACTLY ONE TIMER PER CHANGE. The motion is CSS
  *    `animation`/`transition` only, triggered once per text change and
- *    staggered via a per-cell `--gev-flap-delay` custom property. A change
+ *    staggered via a per-cell `--ce-flap-delay` custom property. A change
  *    schedules exactly ONE `setTimeout` — the settle that strips the cells.
  *    The width ease ends on a `transitionend`/`transitioncancel` listener,
  *    not a second timer. There is zero per-frame JS and zero periodic work;
@@ -76,18 +76,18 @@ export const FLAP_SETTLE_SLACK_MS = 60;
 /**
  * Fraction of a character's flip at which the outgoing glyph has rotated
  * away and the incoming one takes over as what the eye reads. MUST track the
- * `gev-flap-out`/`gev-flap-in` keyframe crossover in style.css — it is what
+ * `ce-flap-out`/`ce-flap-in` keyframe crossover in style.css — it is what
  * makes an interrupted cascade pick honest outgoing glyphs.
  */
 export const FLAP_TURN_RATIO = 0.5;
 
-const HOST_CLASS = 'gev-flap-host';
-const ACTIVE_CLASS = 'gev-flap-active';
-const TEXT_CLASS = 'gev-flap-text';
-const CELLS_CLASS = 'gev-flap-cells';
-const CELL_CLASS = 'gev-flap-cell';
+const HOST_CLASS = 'ce-flap-host';
+const ACTIVE_CLASS = 'ce-flap-active';
+const TEXT_CLASS = 'ce-flap-text';
+const CELLS_CLASS = 'ce-flap-cells';
+const CELL_CLASS = 'ce-flap-cell';
 const FLAPPING_CLASS = 'is-flapping';
-const SIZING_CLASS = 'gev-flap-sizing';
+const SIZING_CLASS = 'ce-flap-sizing';
 
 /**
  * What a reserved-but-empty column shows. A column the new string does not
@@ -301,7 +301,7 @@ function measureWidth(element) {
  * The chip label's permanent shell.
  *
  * Built once per element and then reused forever: the `Text` node inside
- * `.gev-flap-text` is the same object for the life of the chip, so a label
+ * `.ce-flap-text` is the same object for the life of the chip, so a label
  * change never reparents anything (invariant 1). Rebuilt only if something
  * outside this module has clobbered the label's children.
  */
@@ -338,7 +338,7 @@ function ensureHost(element) {
 function clearSizing(element) {
   element.classList?.remove(SIZING_CLASS);
   element.style?.removeProperty('width');
-  element.style?.removeProperty('--gev-flap-total');
+  element.style?.removeProperty('--ce-flap-total');
 }
 
 function cancelWidthEase(element) {
@@ -367,7 +367,7 @@ function easeWidth(element, fromWidth, toWidth, durationMs) {
     clearSizing(element);
     return false;
   }
-  element.style.setProperty('--gev-flap-total', `${durationMs}ms`);
+  element.style.setProperty('--ce-flap-total', `${durationMs}ms`);
   element.style.width = `${fromWidth}px`;
   element.classList.add(SIZING_CLASS);
   void element.offsetWidth; // flush the start value so the transition runs
@@ -405,7 +405,7 @@ function clearFlapTimer(element) {
 function rest(element, host) {
   element.classList.remove(ACTIVE_CLASS);
   host.cells.replaceChildren();
-  element.style?.removeProperty('--gev-flap-dur');
+  element.style?.removeProperty('--ce-flap-dur');
   // The real text is the accessible name; a stale aria-label from an earlier
   // render would otherwise mask it.
   element.removeAttribute?.('aria-label');
@@ -503,7 +503,7 @@ export function setSplitFlapText(element, text, options = {}) {
     if (cell.changed) {
       node.classList.add(FLAPPING_CLASS);
       node.dataset.flapPrev = cell.from || BLANK;
-      node.style.setProperty('--gev-flap-delay', `${cell.delayMs}ms`);
+      node.style.setProperty('--ce-flap-delay', `${cell.delayMs}ms`);
     }
     cellNodes.push(node);
   }
@@ -514,7 +514,7 @@ export function setSplitFlapText(element, text, options = {}) {
   // Only the decorative sibling is rebuilt; the text node is not involved.
   host.cells.replaceChildren(...cellNodes);
   element.classList.add(ACTIVE_CLASS);
-  element.style.setProperty('--gev-flap-dur', `${charMs}ms`);
+  element.style.setProperty('--ce-flap-dur', `${charMs}ms`);
 
   // Width, phase one. A GROWING label reserves its new columns the instant the
   // cells go in, so ease from what was on screen to the cascade width. A
@@ -541,6 +541,6 @@ export function disposeSplitFlap(element) {
   clearFlapTimer(element);
   cancelWidthEase(element);
   clearSizing(element);
-  const cells = element.querySelector?.('.gev-flap-cells');
+  const cells = element.querySelector?.('.ce-flap-cells');
   if (cells) rest(element, { cells });
 }

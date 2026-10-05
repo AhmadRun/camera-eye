@@ -131,7 +131,7 @@ export function createInteraction({
       });
       if (typeof document !== 'undefined') {
         document.dispatchEvent(
-          new CustomEvent('gev:radio-selected', { detail: { stationId } }),
+          new CustomEvent('ce:radio-selected', { detail: { stationId } }),
         );
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);

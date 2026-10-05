@@ -48,11 +48,11 @@ export class PanelPositionControls {
 
   _maybeNotifyLayoutReset() {
     try {
-      const marker = `godsEyeView.${PANEL_POSITION_STORAGE_VERSION}.layoutResetNotified`;
+      const marker = `cameraEye.${PANEL_POSITION_STORAGE_VERSION}.layoutResetNotified`;
       if (localStorage.getItem(marker)) return;
       localStorage.setItem(marker, '1');
       const hadOldPositions = Object.keys(localStorage).some((key) =>
-        key.startsWith('godsEyeView.v6.panelPos.'),
+        key.startsWith('cameraEye.v6.panelPos.'),
       );
       if (hadOldPositions) {
         this._showToast(
@@ -91,11 +91,11 @@ export class PanelPositionControls {
   }
 
   _panelStorageKey(panelId) {
-    return `godsEyeView.${PANEL_POSITION_STORAGE_VERSION}.panelPos.${panelId}`;
+    return `cameraEye.${PANEL_POSITION_STORAGE_VERSION}.panelPos.${panelId}`;
   }
 
   _panelCollapseStorageKey(panelId) {
-    return `godsEyeView.${PANEL_LAYOUT_STORAGE_VERSION}.panelCollapsed.${panelId}`;
+    return `cameraEye.${PANEL_LAYOUT_STORAGE_VERSION}.panelCollapsed.${panelId}`;
   }
 
   _restorePanelCollapsedState(panelId, { allowStored = true } = {}) {

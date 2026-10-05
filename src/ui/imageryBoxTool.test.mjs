@@ -51,7 +51,7 @@ test('a session claims the pointer, borrows the stock clicks, freezes the camera
   assert.equal(pointerOwner(), IMAGERY_BOX_POINTER_OWNER);
   assert.equal(f.stockAction('LEFT_CLICK'), undefined);
   assert.equal(f.stockAction('LEFT_DOUBLE_CLICK'), undefined);
-  assert.ok(f.documentRef.classes.has('gev-imagery-box'));
+  assert.ok(f.documentRef.classes.has('ce-imagery-box'));
   assert.equal(f.camera.enableInputs, true, 'not frozen before the press');
   f.fire('LEFT_DOWN', { position: { x: 250, y: 125 } });
   assert.equal(f.camera.enableInputs, false);
@@ -72,7 +72,7 @@ test('a session claims the pointer, borrows the stock clicks, freezes the camera
   assert.equal(f.stockAction('LEFT_DOUBLE_CLICK'), f.originalDouble);
   assert.equal(f.camera.enableInputs, true);
   assert.equal(f.preview(), false);
-  assert.equal(f.documentRef.classes.has('gev-imagery-box'), false);
+  assert.equal(f.documentRef.classes.has('ce-imagery-box'), false);
   assert.equal(f.documentRef.listeners.length, 0);
   assert.equal(f.handler(), null);
   assert.deepEqual(f.actives, [true, false]);

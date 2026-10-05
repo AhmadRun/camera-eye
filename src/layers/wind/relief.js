@@ -74,8 +74,8 @@ export function createWindRelief({ cesium, getViewer } = {}) {
           fabric: {
             type:
               nextMode === 'terrain relief'
-                ? 'GEVWindTerrainRelief'
-                : 'GEVWindGlobeCurvature',
+                ? 'CEWindTerrainRelief'
+                : 'CEWindGlobeCurvature',
             source: reliefSource(nextMode === 'terrain relief'),
           },
           translucent: true,

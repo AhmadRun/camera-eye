@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.2.1] — 2026-10-02 — God's Eye View through Your Agent (with security fixes and other features)
+## [0.2.1] — 2026-10-02 — Camera Eye through Your Agent (with security fixes and other features)
 
 - Ship each bundled data pack once. The region, marine, admin-boundary,
   county, military-name and neighborhood packs were emitted twice by the
@@ -32,7 +32,7 @@
 
 - Keep the Host-header check when binding to all interfaces. `HOST=0.0.0.0`
   used to accept any Host; the dev and preview servers now accept IP
-  addresses, `localhost` and the LAN hostnames listed in `GEV_ALLOWED_HOSTS`
+  addresses, `localhost` and the LAN hostnames listed in `CE_ALLOWED_HOSTS`
   (suffix and wildcard entries are ignored), which also keeps DNS-rebinding
   names out in LAN mode. The `.local` suffix is no longer accepted by default;
   list such a name explicitly (Puspo Aditya, #97, fixes #21).
@@ -43,7 +43,7 @@
   (`/api/google/nearby-places`, `/api/google/text-search`) 120 — the caps the
   Pinokio build already ships, so the packaged app is unaffected and only an
   unconfigured server changes, from unlimited to what the product already runs
-  with. `GEV_RATELIMIT_OPENAI_PER_MIN` and `GEV_RATELIMIT_GOOGLE_PER_MIN` still
+  with. `CE_RATELIMIT_OPENAI_PER_MIN` and `CE_RATELIMIT_GOOGLE_PER_MIN` still
   override the caps, and exactly `0` disables them; a value that cannot be read
   as a number now falls back to the default rather than to unlimited, so a typo
   cannot silently disarm the guard (daikaginza, #683).
@@ -56,7 +56,7 @@
   requires a Host on the port it reached and an Origin from that host, and
   times out request bodies after 30 seconds; stdio honors
   `notifications/cancelled`. Embed mode is no longer framable unless
-  `GEV_EMBED_FRAME_ANCESTORS` allows the framing page, and view answers go
+  `CE_EMBED_FRAME_ANCESTORS` allows the framing page, and view answers go
   only to the origin that sent the view. SECURITY.md describes the MCP surface
   and the panel's browser keys.
 
@@ -76,11 +76,11 @@
 - Move the aligned Cyber side-panel rails upward on desktop so the left stack
   clears the lower coordinate card; keep Cockpit's independent visor layout.
 
-## [0.2.0] — 2026-10-02 — God's Eye View through Your Agent
+## [0.2.0] — 2026-10-02 — Camera Eye through Your Agent
 
-- Show God's Eye View inside AI conversations. Answers that can be shown
+- Show Camera Eye inside AI conversations. Answers that can be shown
   include a view (camera, layers, style, map, marks, something to follow),
-  and `show_in_gods_eye_view` displays it as the live globe in clients that
+  and `show_in_camera_eye` displays it as the live globe in clients that
   support MCP Apps, such as Claude Desktop and the Codex and ChatGPT desktop
   apps, and as a link everywhere else. The panel loads the app's panel build
   (`npm run build:panel`) and its data through the MCP server, so a local
@@ -95,8 +95,8 @@
   terrain, installation and map-feature queries, plus a situation brief, over
   stdio to clients such as Claude Code, reading
   from a running app. Tools are defined
-  once in `gods-eye-view/tools`, reuse the layers' source factories, and are
-  exposed through the protocol adapter in `gods-eye-view/tools/mcp`. The
+  once in `camera-eye/tools`, reuse the layers' source factories, and are
+  exposed through the protocol adapter in `camera-eye/tools/mcp`. The
   catalog also covers weather maps, wind, recent imagery, submarine cables,
   license plate reader cameras, datacenters and dams, the Bhote Koshi flood,
   military awareness and links that open the app over an area with layers on.
@@ -1079,7 +1079,7 @@ of current runtime behavior, see [`docs/CURRENT-STATE.md`](docs/CURRENT-STATE.md
 - Separate explicit browser build settings from standalone environment loading
   and local provider middleware. Preserve provider behavior and root named exports.
 - Rename standalone browser startup to `src/standalone/` and add a Node-only
-  `gods-eye-view/build/vite` export with checked package ownership.
+  `camera-eye/build/vite` export with checked package ownership.
 
 #### Development
 

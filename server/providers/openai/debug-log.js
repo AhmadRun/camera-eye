@@ -24,7 +24,7 @@ const REALTIME_DEBUG_LOG_MAX_FILE_BYTES = 32 * 1024 * 1024;
 const REALTIME_DEBUG_LOG_MAX_PER_MIN = 120;
 
 function createDebugLogHandler({ sourceRoot = defaultSourceRoot } = {}) {
-  const logDir = path.join(sourceRoot, '.gev-logs');
+  const logDir = path.join(sourceRoot, '.ce-logs');
   const logFile = path.join(logDir, 'realtime-conversations.jsonl');
   const allow = makeRateLimiter({
     windowMs: 60_000,

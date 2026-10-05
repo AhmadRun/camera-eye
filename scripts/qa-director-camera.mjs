@@ -25,12 +25,12 @@ try {
   );
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.sceneDirector &&
+      window.__cameraEye?.sceneDirector &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 60000 },
   );
   const result = await page.evaluate(async () => {
-    const { sceneDirector: d, styleManager: style } = window.__godsEyeView;
+    const { sceneDirector: d, styleManager: style } = window.__cameraEye;
     const file = {
       version: 4,
       scenes: [
@@ -101,9 +101,7 @@ try {
     const settled = Math.abs(style.getCameraState().lon - -97.73) < 1e-6;
     // Updating the target creates an explicit inline pose while retaining the authored start.
     d.updateSelectedShot();
-    const saved = JSON.parse(
-      localStorage.getItem('godsEyeView.sceneProject.v2'),
-    );
+    const saved = JSON.parse(localStorage.getItem('cameraEye.sceneProject.v2'));
     const updated =
       saved.scenes[0].shots[0].camera.altitudeReference === 'ellipsoid' &&
       saved.scenes[0].shots[0].move.from.anchorId === 'start';
@@ -140,7 +138,7 @@ try {
   await new Promise((r) => setTimeout(r, 6000));
   await page.screenshot({ path: path.join(output, 'austin.png') });
   await page.evaluate(() => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const pose = d.styleManager.getCameraState();
     d._setCameraView({ ...pose, heading: pose.heading + 25, pitch: -60 });
     d.viewer.scene.requestRender();
@@ -148,7 +146,7 @@ try {
   await new Promise((r) => setTimeout(r, 3000));
   await page.screenshot({ path: path.join(output, 'angle.png') });
   const inputStarted = await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const scene = d._project.scenes[0];
     window.__qaCameraRun = d.startScene(scene.id, {
       single: true,
@@ -170,12 +168,12 @@ try {
     inputStarted &&
     (await page.evaluate(async () => {
       await window.__qaCameraRun;
-      const d = window.__godsEyeView.sceneDirector;
+      const d = window.__cameraEye.sceneDirector;
       return !d.running && d.getPlaybackTimingState().activeTimers === 0;
     }));
   check('manual canvas input revokes the move and releases clocks', input);
   const hold = await page.evaluate(async () => {
-    const { sceneDirector: d, styleManager: style } = window.__godsEyeView;
+    const { sceneDirector: d, styleManager: style } = window.__cameraEye;
     const scene = d._project.scenes[0];
     const shot = scene.shots[0];
     shot.durationSec = 0.2;

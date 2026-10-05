@@ -67,7 +67,7 @@ retains the existing registered-stack behavior.
 
 ## Validation limits
 
-`gods-eye-view/director` exports `parseSceneDocument(text)`,
+`camera-eye/director` exports `parseSceneDocument(text)`,
 `validateSceneDocument(project)`, `stringifySceneDocument(project)`,
 `SceneDocumentError`, `SCENE_DOCUMENT_VERSION` and `SCENE_DOCUMENT_LIMITS`.
 Validation is independent of the renderer, storage and recipes. Parsing checks
@@ -87,7 +87,7 @@ import cancels and settles pending playback before replacing the project. If
 multiple files are read concurrently, only the newest request can replace it.
 Disposal prevents a pending import from publishing.
 
-The browser storage key remains `godsEyeView.sceneProject.v2` for compatibility;
+The browser storage key remains `cameraEye.sceneProject.v2` for compatibility;
 that key's suffix is not the document version. An unreadable saved project stays
 in storage. The app supplies temporary defaults and a visible warning, but blocks
 saving over the original bytes until a valid file is explicitly imported. Export

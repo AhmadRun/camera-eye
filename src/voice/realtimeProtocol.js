@@ -110,7 +110,7 @@ export function responseInstructionForToolResult(result) {
     return 'Briefly confirm the completed Radio action, then say that Radio remains stopped as requested. Do not say the request was cancelled or that Radio is playing.';
   }
   if (result?.action === 'control_radio' && result.radioPlaybackRequested) {
-    return 'Briefly confirm any other completed GEV actions, then say “Turning on the radio.” Do not claim Radio is already playing.';
+    return 'Briefly confirm any other completed CE actions, then say “Turning on the radio.” Do not claim Radio is already playing.';
   }
   if (result?.action === 'get_entity_context') {
     const selectedLayerId = result.selected?.layerId;
@@ -147,7 +147,7 @@ export function responseInstructionForToolResult(result) {
       );
     }
     return [
-      'Answer the user naturally using the returned GEV entity context.',
+      'Answer the user naturally using the returned CE entity context.',
       'If selected context is present, prioritize it. Otherwise summarize the most relevant in-view entities.',
       'If no entities are returned, identify the target from nearbyPlaces, place labels, streetLabels, knownLandmarks, and the viewport image.',
       'Mention only useful building/place names, streets, layer/type, location, enabled layers, and notable properties. Be concise.',
@@ -155,7 +155,7 @@ export function responseInstructionForToolResult(result) {
     ].join(' ');
   }
   if (result?.action === 'get_current_view_state') {
-    return 'Briefly summarize the current GEV camera, active style, and relevant enabled layers. Do not repeat yourself.';
+    return 'Briefly summarize the current CE camera, active style, and relevant enabled layers. Do not repeat yourself.';
   }
   if (result?.action === 'adjust_camera_zoom') {
     return result.ok
@@ -199,7 +199,7 @@ export function responseInstructionForToolResult(result) {
   if (result?.action === 'clear_annotations') {
     return 'The map annotations are cleared. Continue naturally; do not announce the clear.';
   }
-  return 'Briefly confirm the completed GEV action once. Do not repeat yourself.';
+  return 'Briefly confirm the completed CE action once. Do not repeat yourself.';
 }
 
 export function extractFunctionCalls(event) {

@@ -32,7 +32,7 @@
 
 #command-dock > #location-bar,
 #command-dock > #control-panel,
-#command-dock > #gev-voice-control {
+#command-dock > #ce-voice-control {
   position: relative;
   inset: auto;
   width: auto;
@@ -52,7 +52,7 @@
   border-left: 1px solid rgba(123, 189, 211, 0.16);
 }
 
-#command-dock > #gev-voice-control {
+#command-dock > #ce-voice-control {
   grid-area: voice;
   z-index: 2;
   align-self: stretch;
@@ -69,7 +69,7 @@
     0 0 0 1px rgba(0, 212, 255, 0.08) inset;
 }
 
-#command-dock .gev-voice-kicker {
+#command-dock .ce-voice-kicker {
   position: absolute;
   top: 6px;
   right: 14px;
@@ -84,17 +84,17 @@
   white-space: nowrap;
 }
 
-#command-dock #gev-voice-button {
+#command-dock #ce-voice-button {
   width: 78px;
   height: 42px;
 }
 
-#command-dock .gev-voice-readout {
+#command-dock .ce-voice-readout {
   flex: 1;
   text-align: left;
 }
 
-#command-dock #gev-voice-detail {
+#command-dock #ce-voice-detail {
   max-width: 110px;
 }
 
@@ -270,7 +270,7 @@ body.recording-mode #cesium-credits {
     border-left: 0;
   }
 
-  #command-dock > #gev-voice-control {
+  #command-dock > #ce-voice-control {
     margin: -10px 0 0;
   }
 

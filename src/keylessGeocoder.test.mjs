@@ -309,7 +309,7 @@ test('accents and punctuation do not change what a name compares as', () => {
 // without one, and no behavioural test of the existing three would notice.
 
 test('forward geocoding is composed once and consumers do not call a source directly', () => {
-  for (const file of ['locations.js', 'annotations/annotationResolver.js', 'voice/gevActions.js']) {
+  for (const file of ['locations.js', 'annotations/annotationResolver.js', 'voice/ceActions.js']) {
     const source = readGeocodingConsumer(file);
     assert.match(source, /placeSearch\.geocode\(/);
     assert.doesNotMatch(source, /geocodeKeyless|geocode\/json\?address/);
@@ -324,7 +324,7 @@ test('forward geocoding is composed once and consumers do not call a source dire
 test('a missing key is never a thrown error on the client', () => {
   // It was one, in the Radio layer: a keyless install surfaced "play radio near
   // Hanoi" as a failed voice turn rather than as a station it could not place.
-  for (const file of ['locations.js', 'annotations/annotationResolver.js', 'voice/gevActions.js']) {
+  for (const file of ['locations.js', 'annotations/annotationResolver.js', 'voice/ceActions.js']) {
     const body = readGeocodingConsumer(file);
     assert.doesNotMatch(body, /throw new Error\([^)]*No Google Maps API key/, `${file} throws on a missing key`);
   }

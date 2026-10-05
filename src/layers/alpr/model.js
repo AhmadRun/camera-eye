@@ -50,5 +50,5 @@ export function alprCreditMarkup(attribution) {
           "'": '&#39;',
         })[char],
     );
-  return `<span class="gev-alpr-credit">ALPR: <a href="${escape(href.href)}" target="_blank" rel="noopener">${escape(attribution.text)}</a></span>`;
+  return `<span class="ce-alpr-credit">ALPR: <a href="${escape(href.href)}" target="_blank" rel="noopener">${escape(attribution.text)}</a></span>`;
 }

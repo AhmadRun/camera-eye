@@ -614,7 +614,7 @@ function installSceneRuntime(project = PROJECT_FIXTURE) {
     removeEventListener() {},
     body: { classList: noopClassList, appendChild() {} },
   };
-  const stored = new Map([['godsEyeView.sceneProject.v2', JSON.stringify(project)]]);
+  const stored = new Map([['cameraEye.sceneProject.v2', JSON.stringify(project)]]);
   globalThis.localStorage = {
     getItem: (key) => stored.get(key) ?? null,
     setItem: (key, value) => stored.set(key, value),
@@ -1471,12 +1471,12 @@ test('invalid and unsupported imports retain the current project, selection and 
   try {
     const project = director._project;
     const selected = director._selectedShotId;
-    const saved = localStorage.getItem('godsEyeView.sceneProject.v2');
+    const saved = localStorage.getItem('cameraEye.sceneProject.v2');
     for (const value of ['{}', '{"version":99,"scenes":[]}', '{"scenes":[{"shots":"bad"}]}']) {
       await director.importProjectFile({ name: 'bad.json', text: async () => value });
       assert.equal(director._project, project);
       assert.equal(director._selectedShotId, selected);
-      assert.equal(localStorage.getItem('godsEyeView.sceneProject.v2'), saved);
+      assert.equal(localStorage.getItem('cameraEye.sceneProject.v2'), saved);
       assert.match(director._presentation.status, /Import failed: \$/);
     }
     let read = false;
@@ -1496,21 +1496,21 @@ test('newer imports win delayed file reads, and an empty project is preserved', 
     await older;
     assert.deepEqual(director._project.scenes, []);
     assert.equal(director._selectedSceneId, null);
-    assert.deepEqual(JSON.parse(localStorage.getItem('godsEyeView.sceneProject.v2')).scenes, []);
+    assert.deepEqual(JSON.parse(localStorage.getItem('cameraEye.sceneProject.v2')).scenes, []);
   } finally { restore(); }
 });
 
 test('unsupported stored documents cannot be overwritten by fallback edits', async () => {
   const { director, restore } = makeDirector({ project: { version: 99, scenes: [] } });
   try {
-    const saved = localStorage.getItem('godsEyeView.sceneProject.v2');
+    const saved = localStorage.getItem('cameraEye.sceneProject.v2');
     assert.ok(director._storageReadError);
     director._project.scenes[0].title = 'Fallback edit';
     director._saveProject();
-    assert.equal(localStorage.getItem('godsEyeView.sceneProject.v2'), saved);
+    assert.equal(localStorage.getItem('cameraEye.sceneProject.v2'), saved);
     await director.importProjectFile({ name: 'valid.json', text: async () => JSON.stringify(PROJECT_FIXTURE) });
     assert.equal(director._storageReadError, null);
-    assert.equal(JSON.parse(localStorage.getItem('godsEyeView.sceneProject.v2')).version, 6);
+    assert.equal(JSON.parse(localStorage.getItem('cameraEye.sceneProject.v2')).version, 6);
   } finally { restore(); }
 });
 
@@ -1549,12 +1549,12 @@ test('a delayed import cannot publish after disposal', async () => {
 test('invalid authored edits cannot persist an unreadable project over a good save', () => {
   const { director, restore } = makeDirector();
   try {
-    const before = localStorage.getItem('godsEyeView.sceneProject.v2');
+    const before = localStorage.getItem('cameraEye.sceneProject.v2');
     let notice;
     director._toastStorageError = (message) => { notice = message; };
     director._project.scenes[0].shots[0].camera.lat = 91;
     director._saveProject();
-    assert.equal(localStorage.getItem('godsEyeView.sceneProject.v2'), before);
+    assert.equal(localStorage.getItem('cameraEye.sceneProject.v2'), before);
     assert.match(notice, /camera.lat/);
   } finally { restore(); }
 });

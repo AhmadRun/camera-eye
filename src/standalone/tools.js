@@ -11,7 +11,7 @@ export function createStandaloneTools(options) {
           // A panel names the app's address; see src/tools/globePanel.js.
           baseUrl: new URL(
             '/scene-assets/',
-            globalThis.GEV_APP_BASE_URL ?? document.baseURI,
+            globalThis.CE_APP_BASE_URL ?? document.baseURI,
           ).href,
         }),
       },

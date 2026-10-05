@@ -14,7 +14,7 @@ import path from 'node:path';
 import { formatAdoptedFiles } from '../../scripts/format.mjs';
 
 async function fixture(t, scope = ['adopted.js']) {
-  const root = await mkdtemp(path.join(tmpdir(), 'gev-format-'));
+  const root = await mkdtemp(path.join(tmpdir(), 'ce-format-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   await mkdir(path.join(root, 'scripts'));
   await writeFile(

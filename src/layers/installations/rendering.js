@@ -216,13 +216,13 @@ export function createRendering({
         : null;
       if (retained) {
         // Same geometry: update the marker in place (selection, floor height).
-        if (retained.gevInstallationHeightM !== surfaceHeightM) {
-          retained.gevInstallationHeightM = surfaceHeightM;
+        if (retained.ceInstallationHeightM !== surfaceHeightM) {
+          retained.ceInstallationHeightM = surfaceHeightM;
           retained.position = displayPosition;
-          retained.gevDisplayPosition = () => displayPosition;
+          retained.ceDisplayPosition = () => displayPosition;
         }
-        if (retained.gevInstallationSelected !== selectedRecord) {
-          retained.gevInstallationSelected = selectedRecord;
+        if (retained.ceInstallationSelected !== selectedRecord) {
+          retained.ceInstallationSelected = selectedRecord;
           retained.point.pixelSize = selectedRecord ? 13 : 9;
           retained.point.color = selectedRecord ? Cesium.Color.WHITE : color;
         }
@@ -265,11 +265,11 @@ export function createRendering({
         outline.installationId = record.id;
         entityIds.push(outline.id);
       }
-      entity.gevInstallationHeightM = surfaceHeightM;
-      entity.gevInstallationSelected = selectedRecord;
-      entity.gevTrackedId = `installations:${record.id}`;
-      entity.gevDisplayPosition = () => displayPosition;
-      entity.gevLabelModel = {
+      entity.ceInstallationHeightM = surfaceHeightM;
+      entity.ceInstallationSelected = selectedRecord;
+      entity.ceTrackedId = `installations:${record.id}`;
+      entity.ceDisplayPosition = () => displayPosition;
+      entity.ceLabelModel = {
         title: record.name || 'MAPPED INSTALLATION',
         details: [
           String(record.class || 'installation')

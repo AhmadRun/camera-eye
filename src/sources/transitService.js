@@ -302,7 +302,7 @@ export function createTransitService({ fetchImpl = fetch } = {}) {
         {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store',
-          'X-GEV-Cache': 'NONE',
+          'X-CE-Cache': 'NONE',
           'Retry-After': String(retryAfterS),
           'X-Transit-Backoff': reason,
         },
@@ -387,7 +387,7 @@ export function createTransitService({ fetchImpl = fetch } = {}) {
         {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store',
-          'X-GEV-Cache': 'NONE',
+          'X-CE-Cache': 'NONE',
           'Retry-After': String(retryAfterS),
         },
       );

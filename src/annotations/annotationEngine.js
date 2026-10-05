@@ -1167,7 +1167,7 @@ export function createAnnotationEngine({
     /**
      * Self-running narration "tour" — sequences camera moves and annotations
      * with pauses the way the voice agent would, so the whole experience can be
-     * watched end-to-end without a mic. `window.__gevAnnotations.tour()`.
+     * watched end-to-end without a mic. `window.__ceAnnotations.tour()`.
      */
     async tour() {
       clear();

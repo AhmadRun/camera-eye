@@ -596,7 +596,7 @@
   text-shadow: 0 0 5px rgba(116, 219, 255, 0.38);
 }
 
-.data-toggle-row.gev-voice-focus {
+.data-toggle-row.ce-voice-focus {
   background: rgba(92, 255, 198, 0.1);
   box-shadow:
     inset 0 0 0 1px rgba(92, 255, 198, 0.72),
@@ -821,7 +821,7 @@
   padding: 0 0 0 26px;
   max-height: 150px;
   overflow-y: auto;
-  counter-reset: gev-step;
+  counter-reset: ce-step;
 }
 
 .data-row-list[hidden] {
@@ -829,7 +829,7 @@
 }
 
 .data-row-list-item {
-  counter-increment: gev-step;
+  counter-increment: ce-step;
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -852,7 +852,7 @@
 }
 
 .data-row-list-item::before {
-  content: counter(gev-step);
+  content: counter(ce-step);
   min-width: 13px;
   text-align: right;
   color: var(--text-dim);

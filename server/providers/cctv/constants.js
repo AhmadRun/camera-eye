@@ -142,7 +142,7 @@ export const FINTRAFFIC_STATIONS_URL =
  * frame proxy off-host. */
 export const FINTRAFFIC_IMAGE_ORIGIN = 'https://weathercam.digitraffic.fi/';
 /** Digitraffic asks every client to identify itself on API calls. */
-export const DIGITRAFFIC_USER = 'gods-eye-view';
+export const DIGITRAFFIC_USER = 'camera-eye';
 export const DEFAULT_FINTRAFFIC_MAX_SOURCES = 300;
 /** Ground-elevation prior, in metres, for stations that report no altitude.
  * 228 of 809 stations carry a real metre value (median 94 m); the rest report

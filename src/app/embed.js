@@ -3,9 +3,9 @@
  *
  * With `?embed=1` the app shows only the globe: clean view, with the HUD,
  * welcome and setup prompts hidden. A page that frames it changes what it
- * shows by posting `{ type: 'gev:view', id, view }`; the app applies the view
- * through its own actions and answers `{ type: 'gev:view-applied', id, ok,
- * steps }`. It announces `{ type: 'gev:ready' }` once it can take views.
+ * shows by posting `{ type: 'ce:view', id, view }`; the app applies the view
+ * through its own actions and answers `{ type: 'ce:view-applied', id, ok,
+ * steps }`. It announces `{ type: 'ce:ready' }` once it can take views.
  *
  * Annotations in a share link are drawn once the link has been restored,
  * embedded or not.
@@ -15,9 +15,9 @@ import * as Cesium from 'cesium';
 import { announceNavigationAuthority } from '../navigationPolicy.js';
 import { annotationsFromParams, createView } from '../view/index.js';
 
-export const EMBED_VIEW_MESSAGE = 'gev:view';
-export const EMBED_APPLIED_MESSAGE = 'gev:view-applied';
-export const EMBED_READY_MESSAGE = 'gev:ready';
+export const EMBED_VIEW_MESSAGE = 'ce:view';
+export const EMBED_APPLIED_MESSAGE = 'ce:view-applied';
+export const EMBED_READY_MESSAGE = 'ce:ready';
 
 const FOLLOW_LAYERS = {
   aircraft: 'flights',
@@ -31,7 +31,7 @@ const FLIGHT_SECONDS = 2;
 /**
  * Whether this page shows the app embedded: `?embed=1` when another page
  * frames it, or inline when a panel page loads the app into itself and sets
- * `globalThis.GEV_EMBED_INLINE` first.
+ * `globalThis.CE_EMBED_INLINE` first.
  */
 export function isEmbedded(location = globalThis.location) {
   return (
@@ -42,7 +42,7 @@ export function isEmbedded(location = globalThis.location) {
 
 /** Whether a panel page loaded the app into itself. */
 export function isEmbeddedInline() {
-  return globalThis.GEV_EMBED_INLINE === true;
+  return globalThis.CE_EMBED_INLINE === true;
 }
 
 // A panel keeps drawing at about this rate when its host stops animation
@@ -85,10 +85,7 @@ export function keepPanelRendering(
   const removeErrorListener = viewer.scene?.renderError?.addEventListener(
     (_scene, error) => {
       failed = true;
-      console.error(
-        "[God's Eye View panel] render error:",
-        describeError(error),
-      );
+      console.error('[Camera Eye panel] render error:', describeError(error));
     },
   );
   const timer = windowRef.setInterval(() => {

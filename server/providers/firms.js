@@ -14,7 +14,7 @@ import { filterTrailing24h, parseFirmsCsv } from '../../src/data/firmsCsv.js';
  * 00:00Z) and clamps to the trailing 24 h via src/data/firmsCsv.js. FIRMS
  * quota is 5,000 transactions / 10 min per MAP_KEY, so the cache is the point:
  * TTL 30 min, single-flight refresh, serve-stale-on-failure, and a
- * fresh-enough disk cache (.gev-cache/firms.json) prevents ANY upstream
+ * fresh-enough disk cache (.ce-cache/firms.json) prevents ANY upstream
  * fetch across dev-server restarts. Pattern mirrors celestrakProxy.
  *
  * Routes:
@@ -35,7 +35,7 @@ export function firmsProxy() {
     'VIIRS_SNPP_NRT',
     'MODIS_NRT',
   ];
-  const CACHE_DIR = path.join(process.cwd(), '.gev-cache');
+  const CACHE_DIR = path.join(process.cwd(), '.ce-cache');
   const CACHE_PATH = path.join(CACHE_DIR, 'firms.json');
 
   /** @type {?{at: number, sources: Array<object>, fires: Array<object>}} */

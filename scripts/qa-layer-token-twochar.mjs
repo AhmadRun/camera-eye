@@ -138,7 +138,7 @@ async function newPage() {
   await page.setCacheEnabled(false);
   await page.evaluateOnNewDocument(() => {
     window.__qaRestoreEvents = [];
-    window.addEventListener('gev:initial-share-restore-settled', (event) => {
+    window.addEventListener('ce:initial-share-restore-settled', (event) => {
       window.__qaRestoreEvents.push(event.detail);
     });
   });
@@ -172,7 +172,7 @@ async function newPage() {
 async function load(page, url) {
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 });
   await page.waitForFunction(
-    (id) => window.__godsEyeView?.dataManager?.layers?.has(id),
+    (id) => window.__cameraEye?.dataManager?.layers?.has(id),
     { timeout: 60_000 },
     fixtureId,
   );
@@ -180,11 +180,11 @@ async function load(page, url) {
 
 async function loadedState(page) {
   return page.evaluate((id) => {
-    const manager = window.__godsEyeView.dataManager;
+    const manager = window.__cameraEye.dataManager;
     return {
       enabled: manager.isEnabled(id),
       flights: manager.isEnabled('flights'),
-      localStorage: localStorage.getItem('gev:layer-state:v2'),
+      localStorage: localStorage.getItem('ce:layer-state:v2'),
       restoreEvents: window.__qaRestoreEvents,
       hash: location.hash,
     };
@@ -213,7 +213,7 @@ try {
   await load(sender.page, `${origin}/?welcome=0`);
   const toggled = await sender.page.evaluate(
     (id) =>
-      window.__godsEyeView.dataManager.setEnabled(id, true, { origin: 'user' }),
+      window.__cameraEye.dataManager.setEnabled(id, true, { origin: 'user' }),
     fixtureId,
   );
   assert.equal(toggled, true, 'synthetic layer enables through manager');
@@ -255,7 +255,7 @@ try {
     timeout: 60_000,
   });
   await recipient.page.waitForFunction(
-    (id) => window.__godsEyeView?.dataManager?.layers?.has(id),
+    (id) => window.__cameraEye?.dataManager?.layers?.has(id),
     { timeout: 60_000 },
     fixtureId,
   );
@@ -267,7 +267,7 @@ try {
 
   const disabled = await recipient.page.evaluate(
     (id) =>
-      window.__godsEyeView.dataManager.setEnabled(id, false, {
+      window.__cameraEye.dataManager.setEnabled(id, false, {
         origin: 'user',
       }),
     fixtureId,

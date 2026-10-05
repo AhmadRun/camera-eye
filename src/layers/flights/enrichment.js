@@ -130,14 +130,14 @@ export function createEnrichment({
   }
 
   /** QA seam: headless harnesses (scripts/qa-enrich-ambient.mjs) shrink the
-   *  bucket knobs via window.__GEV_ENRICH_AMBIENT_QA = {ceil, refillTokens,
+   *  bucket knobs via window.__CE_ENRICH_AMBIENT_QA = {ceil, refillTokens,
    *  windowMs} — they cannot wait out a real 5-minute window. Read lazily each
    *  refill so a pre-boot override (or a mid-run windowMs swap) applies.
    *  Production never sets this; the constants above are the defaults. */
 
   function _ambientBudgetKnobs() {
     const o =
-      (typeof window !== 'undefined' && window.__GEV_ENRICH_AMBIENT_QA) || null;
+      (typeof window !== 'undefined' && window.__CE_ENRICH_AMBIENT_QA) || null;
     return {
       ceil:
         Number.isFinite(o?.ceil) && o.ceil > 0

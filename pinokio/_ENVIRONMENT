@@ -1,4 +1,4 @@
-# God's Eye View works without any API keys.
+# Camera Eye works without any API keys.
 # Easiest way to add one: open PROVIDER SETTINGS inside the running app (the
 # POWER UP chip, bottom-right). It saves into this file for you with owner-only
 # permissions and restarts the app — you never need to edit this file by hand.
@@ -25,8 +25,8 @@
 # tunnel-login passcodes, so the launcher refuses to create a tunnel.
 PINOKIO_SHARE_CLOUDFLARE=false
 PINOKIO_SHARE_LOCAL=false
-PINOKIO_SHARE_VAR=__gev_sharing_disabled__
+PINOKIO_SHARE_VAR=__ce_sharing_disabled__
 
 # App-level guards, not billing caps. Provider-side budgets remain authoritative.
-GEV_RATELIMIT_OPENAI_PER_MIN=30
-GEV_RATELIMIT_GOOGLE_PER_MIN=120
+CE_RATELIMIT_OPENAI_PER_MIN=30
+CE_RATELIMIT_GOOGLE_PER_MIN=120

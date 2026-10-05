@@ -96,14 +96,14 @@ function debugUrl(rawUrl) {
 /** Position the camera and explicitly raise the boundaries the layer observes. */
 async function moveCamera(page, view) {
   return page.evaluate((v) => {
-    const gev = window.__godsEyeView;
-    const module = gev.dataManager.layers.get('traffic').module;
+    const ce = window.__cameraEye;
+    const module = ce.dataManager.layers.get('traffic').module;
     const beforeLastUpdate = module.getStats().lastUpdate;
     const boundaryTime = performance.now();
-    const ellipsoid = gev.viewer.scene.globe.ellipsoid;
+    const ellipsoid = ce.viewer.scene.globe.ellipsoid;
     const radians = Math.PI / 180;
-    try { gev.viewer.camera.cancelFlight(); } catch { /* no active flight */ }
-    gev.viewer.camera.setView({
+    try { ce.viewer.camera.cancelFlight(); } catch { /* no active flight */ }
+    ce.viewer.camera.setView({
       destination: ellipsoid.cartographicToCartesian({
         longitude: v.lon * radians,
         latitude: v.lat * radians,
@@ -119,8 +119,8 @@ async function moveCamera(page, view) {
     // explicitly makes the capture boundary deterministic across GPU speeds.
     // Pairing still flows through camera.changed's schedule-time anchor; the
     // synthetic moveEnd is emitted only as the same diagnostic used naturally.
-    gev.viewer.camera.changed.raiseEvent();
-    gev.viewer.camera.moveEnd.raiseEvent();
+    ce.viewer.camera.changed.raiseEvent();
+    ce.viewer.camera.moveEnd.raiseEvent();
     return { beforeLastUpdate, boundaryTime };
   }, view);
 }
@@ -129,7 +129,7 @@ async function moveCamera(page, view) {
 async function waitForTrafficCapture(page, beforeLastUpdate, boundaryTime) {
   await page.waitForFunction(
     (before, boundary) => {
-      const module = window.__godsEyeView?.dataManager?.layers?.get('traffic')?.module;
+      const module = window.__cameraEye?.dataManager?.layers?.get('traffic')?.module;
       if (!module) return false;
       const stats = module.getStats();
       if (stats.lastUpdate === before || stats.count <= 0 || stats.loading) return false;
@@ -272,7 +272,7 @@ function rowsForCapture(capture) {
 /** Read the active WebGL renderer for the real-GPU/SwiftShader warning. */
 function readRenderer(page) {
   return page.evaluate(() => {
-    const gl = window.__godsEyeView?.viewer?.scene?.context?._gl;
+    const gl = window.__cameraEye?.viewer?.scene?.context?._gl;
     if (!gl) return 'unknown';
     const extension = gl.getExtension('WEBGL_debug_renderer_info');
     return extension
@@ -343,18 +343,18 @@ async function main() {
 
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await page.waitForFunction(
-      () => window.__godsEyeView?.viewer && window.__godsEyeView?.dataManager,
+      () => window.__cameraEye?.viewer && window.__cameraEye?.dataManager,
       { timeout: 60_000 },
     );
 
     // Disable all persisted overlays, park above traffic's activation ceiling,
     // then enable traffic without accidentally starting an unmeasured load.
     await page.evaluate(async (highView) => {
-      const gev = window.__godsEyeView;
-      await gev.dataManager.restoreEnabledLayerIds([]);
-      const ellipsoid = gev.viewer.scene.globe.ellipsoid;
+      const ce = window.__cameraEye;
+      await ce.dataManager.restoreEnabledLayerIds([]);
+      const ellipsoid = ce.viewer.scene.globe.ellipsoid;
       const radians = Math.PI / 180;
-      gev.viewer.camera.setView({
+      ce.viewer.camera.setView({
         destination: ellipsoid.cartographicToCartesian({
           longitude: highView.lon * radians,
           latitude: highView.lat * radians,
@@ -362,9 +362,9 @@ async function main() {
         }),
         orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
       });
-      await gev.dataManager.setEnabled('traffic', true);
-      gev.viewer.camera.changed.raiseEvent();
-      gev.viewer.camera.moveEnd.raiseEvent();
+      await ce.dataManager.setEnabled('traffic', true);
+      ce.viewer.camera.changed.raiseEvent();
+      ce.viewer.camera.moveEnd.raiseEvent();
     }, VIEWS.austin);
     await sleep(500);
 
@@ -387,10 +387,10 @@ async function main() {
     // Clear the last-bounds gate without clearing the module's road cache, then
     // revisit the byte-identical camera pose for a true client-cache hit.
     await page.evaluate((view) => {
-      const gev = window.__godsEyeView;
-      const ellipsoid = gev.viewer.scene.globe.ellipsoid;
+      const ce = window.__cameraEye;
+      const ellipsoid = ce.viewer.scene.globe.ellipsoid;
       const radians = Math.PI / 180;
-      gev.viewer.camera.setView({
+      ce.viewer.camera.setView({
         destination: ellipsoid.cartographicToCartesian({
           longitude: view.lon * radians,
           latitude: view.lat * radians,
@@ -398,8 +398,8 @@ async function main() {
         }),
         orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
       });
-      gev.viewer.camera.changed.raiseEvent();
-      gev.viewer.camera.moveEnd.raiseEvent();
+      ce.viewer.camera.changed.raiseEvent();
+      ce.viewer.camera.moveEnd.raiseEvent();
     }, VIEWS.austin);
     await sleep(500);
 
@@ -456,7 +456,7 @@ async function main() {
     console.log('  - Measurement caveat: timings include instrumentation overhead (observer effect) and browser clock-floor quantization.');
     console.log('  - Per-road clock observations inside road-parse-total/waypoint-materialization slightly overstate production work.');
     const timingDiagnostics = await page.evaluate(() => (
-      window.__godsEyeView.dataManager.layers.get('traffic').module.getStats().trafficTiming
+      window.__cameraEye.dataManager.layers.get('traffic').module.getStats().trafficTiming
     ));
     console.log(`  - Correlation drops: ${timingDiagnostics?.uncorrelatedTracesDropped ?? 'unavailable'} scheduling-anchor mismatch(es).`);
     if (!HEADFUL || softwareRenderer) {

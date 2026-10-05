@@ -5,7 +5,7 @@ import path from 'node:path';
 // ---------------------------------------------------------------------------
 /** Stable application identity for operator-configured Overpass instances. */
 const OVERPASS_USER_AGENT =
-  'gods-eye-view/0.1 (+https://github.com/bilawalsidhu/gods-eye-view)';
+  'camera-eye/0.1 (+https://github.com/AhmadRun/camera-eye)';
 
 /** Parse only operator-supplied HTTP(S) endpoints; private instances are allowed. */
 function parseOverpassUpstreams(raw) {
@@ -60,7 +60,7 @@ const OVERPASS_DISK_TTL_MS = 7 * 86_400_000;
 const OVERPASS_BOUNDARY_DISK_TTL_MS = 30 * 86_400_000;
 
 /** Disk-cache directory for Overpass responses. */
-const OVERPASS_DISK_DIR = path.join(process.cwd(), '.gev-cache', 'overpass');
+const OVERPASS_DISK_DIR = path.join(process.cwd(), '.ce-cache', 'overpass');
 
 /** Per-upstream fetch timeout (ms). */
 const OVERPASS_TIMEOUT_MS = 22000;

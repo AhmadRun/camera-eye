@@ -235,7 +235,7 @@ export function createLifecycle({
         layerState._mapStackListener = () =>
           parts.ground.handleMapStackChanged();
         window.addEventListener(
-          'gev:map-stack-changed',
+          'ce:map-stack-changed',
           layerState._mapStackListener,
         );
       }
@@ -425,7 +425,7 @@ export function createLifecycle({
       unregisterPickOwner('cctv');
       if (layerState._mapStackListener && typeof window !== 'undefined') {
         window.removeEventListener(
-          'gev:map-stack-changed',
+          'ce:map-stack-changed',
           layerState._mapStackListener,
         );
         layerState._mapStackListener = null;

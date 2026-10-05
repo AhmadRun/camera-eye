@@ -18,11 +18,11 @@ test('tool project paths default to the installation and accept an explicit dire
   );
   assert.equal(projectRoot(moduleUrl, {}), path.join(os.tmpdir(), 'source'));
   const root = path.join(os.tmpdir(), 'other project');
-  assert.equal(projectRoot(moduleUrl, { GEV_PROJECT_ROOT: root }), root);
+  assert.equal(projectRoot(moduleUrl, { CE_PROJECT_ROOT: root }), root);
 });
 
 test('doctor inspects the selected project dependencies and dotenv without disclosing values', async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'gev-doctor-project-'));
+  const root = await mkdtemp(path.join(os.tmpdir(), 'ce-doctor-project-'));
   try {
     await writeFile(
       path.join(root, 'package.json'),
@@ -63,7 +63,7 @@ bashTest(
   async () => {
     // Physical path: the launched process reports its cwd resolved, and macOS
     // reaches the temp directory through a symlink.
-    const root = await makeFixtureRoot('gev other project-');
+    const root = await makeFixtureRoot('ce other project-');
     try {
       const bin = path.join(root, 'bin');
       await mkdir(bin);
@@ -80,7 +80,7 @@ bashTest(
       await writeFile(
         path.join(bin, 'npm'),
         `#!/usr/bin/env node
-require('node:fs').writeFileSync(process.env.TEST_CAPTURE, JSON.stringify({ cwd: process.cwd(), args: process.argv.slice(2), browser: process.env.GOOGLE_MAPS_API_KEY, server: process.env.GOOGLE_MAPS_SERVER_API_KEY, voice: process.env.OPENAI_API_KEY, provenance: process.env.GEV_KEY_SETUP_EXTERNAL_KEYS }));
+require('node:fs').writeFileSync(process.env.TEST_CAPTURE, JSON.stringify({ cwd: process.cwd(), args: process.argv.slice(2), browser: process.env.GOOGLE_MAPS_API_KEY, server: process.env.GOOGLE_MAPS_SERVER_API_KEY, voice: process.env.OPENAI_API_KEY, provenance: process.env.CE_KEY_SETUP_EXTERNAL_KEYS }));
 `,
         { mode: 0o755 },
       );
@@ -91,7 +91,7 @@ require('node:fs').writeFileSync(process.env.TEST_CAPTURE, JSON.stringify({ cwd:
           cwd: os.tmpdir(),
           env: {
             PATH: `${bin}${path.delimiter}${process.env.PATH}`,
-            GEV_PROJECT_ROOT: root,
+            CE_PROJECT_ROOT: root,
             TEST_CAPTURE: capture,
             GOOGLE_MAPS_SERVER_API_KEY: 'fixture-exported-server',
           },

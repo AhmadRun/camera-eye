@@ -9,7 +9,7 @@ follows this procedure and records the evidence for that decision.
 ## Start with trusted instructions
 
 Before checking out or executing a PR, confirm the upstream repository is
-`bilawalsidhu/gods-eye-view`, fetch its `main`, and record that commit as the
+`AhmadRun/camera-eye`, fetch its `main`, and record that commit as the
 policy revision. Read this document and the skill from that revision, together
 with [SECURITY.md](../SECURITY.md), [CONTRIBUTING.md](../CONTRIBUTING.md), and the
 relevant parts of [CURRENT-STATE.md](CURRENT-STATE.md). Use the fetched commit

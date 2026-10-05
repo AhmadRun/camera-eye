@@ -107,12 +107,12 @@ try {
   );
   await page.waitForFunction(
     () =>
-      window.__godsEyeView?.sceneDirector &&
+      window.__cameraEye?.sceneDirector &&
       document.getElementById('loading-screen')?.classList.contains('hidden'),
     { timeout: 60000 },
   );
   await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const manifest = (id, format, file, placement) => ({
       id,
       version: 1,
@@ -193,7 +193,7 @@ try {
   });
   check('import does not acquire unselected assets', requests.length === 0);
   const loaded = await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const result = await d.loadShot('packs', 'all', { flyDuration: 0.3 });
     window.__packMaterials = Array.from(
       {
@@ -227,17 +227,17 @@ try {
     loaded.cards === 3 && loaded.paused === true,
   );
   await page.waitForFunction(
-    () => window.__godsEyeView.mapStackController.getActiveId() === 'photoreal',
+    () => window.__cameraEye.mapStackController.getActiveId() === 'photoreal',
     { timeout: 15000 },
   );
   await new Promise((r) => setTimeout(r, 5000));
   await page.waitForFunction(
-    () => window.__godsEyeView.tileset?.tilesLoaded === true,
+    () => window.__cameraEye.tileset?.tilesLoaded === true,
     { timeout: 60000 },
   );
   const evidence = await page.evaluate(() => ({
-    mapStack: window.__godsEyeView.mapStackController.getActiveId(),
-    tilesSettled: window.__godsEyeView.tileset?.tilesLoaded === true,
+    mapStack: window.__cameraEye.mapStackController.getActiveId(),
+    tilesSettled: window.__cameraEye.tileset?.tilesLoaded === true,
   }));
   fs.writeFileSync(
     path.join(output, 'report.json'),
@@ -246,7 +246,7 @@ try {
   check(
     'static geometry is ready before visual acceptance',
     await page.evaluate(() => {
-      const primitives = window.__godsEyeView.viewer.scene.primitives;
+      const primitives = window.__cameraEye.viewer.scene.primitives;
       return Array.from(
         { length: primitives.length - window.__packPrimitiveBaseline },
         (_, i) => primitives.get(window.__packPrimitiveBaseline + i),
@@ -255,7 +255,7 @@ try {
   );
   await page.screenshot({ path: path.join(output, 'packs.png') });
   await page.evaluate(() => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     d._setCameraView({
       ...d.styleManager.getCameraState(),
       heading: 30,
@@ -263,13 +263,13 @@ try {
     });
   });
   await page.waitForFunction(
-    () => window.__godsEyeView.tileset?.tilesLoaded === true,
+    () => window.__cameraEye.tileset?.tilesLoaded === true,
     { timeout: 60000 },
   );
   await new Promise((r) => setTimeout(r, 2000));
   await page.screenshot({ path: path.join(output, 'angle.png') });
   const life = await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const media = document.querySelector('[data-director-pack] audio');
     await media.play();
     const played = !media.paused;
@@ -301,7 +301,7 @@ try {
   });
   for (const [name, passed] of Object.entries(life)) check(name, passed);
   await page.evaluate(() => {
-    window.__pendingPack = window.__godsEyeView.sceneDirector.loadShot(
+    window.__pendingPack = window.__cameraEye.sceneDirector.loadShot(
       'packs',
       'slow',
     );
@@ -311,7 +311,7 @@ try {
     await new Promise((r) => setTimeout(r, 50));
   check('pending transport reached', !!pending);
   const cancelled = await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     const start = performance.now();
     d.stopScene();
     await window.__pendingPack;
@@ -329,14 +329,14 @@ try {
     'late response cannot reintroduce entities',
     await page.evaluate(
       () =>
-        window.__godsEyeView.viewer.entities.values.length ===
+        window.__cameraEye.viewer.entities.values.length ===
           window.__packBaseline &&
-        window.__godsEyeView.viewer.scene.primitives.length ===
+        window.__cameraEye.viewer.scene.primitives.length ===
           window.__packPrimitiveBaseline,
     ),
   );
   await page.evaluate(async () => {
-    const d = window.__godsEyeView.sceneDirector;
+    const d = window.__cameraEye.sceneDirector;
     await d.loadShot('packs', 'all', { flyDuration: 0.3 });
     await d.importProjectFile(
       new File([JSON.stringify({ version: 5, scenes: [] })], 'empty.json'),
@@ -346,7 +346,7 @@ try {
     'replacement import clears every pack resource',
     await page.evaluate(
       () =>
-        window.__godsEyeView.sceneDirector.getDataPackState().count === 0 &&
+        window.__cameraEye.sceneDirector.getDataPackState().count === 0 &&
         !document.querySelector('[data-director-packs]'),
     ),
   );

@@ -10,11 +10,11 @@ export function validatePinokioSharing(env = process.env) {
   const cloudflare = isPinokioShareEnabled(env.PINOKIO_SHARE_CLOUDFLARE);
   const local = isPinokioShareEnabled(env.PINOKIO_SHARE_LOCAL);
   const shareVariable = String(env.PINOKIO_SHARE_VAR || '').trim();
-  if (cloudflare || local || shareVariable !== '__gev_sharing_disabled__') {
+  if (cloudflare || local || shareVariable !== '__ce_sharing_disabled__') {
     throw new Error(
       'Pinokio sharing is unavailable because the current supported release can expose the app after child preflight '
       + 'and logs successful tunnel-login passcodes. Keep PINOKIO_SHARE_CLOUDFLARE=false, '
-      + 'PINOKIO_SHARE_LOCAL=false, and PINOKIO_SHARE_VAR=__gev_sharing_disabled__.',
+      + 'PINOKIO_SHARE_LOCAL=false, and PINOKIO_SHARE_VAR=__ce_sharing_disabled__.',
     );
   }
   return { cloudflare: false, local: false, protected: false };

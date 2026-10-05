@@ -35,23 +35,23 @@ export function createApplicationData({
   // Restoration starts only after the caller's complete registry is sealed.
   dataManager.finalizeRegistrations(catalog.metadata);
   if (allowQaRegistration) {
-    window.__gevQaRegisterLayer = (targetManager, layerModule) => {
+    window.__ceQaRegisterLayer = (targetManager, layerModule) => {
       if (targetManager !== dataManager)
         throw new Error('QA layer manager mismatch');
       return dataManager.registerForQa(layerModule);
     };
-    window.__gevQaUnregisterLayer = (targetManager, layerId) => {
+    window.__ceQaUnregisterLayer = (targetManager, layerId) => {
       if (targetManager !== dataManager)
         throw new Error('QA layer manager mismatch');
       return dataManager.unregisterForQa(layerId);
     };
-    const register = window.__gevQaRegisterLayer;
-    const unregister = window.__gevQaUnregisterLayer;
+    const register = window.__ceQaRegisterLayer;
+    const unregister = window.__ceQaUnregisterLayer;
     defer(() => {
-      if (window.__gevQaRegisterLayer === register)
-        delete window.__gevQaRegisterLayer;
-      if (window.__gevQaUnregisterLayer === unregister)
-        delete window.__gevQaUnregisterLayer;
+      if (window.__ceQaRegisterLayer === register)
+        delete window.__ceQaRegisterLayer;
+      if (window.__ceQaUnregisterLayer === unregister)
+        delete window.__ceQaUnregisterLayer;
     });
   }
   presentation.mount(document.getElementById('data-toggles'));

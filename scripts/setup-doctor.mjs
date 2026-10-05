@@ -224,7 +224,7 @@ export function formatSetupReport(report, { readyMessage } = {}) {
     ? 'Ready. Run ./scripts/dev-fresh.sh, then open http://localhost:4173.'
     : 'Ready. Run npm run dev, then open http://localhost:4173.');
   const lines = [
-    "God's Eye View setup doctor",
+    "Camera Eye setup doctor",
     '',
     `[${symbol(report.node.level)}] Node ${report.node.version}: ${report.node.summary}`,
     report.npm.available ? `[OK] npm ${report.npm.version}` : '[ERROR] npm was not found',

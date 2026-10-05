@@ -49,7 +49,7 @@ test('keyless stays keyless', () => {
 });
 
 test('the Street View tool resolves per-variable overrides before preferring the server key', () => {
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-streetview-key-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-streetview-key-'));
   const envPath = path.join(root, '.env');
   try {
     writeFileSync(envPath, 'GOOGLE_MAPS_API_KEY=file-browser\nGOOGLE_MAPS_SERVER_API_KEY="file-server" # separate key\n');
@@ -68,14 +68,14 @@ test('the Street View tool resolves per-variable overrides before preferring the
 });
 
 test('both Places routes select the intended key and keep it out of responses', async (t) => {
-  const original = { server: process.env.GOOGLE_MAPS_SERVER_API_KEY, browser: process.env.GOOGLE_MAPS_API_KEY, limit: process.env.GEV_RATELIMIT_GOOGLE_PER_MIN };
+  const original = { server: process.env.GOOGLE_MAPS_SERVER_API_KEY, browser: process.env.GOOGLE_MAPS_API_KEY, limit: process.env.CE_RATELIMIT_GOOGLE_PER_MIN };
   const calls = [];
   t.mock.method(globalThis, 'fetch', async (url, options) => {
     calls.push({ url, key: options.headers['X-Goog-Api-Key'] });
     return Response.json({ places: [] });
   });
   try {
-    process.env.GEV_RATELIMIT_GOOGLE_PER_MIN = '';
+    process.env.CE_RATELIMIT_GOOGLE_PER_MIN = '';
     for (const [server, browser, expected] of [
       ['server-secret', 'browser-public', 'server-secret'],
       ['server-secret', '', 'server-secret'],
@@ -107,7 +107,7 @@ test('both Places routes select the intended key and keep it out of responses', 
       }
     }
   } finally {
-    for (const [name, value] of Object.entries({ GOOGLE_MAPS_SERVER_API_KEY: original.server, GOOGLE_MAPS_API_KEY: original.browser, GEV_RATELIMIT_GOOGLE_PER_MIN: original.limit })) {
+    for (const [name, value] of Object.entries({ GOOGLE_MAPS_SERVER_API_KEY: original.server, GOOGLE_MAPS_API_KEY: original.browser, CE_RATELIMIT_GOOGLE_PER_MIN: original.limit })) {
       if (value === undefined) delete process.env[name];
       else process.env[name] = value;
     }

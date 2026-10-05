@@ -21,8 +21,8 @@ export function configureCreditKeyboardAccess(root = document) {
   close.setAttribute('tabindex', '0');
   close.setAttribute('aria-label', 'Close data attribution');
 
-  if (expand.dataset.gevKeyboardReady === 'true') return true;
-  expand.dataset.gevKeyboardReady = 'true';
+  if (expand.dataset.ceKeyboardReady === 'true') return true;
+  expand.dataset.ceKeyboardReady = 'true';
 
   const installKeyboardActivation = (control) => {
     let spacePressed = false;

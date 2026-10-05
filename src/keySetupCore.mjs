@@ -201,7 +201,7 @@ export function isSharingEnabled(env = {}) {
     ['PINOKIO_SHARE_CLOUDFLARE', 'PINOKIO_SHARE_LOCAL'].some((name) =>
       /^(1|true)$/i.test(String(env[name] || '').trim()),
     ) ||
-    (shareVar !== '' && shareVar !== '__gev_sharing_disabled__')
+    (shareVar !== '' && shareVar !== '__ce_sharing_disabled__')
   );
 }
 

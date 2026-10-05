@@ -547,12 +547,12 @@ test('the Visual Presets tray owns Map Source and the retired left panel is abse
   );
   assert.match(
     ui,
-    /window\.addEventListener\('gev:map-stack-changed', onChange\)/,
+    /window\.addEventListener\('ce:map-stack-changed', onChange\)/,
     'provider-driven fallback reaches the component without a user click',
   );
   assert.match(
     ui,
-    /window\.removeEventListener\('gev:map-stack-changed', onChange\)/,
+    /window\.removeEventListener\('ce:map-stack-changed', onChange\)/,
     'the provider-driven subscription has an explicit remover',
   );
   assert.match(

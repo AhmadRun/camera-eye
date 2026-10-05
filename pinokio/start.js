@@ -20,9 +20,9 @@ module.exports = {
           LL2_API_TOKEN: '{{env.LL2_API_TOKEN || ""}}',
           PINOKIO_SHARE_CLOUDFLARE: '{{env.PINOKIO_SHARE_CLOUDFLARE || "false"}}',
           PINOKIO_SHARE_LOCAL: '{{env.PINOKIO_SHARE_LOCAL || "false"}}',
-          PINOKIO_SHARE_VAR: '{{env.PINOKIO_SHARE_VAR || "__gev_sharing_disabled__"}}',
-          GEV_RATELIMIT_OPENAI_PER_MIN: '{{env.GEV_RATELIMIT_OPENAI_PER_MIN || ""}}',
-          GEV_RATELIMIT_GOOGLE_PER_MIN: '{{env.GEV_RATELIMIT_GOOGLE_PER_MIN || ""}}',
+          PINOKIO_SHARE_VAR: '{{env.PINOKIO_SHARE_VAR || "__ce_sharing_disabled__"}}',
+          CE_RATELIMIT_OPENAI_PER_MIN: '{{env.CE_RATELIMIT_OPENAI_PER_MIN || ""}}',
+          CE_RATELIMIT_GOOGLE_PER_MIN: '{{env.CE_RATELIMIT_GOOGLE_PER_MIN || ""}}',
         },
         message: 'node scripts/pinokio-start.mjs',
         on: [{

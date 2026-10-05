@@ -43,10 +43,10 @@ test('validatePlacesCoordinates refuses missing, blank, non-numeric, and out-of-
 
 test('both Places routes answer bad coordinates with a 400 before the limiter and before Google', async () => {
   const previousKey = process.env.GOOGLE_MAPS_API_KEY;
-  const previousLimit = process.env.GEV_RATELIMIT_GOOGLE_PER_MIN;
+  const previousLimit = process.env.CE_RATELIMIT_GOOGLE_PER_MIN;
   const originalFetch = globalThis.fetch;
   process.env.GOOGLE_MAPS_API_KEY = 'test-key';
-  process.env.GEV_RATELIMIT_GOOGLE_PER_MIN = '1';
+  process.env.CE_RATELIMIT_GOOGLE_PER_MIN = '1';
   let upstreamCalls = 0;
   globalThis.fetch = async () => {
     upstreamCalls += 1;
@@ -85,8 +85,8 @@ test('both Places routes answer bad coordinates with a 400 before the limiter an
     globalThis.fetch = originalFetch;
     if (previousKey === undefined) delete process.env.GOOGLE_MAPS_API_KEY;
     else process.env.GOOGLE_MAPS_API_KEY = previousKey;
-    if (previousLimit === undefined) delete process.env.GEV_RATELIMIT_GOOGLE_PER_MIN;
-    else process.env.GEV_RATELIMIT_GOOGLE_PER_MIN = previousLimit;
+    if (previousLimit === undefined) delete process.env.CE_RATELIMIT_GOOGLE_PER_MIN;
+    else process.env.CE_RATELIMIT_GOOGLE_PER_MIN = previousLimit;
   }
 });
 

@@ -11,16 +11,16 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { overpassProxy } from 'gods-eye-view/server/providers/overpass';
-import { militaryInstallationsProxy } from 'gods-eye-view/server/providers/military-installations';
+import { overpassProxy } from 'camera-eye/server/providers/overpass';
+import { militaryInstallationsProxy } from 'camera-eye/server/providers/military-installations';
 import {
   regionalBriefProxy,
   weatherEffectsProxy,
-} from 'gods-eye-view/server/providers/regional';
-import { openAiRealtimeProxy } from 'gods-eye-view/server/providers/openai';
-import { keySetupEndpoint } from 'gods-eye-view/server/standalone/key-setup';
+} from 'camera-eye/server/providers/regional';
+import { openAiRealtimeProxy } from 'camera-eye/server/providers/openai';
+import { keySetupEndpoint } from 'camera-eye/server/standalone/key-setup';
 import { realtimeInstructions } from '../../server/providers/openai/instructions.js';
-import { GEV_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
+import { CE_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
 import { standaloneVoiceTools } from '../../server/standalone/voiceTools.js';
 
 function install(plugin, preview = false) {
@@ -84,7 +84,7 @@ function env(t, name, value) {
   });
 }
 function root(t) {
-  const dir = mkdtempSync(path.join(tmpdir(), 'gev-services-'));
+  const dir = mkdtempSync(path.join(tmpdir(), 'ce-services-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
@@ -159,7 +159,7 @@ test('weather-only requests share upstream work and retain fresh and stale respo
 
 test('Realtime handler preserves tools and default instructions, isolates supplied annotation guidance, and keeps the upstream key server-side', async (t) => {
   env(t, 'OPENAI_API_KEY', 'fixture-upstream-secret');
-  env(t, 'GEV_RATELIMIT_OPENAI_PER_MIN', undefined);
+  env(t, 'CE_RATELIMIT_OPENAI_PER_MIN', undefined);
   const sent = [];
   t.mock.method(globalThis, 'fetch', async (url, options) => {
     assert.equal(url, 'https://api.openai.com/v1/realtime/client_secrets');
@@ -183,14 +183,14 @@ test('Realtime handler preserves tools and default instructions, isolates suppli
       { url: '/?tier=unknown' },
     );
     assert.equal(response.status, 200);
-    assert.equal(response.headers['x-gev-voice-tier'], 'standard');
-    assert.equal(response.headers['x-gev-voice-tier-fallback'], '1');
+    assert.equal(response.headers['x-ce-voice-tier'], 'standard');
+    assert.equal(response.headers['x-ce-voice-tier-fallback'], '1');
     assert.equal(response.body.includes('fixture-upstream-secret'), false);
     assert.equal(
       sent.at(-1).session.instructions,
       realtimeInstructions(guidance),
     );
-    assert.deepEqual(sent.at(-1).session.tools, GEV_REALTIME_TOOLS);
+    assert.deepEqual(sent.at(-1).session.tools, CE_REALTIME_TOOLS);
   }
   assert.notEqual(sent[0].session.instructions, sent[1].session.instructions);
   assert.equal(sent[0].session.instructions, sent[2].session.instructions);
@@ -198,7 +198,7 @@ test('Realtime handler preserves tools and default instructions, isolates suppli
 
 test('Realtime sessions carry supplied tools, and the standalone voice adds the catalog queries', async (t) => {
   env(t, 'OPENAI_API_KEY', 'fixture-upstream-secret');
-  env(t, 'GEV_RATELIMIT_OPENAI_PER_MIN', undefined);
+  env(t, 'CE_RATELIMIT_OPENAI_PER_MIN', undefined);
   const sent = [];
   t.mock.method(globalThis, 'fetch', async (url, options) => {
     sent.push(JSON.parse(options.body));
@@ -214,19 +214,16 @@ test('Realtime sessions carry supplied tools, and the standalone voice adds the 
   assert.deepEqual(sent.at(-1).session.tools, tools);
   const names = tools.map((tool) => tool.name);
   assert.equal(new Set(names).size, names.length);
-  assert.deepEqual(
-    tools.slice(0, GEV_REALTIME_TOOLS.length),
-    GEV_REALTIME_TOOLS,
-  );
+  assert.deepEqual(tools.slice(0, CE_REALTIME_TOOLS.length), CE_REALTIME_TOOLS);
   assert.ok(names.includes('get_weather'));
   assert.ok(names.includes('military_awareness'));
-  assert.ok(!names.includes('show_in_gods_eye_view'));
+  assert.ok(!names.includes('show_in_camera_eye'));
   assert.ok(!names.includes('aircraft_in_area'));
   assert.ok(!names.includes('get_weather_map'));
   // The action of the same name answers satellite passes.
   assert.equal(
     tools.findLast((tool) => tool.name === 'next_satellite_pass'),
-    GEV_REALTIME_TOOLS.find((tool) => tool.name === 'next_satellite_pass'),
+    CE_REALTIME_TOOLS.find((tool) => tool.name === 'next_satellite_pass'),
   );
 });
 
@@ -249,10 +246,7 @@ test('debug logging resolves each supplied application directory independently',
       ).status,
       204,
     );
-    const file = path.join(
-      sourceRoot,
-      '.gev-logs/realtime-conversations.jsonl',
-    );
+    const file = path.join(sourceRoot, '.ce-logs/realtime-conversations.jsonl');
     assert.equal(JSON.parse(readFileSync(file, 'utf8')).marker, marker);
   }
 });
@@ -305,7 +299,7 @@ test('Realtime service configuration selects compatible endpoint/model without f
           assert.equal(options.headers.Authorization, 'Bearer server-fixture');
           const payload = JSON.parse(options.body);
           assert.equal(payload.session.model, 'configured-model');
-          assert.deepEqual(payload.session.tools, GEV_REALTIME_TOOLS);
+          assert.deepEqual(payload.session.tools, CE_REALTIME_TOOLS);
           return Response.json({ value: 'short-lived-fixture' });
         },
       },
@@ -316,14 +310,14 @@ test('Realtime service configuration selects compatible endpoint/model without f
   });
   assert.equal(response.status, 200);
   assert.deepEqual(response.json(), { value: 'short-lived-fixture' });
-  assert.equal(response.headers['x-gev-voice-model'], 'configured-model');
+  assert.equal(response.headers['x-ce-voice-model'], 'configured-model');
   assert.equal(response.headers['cache-control'], 'no-store');
   assert.doesNotMatch(response.body, /server-fixture|voice\.example/);
 });
 
 test('OpenAI routes answer generically when the upstream or the request fails', async (t) => {
   env(t, 'OPENAI_API_KEY', 'fixture-upstream-secret');
-  env(t, 'GEV_RATELIMIT_OPENAI_PER_MIN', undefined);
+  env(t, 'CE_RATELIMIT_OPENAI_PER_MIN', undefined);
   const leak =
     'fixture-upstream-secret req_fixture_1234 org-fixture quota exhausted';
 
@@ -379,7 +373,7 @@ test('the debug-log sink stays bounded, rate limited, and quiet about failures',
   const handler = install(openAiRealtimeProxy({ sourceRoot })).get(
     '/api/realtime/debug-log',
   );
-  const file = path.join(sourceRoot, '.gev-logs/realtime-conversations.jsonl');
+  const file = path.join(sourceRoot, '.ce-logs/realtime-conversations.jsonl');
   const write = (record) =>
     request(handler, { method: 'POST', body: JSON.stringify(record) });
 
@@ -426,7 +420,7 @@ test('a debug-log record cannot supply its own timestamp', async (t) => {
     body: JSON.stringify({ loggedAt: '1999-01-01T00:00:00.000Z', note: 'x' }),
   });
   assert.equal(response.status, 204);
-  const file = path.join(sourceRoot, '.gev-logs/realtime-conversations.jsonl');
+  const file = path.join(sourceRoot, '.ce-logs/realtime-conversations.jsonl');
   const [line] = readFileSync(file, 'utf8').split('\n').filter(Boolean);
   const record = JSON.parse(line);
   assert.equal(record.note, 'x');
@@ -456,7 +450,7 @@ test('the debug log rotates instead of growing without bound', async (t) => {
   const handler = install(openAiRealtimeProxy({ sourceRoot })).get(
     '/api/realtime/debug-log',
   );
-  const file = path.join(sourceRoot, '.gev-logs/realtime-conversations.jsonl');
+  const file = path.join(sourceRoot, '.ce-logs/realtime-conversations.jsonl');
 
   // 8 MB bounds one request body; nothing bounded the file until now, so a
   // single page could grow it for as long as the dev server ran. Each record
@@ -493,7 +487,7 @@ test('the voice instructions name only tools the voice session offers', async ()
   const tools = new Set(standaloneVoiceTools().map((tool) => tool.name));
   const known = new Set([
     ...coreTools.map((tool) => tool.name),
-    ...GEV_REALTIME_TOOLS.map((tool) => tool.name),
+    ...CE_REALTIME_TOOLS.map((tool) => tool.name),
   ]);
   const named = new Set(
     realtimeInstructions().match(/\b[a-z]+(?:_[a-z]+)+\b/g),

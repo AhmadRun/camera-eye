@@ -462,7 +462,7 @@ export function createIngestion({ state, services, parts, source }) {
           10,
         );
         applySnapshot(feed, snapshot, {
-          stale: response.headers.get('x-gev-cache') === 'STALE-ERROR',
+          stale: response.headers.get('x-ce-cache') === 'STALE-ERROR',
           contactedAt: Number.isFinite(contactHeader) ? contactHeader : null,
         });
       } catch (error) {

@@ -31,7 +31,7 @@ function install(plugin, hook = 'configureServer') {
 }
 
 function fixture(t, id) {
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-cctv-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-cctv-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   mkdirSync(path.join(root, 'config'));
   writeFileSync(
@@ -152,7 +152,7 @@ for (const hook of ['configureServer', 'configurePreviewServer']) {
 
 test('a failed CCTV media fetch reports a fixed health message, not the error text', async (t) => {
   isolate(t);
-  const root = mkdtempSync(path.join(tmpdir(), 'gev-cctv-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'ce-cctv-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   mkdirSync(path.join(root, 'config'));
   writeFileSync(

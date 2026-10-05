@@ -1215,7 +1215,7 @@ test('no host pauses history, refreshes metadata, and restores retained time and
   t.mock.timers.tick(2000);
   assert.equal(h.stages.length, 2);
   host = { collection: null, kind: 'none' };
-  h.eventTarget.emit('gev:map-stack-changed');
+  h.eventTarget.emit('ce:map-stack-changed');
   await flush();
   assert.equal(h.layer.getDiagnostics().playing, false);
   assert.equal(h.layer.getDiagnostics().timerActive, false);
@@ -1227,7 +1227,7 @@ test('no host pauses history, refreshes metadata, and restores retained time and
   assert.equal(h.stages.length, 2);
   assert.equal(h.layer.getDiagnostics().time, times[2]);
   host = { collection: {}, kind: 'globe' };
-  h.eventTarget.emit('gev:map-stack-changed');
+  h.eventTarget.emit('ce:map-stack-changed');
   assert.equal(h.layer.getDiagnostics().playing, true);
   assert.equal(h.layer.getDiagnostics().timerActive, true);
   t.mock.timers.tick(2000);
@@ -1384,12 +1384,12 @@ for (const [id, product] of [
     assert.equal(layer.getDiagnostics().timerActive, true);
 
     host = { collection: null, kind: 'none' };
-    events.emit('gev:map-stack-changed');
+    events.emit('ce:map-stack-changed');
     assert.equal(shell.show, false);
     assert.equal(layer.getRowControls().summary.status, NO_IMAGERY_HOST);
     assert.equal(layer.getDiagnostics().timerActive, false);
     host = { collection: h.viewer.imageryLayers, kind: 'globe' };
-    events.emit('gev:map-stack-changed');
+    events.emit('ce:map-stack-changed');
     assert.equal(shell.destroyed, true);
     assert.equal(
       layer.getDiagnostics().time,

@@ -31,21 +31,21 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 860 });
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => !!window.__godsEyeView?.viewer, { timeout: 90_000 });
+  await page.waitForFunction(() => !!window.__cameraEye?.viewer, { timeout: 90_000 });
   await new Promise((r) => setTimeout(r, 12_000));
 
   await page.evaluate(async () => {
-    const gev = window.__godsEyeView;
-    gev.viewer.camera.cancelFlight();
-    const ell = gev.viewer.scene.globe.ellipsoid;
-    gev.viewer.camera.setView({
+    const ce = window.__cameraEye;
+    ce.viewer.camera.cancelFlight();
+    const ell = ce.viewer.scene.globe.ellipsoid;
+    ce.viewer.camera.setView({
       destination: ell.cartographicToCartesian({
         longitude: -40 * Math.PI / 180, latitude: 35 * Math.PI / 180, height: 4_500_000,
       }),
       orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
     });
-    for (const [id, entry] of gev.dataManager.layers) {
-      if (entry.enabled) { try { await gev.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* probe */ } }
+    for (const [id, entry] of ce.dataManager.layers) {
+      if (entry.enabled) { try { await ce.dataManager.setEnabled(id, false, { origin: 'user' }); } catch { /* probe */ } }
     }
   });
   await new Promise((r) => setTimeout(r, 5_000));
@@ -57,14 +57,14 @@ try {
 
   const measure = async (label, enabled) => {
     await page.evaluate(async (id, on) => {
-      const gev = window.__godsEyeView;
-      await gev.dataManager.setEnabled(id, on, { origin: 'user' });
+      const ce = window.__cameraEye;
+      await ce.dataManager.setEnabled(id, on, { origin: 'user' });
     }, LAYER_ID, enabled);
     await new Promise((r) => setTimeout(r, enabled ? 6_000 : 3_000)); // load/teardown + settle
 
     // 1. PARKED timed renders.
     const parked = await page.evaluate(() => {
-      const v = window.__godsEyeView.viewer;
+      const v = window.__cameraEye.viewer;
       const durations = [];
       for (let i = 0; i < 40; i++) {
         const t0 = performance.now();
@@ -78,7 +78,7 @@ try {
     const cycles = [];
     for (let cycle = 0; cycle < 3; cycle++) {
       const frames = await page.evaluate(async (step) => {
-        const v = window.__godsEyeView.viewer;
+        const v = window.__cameraEye.viewer;
         const ell = v.scene.globe.ellipsoid;
         v.camera.setView({
           destination: ell.cartographicToCartesian({

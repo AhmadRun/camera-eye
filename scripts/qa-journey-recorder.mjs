@@ -48,10 +48,10 @@ export function frameStats(frames) {
 /** Install the in-page frame probe once per document; returns nothing. */
 export async function installFrameProbe(page) {
   await page.evaluate(() => {
-    if (window.__gevFrameProbe) return;
-    const { viewer } = window.__godsEyeView;
+    if (window.__ceFrameProbe) return;
+    const { viewer } = window.__cameraEye;
     const probe = { frames: [], started: 0 };
-    window.__gevFrameProbe = probe;
+    window.__ceFrameProbe = probe;
     let last = performance.now();
     let renderStart = null;
     let pendingRender = null;
@@ -77,7 +77,7 @@ export async function installFrameProbe(page) {
 export async function readFrames(page, t0, t1 = Infinity) {
   return page.evaluate(
     (a, b) =>
-      window.__gevFrameProbe.frames.filter(
+      window.__ceFrameProbe.frames.filter(
         (f) => f.t >= a && f.t < (b ?? Infinity),
       ),
     t0,
@@ -101,7 +101,7 @@ export async function moveCamera(page, view, seconds) {
   await page.evaluate(
     (v, duration) =>
       new Promise((resolve) => {
-        const { viewer } = window.__godsEyeView;
+        const { viewer } = window.__cameraEye;
         const C = viewer.camera;
         C.cancelFlight();
         C.flyTo({

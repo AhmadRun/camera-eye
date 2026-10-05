@@ -113,7 +113,7 @@ export function resolveTransitRoute(url) {
 export function transitUpstreamHeaders(feed, validators = null) {
   return {
     'User-Agent':
-      'gods-eye-view-transit-proxy/1.0 (+https://github.com/bilawalsidhu/gods-eye-view)',
+      'camera-eye-transit-proxy/1.0 (+https://github.com/AhmadRun/camera-eye)',
     Accept: 'application/x-protobuf, application/octet-stream;q=0.9, */*;q=0.1',
     'Accept-Encoding': 'gzip',
     ...(validators?.etag ? { 'If-None-Match': validators.etag } : {}),
@@ -280,7 +280,7 @@ export function transitCacheState(entry, now) {
 }
 
 /**
- * Response headers for a snapshot. `X-GEV-Cache` mirrors the other proxies
+ * Response headers for a snapshot. `X-CE-Cache` mirrors the other proxies
  * (HIT / MISS / INFLIGHT / STALE-ERROR) so the layer can surface staleness.
  * @param {'HIT'|'MISS'|'INFLIGHT'|'STALE-ERROR'} cacheState
  * @param {string} [upstreamHost]
@@ -297,7 +297,7 @@ export function transitResponseHeaders(
       cacheState === 'STALE-ERROR'
         ? 'no-store'
         : `public, max-age=${Math.floor(TRANSIT_PROXY_TTL_MS / 1000)}`,
-    'X-GEV-Cache': cacheState,
+    'X-CE-Cache': cacheState,
     ...(upstreamHost ? { 'X-Transit-Upstream': upstreamHost } : {}),
     // When the operator last ANSWERED, which is not when the body was fetched.
     // A feed whose file has not changed answers 304 forever, and the body we

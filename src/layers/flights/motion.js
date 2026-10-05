@@ -490,7 +490,7 @@ export function createMotion({
    *
    * It reads `modelMatrix`, which `_updateTrackedModel` already wrote this frame — no
    * sampling, no `_modelDisplayPosition` call from postRender, and no new dead reckoning,
-   * so the follow-camera anti-jitter contract on `gevDisplayPosition` is untouched.
+   * so the follow-camera anti-jitter contract on `ceDisplayPosition` is untouched.
    */
 
   function _trackedVisualCached() {

@@ -7,7 +7,7 @@ links, assets and contributor credit are preserved.
 ## Review imports before applying
 
 IMPORT accepts scene JSON (including older supported versions) or a
-`.gevbundle.json` asset bundle. A preview lists scenes, shots, data-pack attribution,
+`.cebundle.json` asset bundle. A preview lists scenes, shots, data-pack attribution,
 configured or unavailable sources, missing layer IDs and bundled bytes. Preview
 makes no asset requests and does not change the current project. Configured
 sources do not guarantee that a file exists: ordinary assets are checked on LOAD.
@@ -62,7 +62,7 @@ A bundle is uncompressed JSON with these fields:
 
 ```json
 {
-  "format": "gev-scene-bundle",
+  "format": "ce-scene-bundle",
   "version": 1,
   "project": { "version": 6, "scenes": [] },
   "assets": []
@@ -86,7 +86,7 @@ storage: **reimport the bundle after reloading the app**. Missing bundle bytes
 fail explicitly, with no network fallback. This is file sharing, not a storage
 service or an offline basemap.
 
-Portable helpers are exported through `gods-eye-view/director`: `parseSceneShare`,
+Portable helpers are exported through `camera-eye/director`: `parseSceneShare`,
 `readSceneShare`, `createSceneBundle`, `createBundleAssets`, `describeSceneShare`,
 `editSceneDetails` and `selectSceneDocument`. Loading and UI remain separate owners.
 `getSharingState()` reports copied dialog/asset counts for lifecycle diagnostics.

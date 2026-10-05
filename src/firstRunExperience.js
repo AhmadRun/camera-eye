@@ -22,9 +22,9 @@ import { createSurfaceKeyboard } from './ui/surfaceKeyboard.js';
 // is enthusiasm, not "never show me this again".
 
 /** Durable suppression. Written ONLY by the "Don't show this again" checkbox. */
-export const FIRST_RUN_STORAGE_KEY = 'gev:first-run-mission:v1';
+export const FIRST_RUN_STORAGE_KEY = 'ce:first-run-mission:v1';
 /** Per-session dismissal. Written by every close path; scoped to sessionStorage. */
-export const FIRST_RUN_SESSION_KEY = 'gev:first-run-mission-session:v1';
+export const FIRST_RUN_SESSION_KEY = 'ce:first-run-mission-session:v1';
 
 /**
  * Owner-selectable name for the fires/quakes mission. Flip this ONE constant to
@@ -54,7 +54,7 @@ export function environmentalLabel(choice = ENVIRONMENTAL_LABEL_CHOICE) {
  * Owner ruling: picking a mission carries the same weight as clicking the
  * toggles it represents — durable where those clicks are durable — but it must
  * never write a preference the visitor did not effectively choose by picking it.
- * Layer enablement IS durable in this app (`gev:layer-state:v2`, written by
+ * Layer enablement IS durable in this app (`ce:layer-state:v2`, written by
  * LayerStateCoordinator._commitExplicit only for origin user/voice/tool), so:
  *
  *   TOUCHED, DURABLE      layer enables for the mission's OWN layers, at
@@ -75,7 +75,7 @@ export function environmentalLabel(choice = ENVIRONMENTAL_LABEL_CHOICE) {
  *                         kill the CRT/NVG/FLIR auto-preset contract for the
  *                         whole session. Missions run through setContextMode and
  *                         DataManager.setEnabled, neither of which writes it.
- *   NOT TOUCHED           detection allocation (`gev:detection-allocation:v1`),
+ *   NOT TOUCHED           detection allocation (`ce:detection-allocation:v1`),
  *                         3D aircraft models, scope feather. All are defaults or
  *                         separate durable prefs the visitor did not choose here.
  *                         In particular nothing calls `_setModels3dEnabled` /
@@ -212,7 +212,7 @@ export function shouldShowFirstRun({
   const params = new URLSearchParams(location?.search || '');
   if (params.get('welcome') === '0') return false;
   // An embedded globe never shows the welcome launcher.
-  if (params.get('embed') === '1' || globalThis.GEV_EMBED_INLINE === true)
+  if (params.get('embed') === '1' || globalThis.CE_EMBED_INLINE === true)
     return false;
   // The demo/support escape hatch outranks both suppressions on purpose.
   if (params.get('welcome') === '1') return true;

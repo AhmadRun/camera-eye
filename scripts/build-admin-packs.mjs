@@ -107,7 +107,7 @@ const args = process.argv.slice(2);
 const cacheDir = path.resolve(
   args.includes('--cache')
     ? args[args.indexOf('--cache') + 1]
-    : path.join(os.tmpdir(), 'gev-admin-packs'),
+    : path.join(os.tmpdir(), 'ce-admin-packs'),
 );
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : null;
 

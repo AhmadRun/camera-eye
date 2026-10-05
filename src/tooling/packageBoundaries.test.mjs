@@ -10,7 +10,7 @@ async function fixture(
   entry = 'export const value = 1;',
   extraExports = {},
 ) {
-  const root = await mkdtemp(path.join(tmpdir(), 'gev-boundaries-'));
+  const root = await mkdtemp(path.join(tmpdir(), 'ce-boundaries-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   await mkdir(path.join(root, 'scripts'));
   await writeFile(

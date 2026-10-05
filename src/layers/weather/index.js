@@ -267,7 +267,7 @@ export function createWeatherLayer({
       });
       checkHost(false);
       eventTarget?.addEventListener?.(
-        'gev:map-stack-changed',
+        'ce:map-stack-changed',
         onMapStackChanged,
       );
       rendering.setAlpha(opacity === 'light' ? 0.4 : satellite ? 0.7 : 0.8);
@@ -713,7 +713,7 @@ export function createWeatherLayer({
       motion?.removeEventListener?.('change', onVisibility);
       documentRef?.removeEventListener?.('visibilitychange', onVisibility);
       eventTarget?.removeEventListener?.(
-        'gev:map-stack-changed',
+        'ce:map-stack-changed',
         onMapStackChanged,
       );
       runNavigation = null;

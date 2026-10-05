@@ -373,7 +373,7 @@ export function createSceneSharing(director) {
           { signal: owner.signal },
         );
         if (alive(owner)) {
-          download(text, 'scene.gevbundle.json');
+          download(text, 'scene.cebundle.json');
           dialog.status.textContent = 'Asset bundle downloaded';
         }
       }),

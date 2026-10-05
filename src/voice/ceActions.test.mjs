@@ -17,9 +17,9 @@ import {
   formatTrackedEntityLabel,
   knownRadioLocation,
   normalizeStackId,
-} from './gevActions.js';
+} from './ceActions.js';
 import { MAP_STACKS } from '../mapStackController.js';
-import { GEV_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
+import { CE_REALTIME_TOOLS } from '../../server/providers/openai/tools.js';
 
 test('every live basemap is reachable by its own id — no enum value without a voice alias', () => {
   // B1 regression: a stack added to MAP_STACKS (and the set_map_stack enum)
@@ -37,7 +37,7 @@ test('every live basemap is reachable by its own id — no enum value without a 
   assert.equal(normalizeStackId('Esri'), 'esri-imagery');
   assert.equal(normalizeStackId('esri imagery'), 'esri-imagery');
   // And the voice tool's enum must equal the set of live ids — no drift either way.
-  const enumIds = GEV_REALTIME_TOOLS.find(tool => tool.name === 'set_map_stack').parameters.properties.stack.enum;
+  const enumIds = CE_REALTIME_TOOLS.find(tool => tool.name === 'set_map_stack').parameters.properties.stack.enum;
   assert.deepEqual(
     [...enumIds].sort(),
     MAP_STACKS.map((s) => s.id).sort(),
@@ -471,7 +471,7 @@ test('voice Stop Tracking reports exact layers whose active or durable clear fai
     getAll: () => [],
   };
   const viewer = {
-    trackedEntity: { gevTrackedId: 'flights:active' },
+    trackedEntity: { ceTrackedId: 'flights:active' },
     scene: {
       canvas: { addEventListener() {}, removeEventListener() {} },
       preRender: { addEventListener() {} },
@@ -1236,7 +1236,7 @@ test('control_cockpit delegates selected-flight adoption to the canonical cockpi
     scene: { canvas: { addEventListener() {}, removeEventListener() {} } },
     camera: { moveEnd: { addEventListener() {} } },
   };
-  const recordCarrier = { __gevContextId: 'selected-flight-for-cockpit-enter' };
+  const recordCarrier = { __ceContextId: 'selected-flight-for-cockpit-enter' };
   const record = registerEntityContext(recordCarrier, {
     id: 'abc123',
     layerId: 'flights',
@@ -1377,10 +1377,10 @@ test('control_cockpit rolls Contacts back when the turn becomes stale at commit'
 test('control_cockpit adopts the newest selection after Contacts settles', async () => {
   globalThis.window = globalThis.window || { clearTimeout, setTimeout, requestIdleCallback: null };
   const contextStore = getContextStore();
-  const first = registerEntityContext({ __gevContextId: 'cockpit-selection-first' }, {
+  const first = registerEntityContext({ __ceContextId: 'cockpit-selection-first' }, {
     id: 'first', layerId: 'flights', label: 'FIRST',
   });
-  const second = registerEntityContext({ __gevContextId: 'cockpit-selection-second' }, {
+  const second = registerEntityContext({ __ceContextId: 'cockpit-selection-second' }, {
     id: 'second', layerId: 'flights', label: 'SECOND',
   });
   contextStore.selectedEntityId = first.id;
@@ -1646,7 +1646,7 @@ test('control_cockpit enter skips selected non-flight context', async () => {
     scene: { canvas: { addEventListener() {}, removeEventListener() {} } },
     camera: { moveEnd: { addEventListener() {} } },
   };
-  const recordCarrier = { __gevContextId: 'selected-non-flight-cockpit-enter' };
+  const recordCarrier = { __ceContextId: 'selected-non-flight-cockpit-enter' };
   const record = registerEntityContext(recordCarrier, {
     id: 'poi-001',
     layerId: 'local-datacenters',

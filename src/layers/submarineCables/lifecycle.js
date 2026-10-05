@@ -26,7 +26,7 @@ export function createLifecycle({ state, parts, source, mapStackEventTarget }) {
           );
         };
         mapStackEventTarget.addEventListener(
-          'gev:map-stack-changed',
+          'ce:map-stack-changed',
           state._mapStackListener,
         );
       }
@@ -115,7 +115,7 @@ export function createLifecycle({ state, parts, source, mapStackEventTarget }) {
       }
       if (state._mapStackListener && mapStackEventTarget?.removeEventListener) {
         mapStackEventTarget.removeEventListener(
-          'gev:map-stack-changed',
+          'ce:map-stack-changed',
           state._mapStackListener,
         );
         state._mapStackListener = null;

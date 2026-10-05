@@ -64,7 +64,7 @@ const shot = async (name) => {
 async function lookAt(lat, lon, height) {
   await page.evaluate(
     (la, lo, h) => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       const Cartesian3 = viewer.camera.positionWC.constructor;
       viewer.camera.cancelFlight();
       viewer.camera.setView({
@@ -82,7 +82,7 @@ async function lookAt(lat, lon, height) {
 const screenAt = (lat, lon) =>
   page.evaluate(
     (la, lo) => {
-      const viewer = window.__godsEyeView.viewer;
+      const viewer = window.__cameraEye.viewer;
       const scene = viewer.scene;
       const Cartesian3 = viewer.camera.positionWC.constructor;
       const Cartographic = viewer.camera.positionCartographic.constructor;
@@ -103,14 +103,14 @@ const screenAt = (lat, lon) =>
 
 const layerState = () =>
   page.evaluate(() => {
-    const gev = window.__godsEyeView;
-    const manager = gev.dataManager;
+    const ce = window.__cameraEye;
+    const manager = ce.dataManager;
     const module = manager.layers.get('directions').module;
     const row = document.querySelector(
       '#data-toggles [data-layer-id="directions"]',
     );
     const controls = module.getRowControls();
-    const viewer = gev.viewer;
+    const viewer = ce.viewer;
     const entities = [...viewer.entities.values];
     const routeEntities = entities.filter(
       (entity) => String(entity.id) === 'directions:route',
@@ -144,8 +144,8 @@ const layerState = () =>
       markerCount: entities.filter((entity) =>
         String(entity.id).startsWith('directions:marker:'),
       ).length,
-      pointerOwner: window.__gevQa.pointerOwner(),
-      cameraMotion: window.__gevQa.getActiveCameraMotion(),
+      pointerOwner: window.__ceQa.pointerOwner(),
+      cameraMotion: window.__ceQa.getActiveCameraMotion(),
     };
   });
 
@@ -170,16 +170,15 @@ const setMode = async (mode) => {
 const waitForRoute = () =>
   page.waitForFunction(
     () =>
-      window.__godsEyeView.dataManager.layers
-        .get('directions')
-        .module.getStats().count > 0,
+      window.__cameraEye.dataManager.layers.get('directions').module.getStats()
+        .count > 0,
     { timeout: 40000 },
   );
 
 const waitForMode = (word) =>
   page.waitForFunction(
     (w) =>
-      window.__godsEyeView.dataManager.layers
+      window.__cameraEye.dataManager.layers
         .get('directions')
         .module.getStats()
         .coverage?.endsWith(w),
@@ -189,7 +188,7 @@ const waitForMode = (word) =>
 
 const cameraPose = () =>
   page.evaluate(() => {
-    const c = window.__godsEyeView.viewer.camera.positionWC;
+    const c = window.__cameraEye.viewer.camera.positionWC;
     return { x: c.x, y: c.y, z: c.z };
   });
 const poseDelta = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -213,7 +212,7 @@ try {
     waitUntil: 'domcontentloaded',
     timeout: 90000,
   });
-  await page.waitForFunction(() => window.__godsEyeView?.dataManager, {
+  await page.waitForFunction(() => window.__cameraEye?.dataManager, {
     timeout: 90000,
   });
   // Two module reads the assertions need. Both are the app's OWN module
@@ -223,7 +222,7 @@ try {
       import('/src/data/inputOwnership.js'),
       import('/src/cameraVerbs.js'),
     ]);
-    window.__gevQa = {
+    window.__ceQa = {
       pointerOwner: own.pointerOwner,
       claimPointer: own.claimPointer,
       releasePointer: own.releasePointer,
@@ -341,10 +340,10 @@ try {
   // That is every ambient selection handler in the app, and it is the one that
   // used to place B and deselect whatever was under it in the same gesture.
   await page.evaluate(() => {
-    window.__gevQaLateHandler = [];
-    const canvas = window.__godsEyeView.viewer.scene.canvas;
+    window.__ceQaLateHandler = [];
+    const canvas = window.__cameraEye.viewer.scene.canvas;
     canvas.addEventListener('pointerup', () => {
-      window.__gevQaLateHandler.push(window.__gevQa.pointerOwner());
+      window.__ceQaLateHandler.push(window.__ceQa.pointerOwner());
     });
   });
 
@@ -352,7 +351,7 @@ try {
   at = await screenAt(GGPARK.lat, GGPARK.lon);
   check('Golden Gate Park is on screen', !!at, JSON.stringify(at));
   await page.mouse.click(at.x, at.y);
-  const lateOwners = await page.evaluate(() => window.__gevQaLateHandler);
+  const lateOwners = await page.evaluate(() => window.__ceQaLateHandler);
   check(
     'a handler later in the same click still sees the pointer as taken',
     lateOwners.length > 0 &&
@@ -455,7 +454,7 @@ try {
 
   // ── 5. Three rapid reroutes leave exactly one route. ─────────────────────
   await page.evaluate(() => {
-    const manager = window.__godsEyeView.dataManager;
+    const manager = window.__cameraEye.dataManager;
     manager.setLayerParams('directions', { mode: 'foot' }, { origin: 'user' });
     manager.setLayerParams('directions', { mode: 'bike' }, { origin: 'user' });
     manager.setLayerParams('directions', { mode: 'car' }, { origin: 'user' });
@@ -507,7 +506,7 @@ try {
 
   const reroute = async () => {
     await page.evaluate(() =>
-      window.__godsEyeView.dataManager.setLayerParams(
+      window.__cameraEye.dataManager.setLayerParams(
         'directions',
         { mode: 'foot' },
         { origin: 'user' },
@@ -566,7 +565,7 @@ try {
     // Back to a real route before the next case.
     stub = null;
     await page.evaluate(() =>
-      window.__godsEyeView.dataManager.setLayerParams(
+      window.__cameraEye.dataManager.setLayerParams(
         'directions',
         { mode: 'car' },
         { origin: 'user' },
@@ -646,7 +645,7 @@ try {
   // ── 8. A tool holding the pointer blocks placement, and says so. ─────────
   await page.evaluate(() => {
     // A claim answers with a lease; the release takes that lease back.
-    window.__gevQaDrawLease = window.__gevQa.claimPointer('draw');
+    window.__ceQaDrawLease = window.__ceQa.claimPointer('draw');
   });
   await clickChip('set-a');
   const blocked = await layerState();
@@ -678,7 +677,7 @@ try {
   check('and that toast is actually on screen', toast.visible);
   await shot(`05-${LABEL}-pointer-blocked-toast.jpg`);
   const released = await page.evaluate(() =>
-    window.__gevQa.releasePointer(window.__gevQaDrawLease),
+    window.__ceQa.releasePointer(window.__ceQaDrawLease),
   );
   check('and it gets the pointer back when it lets go', released);
 
@@ -696,7 +695,7 @@ try {
       // Let the shared ground-floor cells warm and the dots re-anchor.
       await sleep(9000);
       const denver = await page.evaluate(() => {
-        const viewer = window.__godsEyeView.viewer;
+        const viewer = window.__cameraEye.viewer;
         const Cartographic = viewer.camera.positionCartographic.constructor;
         const scene = viewer.scene;
         let collection = null;
@@ -743,7 +742,7 @@ try {
 
   // ── 10. Disable: nothing is left behind. ────────────────────────────────
   const { beforeDisable, directionsBeforeDisable } = await page.evaluate(() => {
-    const entities = [...window.__godsEyeView.viewer.entities.values];
+    const entities = [...window.__cameraEye.viewer.entities.values];
     return {
       beforeDisable: entities.length,
       directionsBeforeDisable: entities.filter((entity) =>
@@ -752,14 +751,14 @@ try {
     };
   });
   await page.evaluate(() =>
-    window.__godsEyeView.dataManager.setEnabled('directions', false, {
+    window.__cameraEye.dataManager.setEnabled('directions', false, {
       origin: 'user',
     }),
   );
   await sleep(1500);
   const off = await page.evaluate(() => {
-    const gev = window.__godsEyeView;
-    const viewer = gev.viewer;
+    const ce = window.__cameraEye;
+    const viewer = ce.viewer;
     const left = [...viewer.entities.values].filter((entity) =>
       String(entity.id).startsWith('directions:'),
     );
@@ -784,8 +783,8 @@ try {
       controlsHidden:
         row?.querySelector('.data-toggle-controls')?.hidden === true,
       listHidden: row?.querySelector('.data-row-list')?.hidden === true,
-      pointerOwner: window.__gevQa.pointerOwner(),
-      motion: window.__gevQa.getActiveCameraMotion(),
+      pointerOwner: window.__ceQa.pointerOwner(),
+      motion: window.__ceQa.getActiveCameraMotion(),
       totalEntities: viewer.entities.values.length,
     };
   });

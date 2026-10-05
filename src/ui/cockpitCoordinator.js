@@ -85,7 +85,7 @@ export class CockpitCoordinator {
       onEntered: () => this.enterPanels(),
       onExited: () => this.exitPanels(),
       restoreTrackingFrame: (entity) => {
-        const [layerId, ...idParts] = String(entity?.gevTrackedId || '').split(
+        const [layerId, ...idParts] = String(entity?.ceTrackedId || '').split(
           ':',
         );
         const trackedId = idParts.join(':');

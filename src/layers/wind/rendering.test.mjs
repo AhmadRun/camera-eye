@@ -1012,7 +1012,7 @@ test('scalar field becomes a raised shell on 3D Tiles and survives no-host event
     },
   };
   host = { collection: tiles, kind: 'tileset' };
-  eventTarget.dispatchEvent(new Event('gev:map-stack-changed'));
+  eventTarget.dispatchEvent(new Event('ce:map-stack-changed'));
   assert.equal(h.imagery.length, 0);
   assert.equal(h.removed[0].destroy, true);
   const [primitive] = h.primitives();
@@ -1031,7 +1031,7 @@ test('scalar field becomes a raised shell on 3D Tiles and survives no-host event
   assert.equal(diagnostics.imageryActive, true);
   assert.equal(diagnostics.shell.height, 5_000);
   host = { collection: null, kind: 'none' };
-  eventTarget.dispatchEvent(new Event('gev:map-stack-changed'));
+  eventTarget.dispatchEvent(new Event('ce:map-stack-changed'));
   assert.equal(primitive.show, false);
   assert.equal(h.rendering.getDiagnostics().imageryError, NO_IMAGERY_HOST);
   h.viewer.scene.camera.moveEnd.emit();
@@ -1052,7 +1052,7 @@ test('scalar field becomes a raised shell on 3D Tiles and survives no-host event
   h.rendering.destroy();
   assert.equal(h.imagery.length, 0);
   assert.equal(h.viewer.scene.postRender.size, 0);
-  eventTarget.dispatchEvent(new Event('gev:map-stack-changed'));
+  eventTarget.dispatchEvent(new Event('ce:map-stack-changed'));
   assert.equal(h.primitives().length, 0);
 });
 

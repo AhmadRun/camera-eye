@@ -105,7 +105,7 @@ export function createLifecycle({
         flightState._cockpitModeListener = (event) =>
           parts.tracking._applyCockpitState(event?.detail);
         window.addEventListener(
-          'gev:cockpit-mode-changed',
+          'ce:cockpit-mode-changed',
           flightState._cockpitModeListener,
         );
       }
@@ -263,7 +263,7 @@ export function createLifecycle({
       document.removeEventListener('keydown', parts.tracking._onKeyDown);
       if (flightState._cockpitModeListener) {
         window.removeEventListener(
-          'gev:cockpit-mode-changed',
+          'ce:cockpit-mode-changed',
           flightState._cockpitModeListener,
         );
         flightState._cockpitModeListener = null;

@@ -149,7 +149,7 @@ export function checkImportDirections(root) {
         report(file, `Reusable module imports standalone setup: ${to}`);
       if (source(file) && renderer(to))
         report(file, `Source imports rendering/application: ${to}`);
-      if (file === 'src/voice/gevActions.js' && to === 'src/data/manager.js')
+      if (file === 'src/voice/ceActions.js' && to === 'src/data/manager.js')
         report(
           file,
           'Actions must consume feed state without the manager facade',

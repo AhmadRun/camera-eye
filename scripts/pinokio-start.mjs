@@ -33,7 +33,7 @@ async function start() {
   // .env) when the app runs under this launcher. The marker is set here — after
   // applyPinokioEnvironment, before Vite snapshots process.env — so the
   // dev-server endpoint knows which store this launch owns.
-  process.env.GEV_LAUNCHER = 'pinokio';
+  process.env.CE_LAUNCHER = 'pinokio';
   console.log('[Pinokio] Local-only launch.');
 
   // Import Vite only after app-scoped blank fields have replaced any merged

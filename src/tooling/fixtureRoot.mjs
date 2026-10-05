@@ -13,7 +13,7 @@ import path from 'node:path';
  * the same directory and fails. Resolving the root once, here, keeps both sides
  * on the physical path.
  *
- * @param {string} prefix - Directory name prefix, e.g. `gev-preview-`.
+ * @param {string} prefix - Directory name prefix, e.g. `ce-preview-`.
  * @returns {Promise<string>} The fixture root, with no symlinked component.
  */
 export async function makeFixtureRoot(prefix) {

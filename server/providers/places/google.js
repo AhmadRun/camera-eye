@@ -14,7 +14,7 @@ import {
 let _googleRateLimiter;
 
 /**
- * Requests/min/IP applied when GEV_RATELIMIT_GOOGLE_PER_MIN is unset. This is
+ * Requests/min/IP applied when CE_RATELIMIT_GOOGLE_PER_MIN is unset. This is
  * the value the Pinokio build already ships (pinokio/_ENVIRONMENT), so the
  * packaged app keeps behaving exactly as it does today and only an
  * unconfigured server changes — from unlimited to what the product already
@@ -29,7 +29,7 @@ export const GOOGLE_DEFAULT_PER_MIN = 120;
 function googleRateLimiter() {
   if (_googleRateLimiter === undefined)
     _googleRateLimiter = makeCostRateLimiter(
-      process.env.GEV_RATELIMIT_GOOGLE_PER_MIN,
+      process.env.CE_RATELIMIT_GOOGLE_PER_MIN,
       GOOGLE_DEFAULT_PER_MIN,
     );
   return _googleRateLimiter;
@@ -97,7 +97,7 @@ export function googlePlacesContextProxy({
       }
       const { latitude, longitude } = coordinates;
 
-      // Per-IP throttle (GEV_RATELIMIT_GOOGLE_PER_MIN). On by default; 0 disables.
+      // Per-IP throttle (CE_RATELIMIT_GOOGLE_PER_MIN). On by default; 0 disables.
       // Inlined (not the shared helper) so the 429 body keeps this endpoint's
       // `places: []` contract that the client expects on every error response.
       const _grl = googleRateLimiter();
@@ -219,7 +219,7 @@ export function googlePlacesContextProxy({
       }
       const { latitude, longitude } = coordinates;
 
-      // Per-IP throttle (GEV_RATELIMIT_GOOGLE_PER_MIN). On by default; 0 disables.
+      // Per-IP throttle (CE_RATELIMIT_GOOGLE_PER_MIN). On by default; 0 disables.
       // Inlined (like nearby-places) so the 429 body keeps the `places: []`
       // contract the client expects on every error response.
       const _grl = googleRateLimiter();

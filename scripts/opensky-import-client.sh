@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ROOT_DIR="$(cd "${GEV_PROJECT_ROOT:-$SOURCE_ROOT}" && pwd)"
+ROOT_DIR="$(cd "${CE_PROJECT_ROOT:-$SOURCE_ROOT}" && pwd)"
 cd "${ROOT_DIR}"
 
 if ! command -v security >/dev/null 2>&1; then

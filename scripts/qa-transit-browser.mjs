@@ -43,7 +43,7 @@ export function boundPageEvaluations(page, defaultTimeoutMs = 30000) {
 
 export async function reportTransitVisibility(page, label) {
   const result = await page.evaluate(() => {
-    const app = window.__godsEyeView;
+    const app = window.__cameraEye;
     const layer = app.dataManager.layers.get('transit').module;
     const state = layer._transitStateForTest();
     return {
@@ -73,7 +73,7 @@ export async function restoreRetainedTransit(retained) {
       error: 'No multi-fix history observed during the probe',
       unexercised: true,
     };
-  const app = window.__godsEyeView;
+  const app = window.__cameraEye;
   await app.dataManager.setEnabled('transit', true, { source: 'qa' });
   const layer = app.dataManager.layers.get('transit').module;
   const state = layer._transitStateForTest();
@@ -116,7 +116,7 @@ export async function restoreRetainedTransit(retained) {
 
 export async function sampleTransitPixels(page, palette) {
   return page.evaluate(async (palette) => {
-    const app = window.__godsEyeView;
+    const app = window.__cameraEye;
     const state = app.dataManager.layers
       .get('transit')
       .module._transitStateForTest();
@@ -156,8 +156,8 @@ export async function sampleTransitPixels(page, palette) {
         );
       }, 5000);
       const remove =
-        window.__godsEyeView.viewer.scene.postRender.addEventListener(() => {
-          const app = window.__godsEyeView;
+        window.__cameraEye.viewer.scene.postRender.addEventListener(() => {
+          const app = window.__cameraEye;
           const layer = app.dataManager.layers.get('transit').module;
           const state = layer._transitStateForTest();
           const scene = app.viewer.scene;
@@ -640,14 +640,14 @@ export async function sampleTransitPixels(page, palette) {
           );
           resolve(out);
         });
-      window.__godsEyeView.viewer.scene.requestRender();
+      window.__cameraEye.viewer.scene.requestRender();
     });
   }, palette);
 }
 
 /** A fleet-to-fleet comparison must not inherit the city's selected marker. */
 export function readTransitFleetStyle({ key, resetSelection = false } = {}) {
-  const layer = window.__godsEyeView.dataManager.layers.get('transit').module;
+  const layer = window.__cameraEye.dataManager.layers.get('transit').module;
   const state = layer._transitStateForTest();
   if (resetSelection) layer._transitPartsForTest().selection.clearSelection();
   const entry = key

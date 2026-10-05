@@ -99,9 +99,9 @@ if (TERRAIN_DELAY_MS > 0) {
 /** Install a postRender sampler: one row per RENDERED frame. */
 async function installSampler() {
   await page.evaluate(() => {
-    const viewer = window.__godsEyeView.viewer;
-    window.__gevFlyTrace = { rows: [], marks: [] };
-    if (window.__gevFlyTraceRemove) window.__gevFlyTraceRemove();
+    const viewer = window.__cameraEye.viewer;
+    window.__ceFlyTrace = { rows: [], marks: [] };
+    if (window.__ceFlyTraceRemove) window.__ceFlyTraceRemove();
     let frame = 0;
     const listener = () => {
       const cam = viewer.camera;
@@ -117,7 +117,7 @@ async function installSampler() {
           if (Number.isFinite(probe)) surfaceM = probe;
         } catch { /* tiles not loaded under the camera */ }
       }
-      window.__gevFlyTrace.rows.push({
+      window.__ceFlyTrace.rows.push({
         t: performance.now(),
         lon: (carto.longitude * 180) / Math.PI,
         lat: (carto.latitude * 180) / Math.PI,
@@ -129,14 +129,14 @@ async function installSampler() {
       });
     };
     viewer.scene.postRender.addEventListener(listener);
-    window.__gevFlyTraceRemove = () => viewer.scene.postRender.removeEventListener(listener);
+    window.__ceFlyTraceRemove = () => viewer.scene.postRender.removeEventListener(listener);
   });
 }
 
 async function readTrace() {
   return page.evaluate(() => ({
-    rows: window.__gevFlyTrace.rows.slice(),
-    marks: window.__gevFlyTrace.marks.slice(),
+    rows: window.__ceFlyTrace.rows.slice(),
+    marks: window.__ceFlyTrace.marks.slice(),
   }));
 }
 
@@ -153,11 +153,11 @@ try {
   console.log(`\nfly_route cinematic evidence — ${APP_URL}`);
   await page.goto(APP_URL, { waitUntil: 'domcontentloaded', timeout: 90000 });
   await page.waitForFunction(
-    () => window.__godsEyeView?.viewer && window.__gevVoiceCommands?.runner && window.__gevAnnotations,
+    () => window.__cameraEye?.viewer && window.__ceVoiceCommands?.runner && window.__ceAnnotations,
     { timeout: 150000, polling: 250 },
   );
   const run = (name, args = {}) => page.evaluate(
-    (n, a) => window.__gevVoiceCommands.runner(n, a), name, args,
+    (n, a) => window.__ceVoiceCommands.runner(n, a), name, args,
   );
 
   // ── Setup: get over downtown Austin, draw the route ───────────────────
@@ -172,7 +172,7 @@ try {
   });
   await sleep(6000);
   const routeInfo = await page.evaluate(() => {
-    const route = (window.__gevAnnotations.list?.() || []).filter((a) => a.type === 'route').at(-1);
+    const route = (window.__ceAnnotations.list?.() || []).filter((a) => a.type === 'route').at(-1);
     return route ? { label: route.label, waypoints: route.path?.length ?? 0 } : null;
   });
   report(Boolean(routeInfo?.waypoints >= 2), 'route drawn on the board',
@@ -182,7 +182,7 @@ try {
   // ── Run 1: the full cinematic flight ──────────────────────────────────
   await installSampler();
   const flight = await run('fly_route', { label: 'cinema evidence', speed: 'normal' });
-  await page.evaluate(() => window.__gevFlyTrace.marks.push({ label: 'flight-start', t: performance.now() }));
+  await page.evaluate(() => window.__ceFlyTrace.marks.push({ label: 'flight-start', t: performance.now() }));
   report(flight?.ok === true, 'fly_route accepted',
     `distanceM=${flight?.distanceM} durationS=${flight?.durationS} waypoints=${flight?.waypoints}`);
   if (!flight?.ok) throw new Error(`fly_route refused: ${flight?.error}`);
@@ -202,7 +202,7 @@ try {
   // dev server hands a dynamic import its own module instance after any HMR
   // update, whose motion slot is empty no matter what the app is doing.
   const stillForMs = () => page.evaluate(() => {
-    const rows = window.__gevFlyTrace.rows;
+    const rows = window.__ceFlyTrace.rows;
     if (rows.length < 3) return 0;
     const last = rows.at(-1);
     for (let i = rows.length - 2; i >= 0; i -= 1) {
@@ -227,7 +227,7 @@ try {
     if (Date.now() - startedAt > 5000 && (await stillForMs()) > 1500) break;
   }
   const trace = await readTrace();
-  await page.evaluate(() => window.__gevFlyTraceRemove?.());
+  await page.evaluate(() => window.__ceFlyTraceRemove?.());
   report(shots.length >= 6, 'screenshot sequence captured', `${shots.length} frames @ ${SHOT_EVERY_MS}ms`);
 
   // ── Measure the REAL camera ───────────────────────────────────────────
@@ -426,7 +426,7 @@ try {
   const second = await run('fly_route', { label: 'cinema evidence', speed: 'normal' });
   report(second?.ok === true, 'second flight starts for the interrupt case');
   const liveRollDeg = () => page.evaluate(
-    () => (window.__godsEyeView.viewer.camera.roll * 180) / Math.PI,
+    () => (window.__cameraEye.viewer.camera.roll * 180) / Math.PI,
   );
   let rollBeforeCut = 0;
   for (let waited = 0; waited < 90000; waited += 400) {
@@ -439,7 +439,7 @@ try {
   await page.screenshot({ path: path.join(OUT_DIR, 'interrupt-0-banked.png') });
 
   const cut = await page.evaluate(async () => {
-    const viewer = window.__godsEyeView.viewer;
+    const viewer = window.__cameraEye.viewer;
     const canvas = viewer.scene.canvas;
     // Read the motion slot BEFORE the cut too: under Vite a dynamic import can
     // hand back a second module instance whose slot is always empty, and an
@@ -453,7 +453,7 @@ try {
       slotBefore = read();
     } catch { /* dev-only module read */ }
     const rollBefore = (viewer.camera.roll * 180) / Math.PI;
-    window.__gevFlyTrace.marks.push({ label: 'pointerdown', t: performance.now() });
+    window.__ceFlyTrace.marks.push({ label: 'pointerdown', t: performance.now() });
     canvas.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
     // Same synchronous turn as the pointerdown — no frame has rendered yet.
     const rollAfter = (viewer.camera.roll * 180) / Math.PI;
@@ -480,7 +480,7 @@ try {
     `roll ${rollAfterSettle.toFixed(4)}° 2.5 s later`);
   await page.screenshot({ path: path.join(OUT_DIR, 'interrupt-1-level.png') });
   const cutTrace = await readTrace();
-  await page.evaluate(() => window.__gevFlyTraceRemove?.());
+  await page.evaluate(() => window.__ceFlyTraceRemove?.());
 
   const cutAt = cutTrace.marks.at(-1)?.t ?? 0;
   const before = cutTrace.rows.filter((r) => r.t < cutAt);

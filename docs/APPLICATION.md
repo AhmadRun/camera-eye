@@ -1,6 +1,6 @@
 # Application construction
 
-`gods-eye-view/application` exports `createApplication`. Importing it does not
+`camera-eye/application` exports `createApplication`. Importing it does not
 create a viewer, discover configuration, start requests, or attach browser
 listeners. Construction is also inactive until the caller invokes `start()`.
 
@@ -20,8 +20,8 @@ interpret provider names, environment variables, endpoints, or module paths.
 There is no module discovery or automatic import mechanism.
 
 ```js
-import { createApplication } from 'gods-eye-view/application';
-import { createApplicationViewer } from 'gods-eye-view/application/viewer';
+import { createApplication } from 'camera-eye/application';
+import { createApplicationViewer } from 'camera-eye/application/viewer';
 
 const app = createApplication({
   createScene({ defer }) {
@@ -86,7 +86,7 @@ standalone share-restoration result keep their existing separate contracts.
 `src/main.js` reads the existing browser configuration and starts
 `src/standalone/application.js`. That module selects the four implementations
 in its directory. Scene setup, controls, layer registration, tools and loading
-chrome have separate owners. The existing `window.__godsEyeView` debugging shape
+chrome have separate owners. The existing `window.__cameraEye` debugging shape
 is preserved while the app is running.
 
 The standalone controls and layer modules still contain page-scoped state.

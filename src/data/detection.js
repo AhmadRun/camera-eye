@@ -287,10 +287,7 @@ let _cockpitModeListener = null;
  */
 export function initDetection(viewer, layers, onModeChange) {
   if (_cockpitModeListener && typeof window !== 'undefined') {
-    window.removeEventListener(
-      'gev:cockpit-mode-changed',
-      _cockpitModeListener,
-    );
+    window.removeEventListener('ce:cockpit-mode-changed', _cockpitModeListener);
   }
   _hostLane?.unregister?.();
   _calloutLane?.unregister?.();
@@ -323,7 +320,7 @@ export function initDetection(viewer, layers, onModeChange) {
     _hostLane?.requestPaint();
   };
   if (typeof window !== 'undefined') {
-    window.addEventListener('gev:cockpit-mode-changed', _cockpitModeListener);
+    window.addEventListener('ce:cockpit-mode-changed', _cockpitModeListener);
   }
 
   setDetectionStyle('normal');
@@ -335,10 +332,7 @@ export function initDetection(viewer, layers, onModeChange) {
 export function destroyDetection() {
   _clearCyberSonarRenderTimer();
   if (_cockpitModeListener && typeof window !== 'undefined') {
-    window.removeEventListener(
-      'gev:cockpit-mode-changed',
-      _cockpitModeListener,
-    );
+    window.removeEventListener('ce:cockpit-mode-changed', _cockpitModeListener);
   }
   _cockpitModeListener = null;
   _cockpitActive = false;

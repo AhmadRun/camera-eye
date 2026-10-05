@@ -1,6 +1,6 @@
 /**
  * Scanner design inspired by kk376's tactical naval sonar visual style:
- * https://github.com/bilawalsidhu/gods-eye-view/pull/214
+ * https://github.com/AhmadRun/camera-eye/pull/214
  *
  * This is a separate HUD/contact treatment, not a port of that PR's shader.
  */
