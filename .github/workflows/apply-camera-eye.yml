@@ -1,0 +1,22 @@
+name: Apply Camera Eye rename
+on:
+  push:
+    branches: [main]
+    paths: [camera-eye-rename.patch]
+permissions:
+  contents: write
+jobs:
+  rename:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Apply verified rename and remove migration files
+        shell: bash
+        run: |
+          git apply --check camera-eye-rename.patch
+          git apply --index camera-eye-rename.patch
+          git rm camera-eye-rename.patch .github/workflows/apply-camera-eye.yml
+          git config user.name 'AhmadRun'
+          git config user.email '150353978+AhmadRun@users.noreply.github.com'
+          git commit -m 'Rename application and project to Camera Eye'
+          git push origin HEAD:main
