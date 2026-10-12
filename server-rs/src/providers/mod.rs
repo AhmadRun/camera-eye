@@ -7,9 +7,14 @@ pub mod fire_perimeters;
 pub mod firms;
 pub mod gbfs;
 pub mod hazard_support;
+pub mod mapdata_support;
+pub mod military_installations;
+pub mod overpass;
+pub mod regional;
 pub mod space;
 pub mod terrain;
 pub mod traffic;
+pub mod transit;
 pub mod weather;
 pub mod wind;
 
@@ -25,7 +30,11 @@ pub fn router(state: &AppState) -> Router<AppState> {
         .merge(traffic::router(state))
         .merge(firms::router(state))
         .merge(terrain::router(state))
+        .merge(overpass::router(state))
+        .merge(military_installations::router(state))
+        .merge(regional::router(state))
         .merge(gbfs::router(state))
+        .merge(transit::router(state))
         .merge(wind::router(state))
         .merge(weather::router(state))
         .merge(cyclones::router(state))
