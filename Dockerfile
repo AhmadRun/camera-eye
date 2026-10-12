@@ -7,7 +7,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=true
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
-RUN npm run build
+RUN npm run build && node scripts/export-voice-tools.mjs
 
 FROM rust:1-bookworm AS server
 WORKDIR /app/server-rs
@@ -28,6 +28,7 @@ WORKDIR /app
 COPY --from=web /app/public ./public
 COPY --from=web /app/src ./src
 COPY --from=web /app/dist ./dist
+COPY --from=web /app/server-rs/generated ./server-rs/generated
 COPY --from=server /app/server-rs/target/release/camera-eye-server /usr/local/bin/camera-eye-server
 ENV HOST=0.0.0.0 PORT=4173 CE_ROOT=/app
 EXPOSE 4173
