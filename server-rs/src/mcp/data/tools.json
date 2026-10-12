@@ -1,0 +1,4571 @@
+{
+  "version": "0.2.1",
+  "tools": [
+    {
+      "name": "get_earthquakes",
+      "kind": "query",
+      "title": "Recent earthquakes",
+      "description": "Earthquakes of magnitude 2.5 or more from the USGS feed for the last 24 hours, strongest first. Optionally limited to an area and a minimum magnitude.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "min_magnitude": {
+            "type": "number",
+            "minimum": 2.5,
+            "maximum": 10
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "earthquakes"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_active_fires",
+      "kind": "query",
+      "title": "Active fires",
+      "description": "Satellite fire detections from NASA FIRMS in the last 24 hours within an area, most intense (fire radiative power) first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "fires"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_recent_launches",
+      "kind": "query",
+      "title": "Recent launches",
+      "description": "Orbital launches from Launch Library 2 over the last 30 days, newest first, with provider, rocket, pad, mission and outcome.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "launches"
+      ],
+      "ui": null
+    },
+    {
+      "name": "aircraft_in_area",
+      "kind": "query",
+      "title": "Aircraft in an area",
+      "description": "Aircraft currently reported inside an area, nearest the center first. Optionally military aircraft only, airborne only, or within an altitude band.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "military": {
+            "type": "boolean",
+            "description": "Use the military aircraft feed instead of the general feed."
+          },
+          "airborne_only": {
+            "type": "boolean"
+          },
+          "min_altitude_m": {
+            "type": "number",
+            "minimum": -500,
+            "maximum": 30000
+          },
+          "max_altitude_m": {
+            "type": "number",
+            "minimum": -500,
+            "maximum": 30000
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "aircraft"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_aircraft",
+      "kind": "query",
+      "title": "Find an aircraft",
+      "description": "Find aircraft currently reported anywhere by callsign, ICAO 24-bit address or registration. Registrations are known only for aircraft in the military feed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "callsign": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]{2,8}$",
+            "description": "Flight callsign, such as \"UAL123\"."
+          },
+          "icao24": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{6}$",
+            "description": "ICAO 24-bit address as six hex characters, such as \"a1b2c3\"."
+          },
+          "registration": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 12
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "aircraft"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_aircraft_track",
+      "kind": "query",
+      "title": "Aircraft track",
+      "description": "Recent positions of one aircraft by ICAO 24-bit address, oldest first. Long tracks are evenly thinned to at most 200 points.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "icao24": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{6}$",
+            "description": "ICAO 24-bit address as six hex characters, such as \"a1b2c3\"."
+          },
+          "military": {
+            "type": "boolean",
+            "description": "Use the military aircraft feed instead of the general feed."
+          }
+        },
+        "required": [
+          "icao24"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "aircraft"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_aircraft_info",
+      "kind": "query",
+      "title": "Aircraft type and route",
+      "description": "Look up an aircraft type and registration by ICAO 24-bit address, and a flight route by callsign, from adsbdb. Give either or both.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "icao24": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{6}$",
+            "description": "ICAO 24-bit address as six hex characters, such as \"a1b2c3\"."
+          },
+          "callsign": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]{2,8}$",
+            "description": "Flight callsign, such as \"UAL123\"."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "aircraft"
+      ],
+      "ui": null
+    },
+    {
+      "name": "vessels_in_area",
+      "kind": "query",
+      "title": "Vessels in an area",
+      "description": "Ships currently reported by AIS inside an area, nearest the center first, optionally filtered by vessel type.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40,
+            "description": "Vessel type to match, such as \"tanker\" or \"cargo\"."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "vessels"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_vessel",
+      "kind": "query",
+      "title": "Find a vessel",
+      "description": "Find ships currently reported anywhere by MMSI, IMO number or name. Names match when they contain the given text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mmsi": {
+            "type": "string",
+            "pattern": "^\\d{5,10}$",
+            "description": "Maritime Mobile Service Identity, such as \"366999712\"."
+          },
+          "imo": {
+            "type": "string",
+            "pattern": "^\\d{7}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 60
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "vessels"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_vessel_track",
+      "kind": "query",
+      "title": "Vessel track",
+      "description": "Recent positions of one ship by MMSI, oldest first. Long tracks are evenly thinned to at most 200 points.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mmsi": {
+            "type": "string",
+            "pattern": "^\\d{5,10}$",
+            "description": "Maritime Mobile Service Identity, such as \"366999712\"."
+          }
+        },
+        "required": [
+          "mmsi"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "vessels"
+      ],
+      "ui": null
+    },
+    {
+      "name": "next_satellite_pass",
+      "kind": "query",
+      "title": "Next satellite pass",
+      "description": "When a satellite next rises over an observer, with rise, peak and set times, peak elevation, rise direction and naked-eye visibility. Defaults to the International Space Station.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "satellite": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "description": "Satellite name or NORAD catalog number (default the ISS)."
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "stations",
+              "visual",
+              "gps-ops",
+              "glo-ops",
+              "galileo",
+              "geo",
+              "starlink"
+            ],
+            "description": "CelesTrak group to search (default \"stations\")."
+          },
+          "min_elevation_deg": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 80
+          },
+          "visible_only": {
+            "type": "boolean",
+            "description": "Only passes visible to the naked eye."
+          },
+          "hours": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 72
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "satellites"
+      ],
+      "ui": null
+    },
+    {
+      "name": "satellites_overhead",
+      "kind": "query",
+      "title": "Satellites overhead",
+      "description": "Satellites in a group that are above an observer right now, highest first, with elevation and direction.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "stations",
+              "visual",
+              "gps-ops",
+              "glo-ops",
+              "galileo",
+              "geo",
+              "starlink"
+            ],
+            "description": "CelesTrak group to search (default \"stations\")."
+          },
+          "min_elevation_deg": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 90
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "satellites"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_cctv_cameras",
+      "kind": "query",
+      "title": "Public cameras in an area",
+      "description": "Public traffic and city cameras in an area, nearest the center first. Use get_cctv_snapshot with a camera id to see its current view.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "cctv"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_cctv_snapshot",
+      "kind": "query",
+      "title": "Current camera view",
+      "description": "The current image from one public camera, by the id from find_cctv_cameras.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "camera_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "camera_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "cctv"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_alpr_cameras",
+      "kind": "query",
+      "title": "License plate reader cameras",
+      "description": "Automated license plate reader (ALPR) cameras mapped in OpenStreetMap in a US or Canadian area of at most 3° per side, nearest the center first, with operator, manufacturer and facing direction.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "alpr"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_radio_stations",
+      "kind": "query",
+      "title": "Radio stations",
+      "description": "Internet radio stations from a directory of popular Radio Browser stations, not every station, by area and/or a search term matched against name, tags, language and country. Each result includes the broadcaster's public stream URL.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "description": "Words such as \"jazz\", \"news\" or \"Tokyo\"."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "radio"
+      ],
+      "ui": null
+    },
+    {
+      "name": "search_places",
+      "kind": "query",
+      "title": "Search places",
+      "description": "Find businesses, landmarks and other points of interest matching a query within an area, using Google Places.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "query",
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "placeSearch"
+      ],
+      "ui": null
+    },
+    {
+      "name": "places_nearby",
+      "kind": "query",
+      "title": "Places nearby",
+      "description": "Notable places around a point within a radius, most notable first, using Google Places.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "radius_m": {
+            "type": "number",
+            "minimum": 10,
+            "maximum": 5000
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "placeSearch"
+      ],
+      "ui": null
+    },
+    {
+      "name": "plan_route",
+      "kind": "query",
+      "title": "Plan a route",
+      "description": "Walking, driving or cycling route between two locations over OpenStreetMap, with distance, duration and a simplified path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "to": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "walk",
+              "drive",
+              "bike"
+            ]
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "routing"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_bike_share",
+      "kind": "query",
+      "title": "Bike-share stations",
+      "description": "Live bike-share stations in an area from public GBFS feeds, nearest the center first, with bikes and docks available.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "bikeshare"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_transit_vehicles",
+      "kind": "query",
+      "title": "Transit vehicles",
+      "description": "Live positions of buses, trains and other transit vehicles in an area from public GTFS-Realtime feeds, optionally for one route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "route": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Route id or vehicle label to match, such as \"1\" or \"Red\"."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "transit"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_traffic_flow",
+      "kind": "query",
+      "title": "Traffic flow",
+      "description": "Live road traffic in a city-sized area from TomTom: average speed as a share of free-flow speed, congested and closed road length, and a breakdown by road category.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "traffic"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_weather",
+      "kind": "query",
+      "title": "Current weather",
+      "description": "Current weather at a location: conditions, temperature, feels-like, precipitation, cloud cover, wind and visibility.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "weather"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_weather_map",
+      "kind": "query",
+      "title": "Weather map",
+      "description": "The latest NOAA weather map image over an area: precipitation radar (contiguous US), regional or global infrared satellite clouds, or lightning density (the Americas). Returns the image itself.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "map": {
+            "type": "string",
+            "enum": [
+              "radar",
+              "satellite",
+              "global_satellite",
+              "lightning"
+            ]
+          },
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "map"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "weatherMaps"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_wind",
+      "kind": "query",
+      "title": "Wind",
+      "description": "Forecast wind 10 m above ground at a location from the GFS or IFS global model: speed and the direction it blows from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "gfs",
+              "ifs"
+            ]
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "wind"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_recent_imagery",
+      "kind": "query",
+      "title": "Recent satellite image",
+      "description": "The most recent clear satellite image of an area from NASA Harmonized Landsat and Sentinel-2 (30 m), falling back to the VIIRS daily overview. Areas up to 1000 km across. Returns the image itself.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "imagery"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_submarine_cables",
+      "kind": "query",
+      "title": "Submarine cables",
+      "description": "Undersea telecommunication cables and landing points from the TeleGeography map: those passing through or landing in an area, and/or those whose name matches.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "cables"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_infrastructure",
+      "kind": "query",
+      "title": "Datacenters and dams",
+      "description": "Datacenters (with operator and capacity) or dams (with river and power output) mapped in OpenStreetMap within an area, nearest the center first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "datacenters",
+              "dams"
+            ]
+          },
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "kind",
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "infrastructure"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_bhote_koshi_flood",
+      "kind": "query",
+      "title": "Bhote Koshi flood",
+      "description": "The 26 August 2026 Bhote Koshi outburst flood in Nepal as Camera Eye maps it: the evidence trail of geolocated public witness posts from the collapse to Devighat in story order, the mapped flood path, and the before and after satellite imagery. A visualization, not an official hazard model; capture times are unverified.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40,
+            "description": "Only evidence in a phase, such as \"downstream passage\"."
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "events"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_regional_brief",
+      "kind": "query",
+      "title": "Regional brief",
+      "description": "What and where a location is, its current weather, and recent news headlines for the region.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "regional"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_cyclones",
+      "kind": "query",
+      "title": "Tropical cyclones",
+      "description": "Active tropical cyclones from the NOAA National Hurricane Center and Central Pacific Hurricane Center, optionally limited to an area.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "cyclones"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_fire_perimeters",
+      "kind": "query",
+      "title": "Wildfire perimeters",
+      "description": "Mapped wildfire perimeters from the US WFIGS service in an area, largest first, with size, containment, cause and personnel.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "perimeters"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_terrain_height",
+      "kind": "query",
+      "title": "Terrain height",
+      "description": "Ground elevation above sea level at up to 20 points, with the geoid and ellipsoid heights.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "properties": {
+                "lat": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "lon": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                }
+              },
+              "required": [
+                "lat",
+                "lon"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "points"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "terrain"
+      ],
+      "ui": null
+    },
+    {
+      "name": "find_military_installations",
+      "kind": "query",
+      "title": "Military installations",
+      "description": "Military installations mapped in OpenStreetMap within an area of at most 10° on each side, nearest the center first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "installations"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_map_features",
+      "kind": "query",
+      "title": "Map features",
+      "description": "Named OpenStreetMap features at a location: the administrative areas containing it, named parks, land uses and water nearby, or monuments and memorials within 2.5 km.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "administrative_areas",
+              "named_places",
+              "monuments"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Most rows to return (default 25, at most 200)."
+          }
+        },
+        "required": [
+          "location",
+          "kind"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "features"
+      ],
+      "ui": null
+    },
+    {
+      "name": "situation_brief",
+      "kind": "query",
+      "title": "Situation brief",
+      "description": "One overview of an area: current weather, recent earthquakes, active fires, aircraft overhead, ships and tropical cyclones, each summarized with its top items. Sections that are unavailable are marked as such.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "weather"
+      ],
+      "ui": null
+    },
+    {
+      "name": "military_awareness",
+      "kind": "query",
+      "title": "Military awareness",
+      "description": "Military contacts around a location, as the military awareness panel shows them: military aircraft, other aircraft, ships and mapped military installations within 250 km by default, each nearest first. Sections that are unavailable are marked as such.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "object",
+            "description": "A place name, or lat and lon.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              }
+            },
+            "additionalProperties": false
+          },
+          "radius_km": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 250
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "military"
+      ],
+      "ui": null
+    },
+    {
+      "name": "get_hud_caption",
+      "kind": "query",
+      "title": "Heads-up display caption",
+      "description": "The short heads-up display caption Camera Eye would show for an area, written by the app from the same overview situation_brief gives.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "area"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "weather",
+        "summary"
+      ],
+      "ui": null
+    },
+    {
+      "name": "show_in_camera_eye",
+      "kind": "query",
+      "title": "Show in Camera Eye",
+      "description": "Shows a view in Camera Eye: in clients that display apps, the live Camera Eye globe in the conversation; everywhere, a link that opens it. Pass the view another answer returned, or describe one: an area framed from above or a camera position, with chosen data layers, visual style and map, optionally following an aircraft (or riding in its cockpit view) or a satellite, and with marks drawn on the map.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "object",
+            "description": "A view another answer returned (its data.view), shown as it is; other arguments given with it change that part of it."
+          },
+          "area": {
+            "type": "object",
+            "description": "Where to look. Give exactly one of: place (a name such as \"Taiwan\" or \"San Francisco Bay\"), bbox ([west, south, east, north] in degrees), or lat and lon with radius_km.",
+            "properties": {
+              "place": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "bbox": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "radius_km": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2000
+              }
+            },
+            "additionalProperties": false
+          },
+          "camera": {
+            "type": "object",
+            "description": "Camera position: lat and lon it is above, altitude in meters, heading (0 is north) and pitch (-90 looks straight down, 0 at the horizon).",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "altitude_m": {
+                "type": "number",
+                "minimum": 50,
+                "maximum": 20000000
+              },
+              "heading_deg": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 360
+              },
+              "pitch_deg": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "layers": {
+            "type": "array",
+            "maxItems": 28,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ais-live-vessels",
+                "alpr-cameras",
+                "bhote-koshi-2026",
+                "bhote-koshi-locator",
+                "bikeshare",
+                "cctv",
+                "directions",
+                "earthquakes",
+                "fire-perimeters",
+                "flights",
+                "local-dams",
+                "local-datacenters",
+                "local-firms",
+                "military",
+                "military-awareness",
+                "military-installations",
+                "radio",
+                "recent-imagery",
+                "rocket-launches",
+                "satellites",
+                "telegeography-submarine-cables",
+                "traffic",
+                "transit",
+                "weather-cyclones",
+                "weather-lightning",
+                "weather-radar",
+                "weather-satellite",
+                "wind"
+              ]
+            },
+            "description": "Data layers to turn on, such as \"flights\" or \"earthquakes\"."
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "retro",
+              "surveillance",
+              "thermal",
+              "anime",
+              "noir",
+              "snow"
+            ],
+            "description": "Visual style: retro is CRT, surveillance is night vision, thermal is FLIR."
+          },
+          "map": {
+            "type": "string",
+            "enum": [
+              "photoreal",
+              "bing-aerial",
+              "bing-labels",
+              "esri-imagery",
+              "osm"
+            ],
+            "description": "Map imagery; photoreal is Google 3D tiles."
+          },
+          "annotations": {
+            "type": "array",
+            "maxItems": 24,
+            "description": "Marks drawn on the globe: a pin, highlight, area or label at a place name (target) or lat/lon, an arrow between two points, or a route through points.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "pin",
+                    "highlight",
+                    "area",
+                    "arrow",
+                    "route",
+                    "label"
+                  ]
+                },
+                "target": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "toLatitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "toLongitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "points": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 12,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "latitude": {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                      },
+                      "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                      }
+                    },
+                    "required": [
+                      "latitude",
+                      "longitude"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "color": {
+                  "type": "string",
+                  "enum": [
+                    "primary",
+                    "amber",
+                    "cyan",
+                    "green",
+                    "red"
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "follow": {
+            "type": "object",
+            "description": "An entity the camera follows: an aircraft or military aircraft by ICAO 24-bit address, or a satellite by NORAD catalog number. Its layer is turned on.",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "aircraft",
+                  "military_aircraft",
+                  "satellite"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-Za-z~_-]{1,16}$"
+              },
+              "cockpit": {
+                "type": "boolean",
+                "description": "Show the aircraft's cockpit view instead of following it from outside. Aircraft only; links open the app following it."
+              }
+            },
+            "required": [
+              "kind",
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "app"
+      ],
+      "ui": {
+        "resourceUri": "ui://camera-eye/globe"
+      }
+    },
+    {
+      "name": "panel_request",
+      "kind": "query",
+      "title": "Camera Eye panel request",
+      "description": "Loads a file or data for the Camera Eye panel from the app's server. Only the panel calls this; it does not answer questions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The panel's key, from its own page."
+          },
+          "path": {
+            "type": "string",
+            "description": "A path on the app's server, starting with /."
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "HEAD",
+              "POST"
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "description": "Request headers; only Accept and Content-Type are sent."
+          },
+          "body": {
+            "type": "string",
+            "description": "The request body, base64."
+          },
+          "id": {
+            "type": "string",
+            "description": "Continue a response an earlier call returned in parts."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "requires": [
+        "app"
+      ],
+      "ui": {
+        "visibility": [
+          "app"
+        ]
+      }
+    }
+  ],
+  "surfaces": {
+    "show_in_camera_eye": {
+      "voice": false
+    },
+    "panel_request": {
+      "voice": false
+    },
+    "next_satellite_pass": {
+      "voice": false
+    },
+    "get_weather_map": {
+      "voice": false
+    },
+    "get_recent_imagery": {
+      "voice": false
+    },
+    "get_cctv_snapshot": {
+      "voice": false
+    },
+    "get_hud_caption": {
+      "voice": false,
+      "mcp": false
+    },
+    "aircraft_in_area": {
+      "voice": false
+    },
+    "vessels_in_area": {
+      "voice": false
+    },
+    "find_aircraft": {
+      "voice": false
+    },
+    "find_vessel": {
+      "voice": false
+    },
+    "get_earthquakes": {
+      "voice": false
+    },
+    "get_active_fires": {
+      "voice": false
+    },
+    "find_infrastructure": {
+      "voice": false
+    },
+    "satellites_overhead": {
+      "voice": false
+    },
+    "search_places": {
+      "mcp": false
+    },
+    "places_nearby": {
+      "mcp": false
+    },
+    "plan_route": {
+      "mcp": false
+    },
+    "get_weather": {
+      "mcp": false
+    },
+    "get_wind": {
+      "mcp": false
+    },
+    "get_regional_brief": {
+      "mcp": false
+    },
+    "find_radio_stations": {
+      "mcp": false
+    },
+    "get_bike_share": {
+      "mcp": false
+    },
+    "get_transit_vehicles": {
+      "mcp": false
+    }
+  },
+  "layerRegistry": [
+    {
+      "id": "ais-live-vessels",
+      "token": "a"
+    },
+    {
+      "id": "alpr-cameras",
+      "token": "p"
+    },
+    {
+      "id": "bhote-koshi-2026",
+      "token": "h"
+    },
+    {
+      "id": "bhote-koshi-locator",
+      "token": "z"
+    },
+    {
+      "id": "bikeshare",
+      "token": "b"
+    },
+    {
+      "id": "cctv",
+      "token": "c"
+    },
+    {
+      "id": "directions",
+      "token": "n"
+    },
+    {
+      "id": "earthquakes",
+      "token": "e"
+    },
+    {
+      "id": "fire-perimeters",
+      "token": "2"
+    },
+    {
+      "id": "flights",
+      "token": "f"
+    },
+    {
+      "id": "local-dams",
+      "token": "q"
+    },
+    {
+      "id": "local-datacenters",
+      "token": "d"
+    },
+    {
+      "id": "local-firms",
+      "token": "w"
+    },
+    {
+      "id": "military",
+      "token": "m"
+    },
+    {
+      "id": "military-awareness",
+      "token": "g"
+    },
+    {
+      "id": "military-installations",
+      "token": "i"
+    },
+    {
+      "id": "radio",
+      "token": "r"
+    },
+    {
+      "id": "recent-imagery",
+      "token": "1"
+    },
+    {
+      "id": "rocket-launches",
+      "token": "x"
+    },
+    {
+      "id": "satellites",
+      "token": "s"
+    },
+    {
+      "id": "telegeography-submarine-cables",
+      "token": "u"
+    },
+    {
+      "id": "traffic",
+      "token": "t"
+    },
+    {
+      "id": "transit",
+      "token": "j"
+    },
+    {
+      "id": "weather-cyclones",
+      "token": "y"
+    },
+    {
+      "id": "weather-lightning",
+      "token": "l"
+    },
+    {
+      "id": "weather-radar",
+      "token": "v"
+    },
+    {
+      "id": "weather-satellite",
+      "token": "o"
+    },
+    {
+      "id": "wind",
+      "token": "k"
+    }
+  ],
+  "bhoteKoshiFloodPath": [
+    [
+      85.48476,
+      28.33255
+    ],
+    [
+      85.48353,
+      28.33308
+    ],
+    [
+      85.48231,
+      28.33279
+    ],
+    [
+      85.48108,
+      28.33278
+    ],
+    [
+      85.47985,
+      28.33304
+    ],
+    [
+      85.47863,
+      28.33275
+    ],
+    [
+      85.47741,
+      28.33301
+    ],
+    [
+      85.47618,
+      28.33299
+    ],
+    [
+      85.47496,
+      28.33325
+    ],
+    [
+      85.47373,
+      28.33351
+    ],
+    [
+      85.4725,
+      28.33377
+    ],
+    [
+      85.47128,
+      28.33375
+    ],
+    [
+      85.47005,
+      28.33401
+    ],
+    [
+      85.46881,
+      28.33481
+    ],
+    [
+      85.46759,
+      28.33506
+    ],
+    [
+      85.46636,
+      28.33532
+    ],
+    [
+      85.46513,
+      28.33585
+    ],
+    [
+      85.4639,
+      28.33584
+    ],
+    [
+      85.46267,
+      28.33609
+    ],
+    [
+      85.46145,
+      28.33635
+    ],
+    [
+      85.46022,
+      28.33661
+    ],
+    [
+      85.45899,
+      28.33659
+    ],
+    [
+      85.45777,
+      28.33685
+    ],
+    [
+      85.45655,
+      28.33629
+    ],
+    [
+      85.45533,
+      28.33628
+    ],
+    [
+      85.45411,
+      28.336
+    ],
+    [
+      85.45289,
+      28.33544
+    ],
+    [
+      85.45167,
+      28.33543
+    ],
+    [
+      85.45045,
+      28.33514
+    ],
+    [
+      85.44922,
+      28.33513
+    ],
+    [
+      85.448,
+      28.33511
+    ],
+    [
+      85.44677,
+      28.33537
+    ],
+    [
+      85.44554,
+      28.33563
+    ],
+    [
+      85.44432,
+      28.33534
+    ],
+    [
+      85.4431,
+      28.33533
+    ],
+    [
+      85.44188,
+      28.33504
+    ],
+    [
+      85.44065,
+      28.3353
+    ],
+    [
+      85.43943,
+      28.33529
+    ],
+    [
+      85.43821,
+      28.335
+    ],
+    [
+      85.43699,
+      28.33472
+    ],
+    [
+      85.43577,
+      28.33416
+    ],
+    [
+      85.43456,
+      28.33334
+    ],
+    [
+      85.43335,
+      28.33251
+    ],
+    [
+      85.43214,
+      28.33141
+    ],
+    [
+      85.43093,
+      28.33059
+    ],
+    [
+      85.42971,
+      28.33057
+    ],
+    [
+      85.42848,
+      28.33056
+    ],
+    [
+      85.42726,
+      28.33027
+    ],
+    [
+      85.42604,
+      28.33026
+    ],
+    [
+      85.42482,
+      28.33025
+    ],
+    [
+      85.4236,
+      28.32996
+    ],
+    [
+      85.42238,
+      28.32968
+    ],
+    [
+      85.42116,
+      28.32939
+    ],
+    [
+      85.41995,
+      28.32829
+    ],
+    [
+      85.41873,
+      28.32774
+    ],
+    [
+      85.41752,
+      28.32718
+    ],
+    [
+      85.41629,
+      28.32744
+    ],
+    [
+      85.41508,
+      28.32634
+    ],
+    [
+      85.41387,
+      28.32524
+    ],
+    [
+      85.41297,
+      28.32415
+    ],
+    [
+      85.41268,
+      28.32306
+    ],
+    [
+      85.41239,
+      28.32198
+    ],
+    [
+      85.41241,
+      28.3209
+    ],
+    [
+      85.41273,
+      28.31982
+    ],
+    [
+      85.41275,
+      28.31873
+    ],
+    [
+      85.41276,
+      28.31765
+    ],
+    [
+      85.41308,
+      28.31657
+    ],
+    [
+      85.41249,
+      28.31548
+    ],
+    [
+      85.4122,
+      28.3144
+    ],
+    [
+      85.41252,
+      28.31332
+    ],
+    [
+      85.41254,
+      28.31223
+    ],
+    [
+      85.41194,
+      28.31114
+    ],
+    [
+      85.41196,
+      28.31006
+    ],
+    [
+      85.41167,
+      28.30897
+    ],
+    [
+      85.41077,
+      28.30788
+    ],
+    [
+      85.40955,
+      28.30705
+    ],
+    [
+      85.40865,
+      28.30596
+    ],
+    [
+      85.40744,
+      28.30513
+    ],
+    [
+      85.40623,
+      28.30404
+    ],
+    [
+      85.40503,
+      28.30294
+    ],
+    [
+      85.40381,
+      28.30238
+    ],
+    [
+      85.4026,
+      28.30156
+    ],
+    [
+      85.40139,
+      28.30046
+    ],
+    [
+      85.40019,
+      28.29936
+    ],
+    [
+      85.39898,
+      28.29827
+    ],
+    [
+      85.39777,
+      28.29717
+    ],
+    [
+      85.39748,
+      28.29608
+    ],
+    [
+      85.39658,
+      28.29499
+    ],
+    [
+      85.39629,
+      28.2939
+    ],
+    [
+      85.3957,
+      28.29281
+    ],
+    [
+      85.39449,
+      28.29172
+    ],
+    [
+      85.39328,
+      28.29062
+    ],
+    [
+      85.39238,
+      28.28953
+    ],
+    [
+      85.39117,
+      28.28897
+    ],
+    [
+      85.38996,
+      28.28787
+    ],
+    [
+      85.38875,
+      28.28678
+    ],
+    [
+      85.38754,
+      28.28622
+    ],
+    [
+      85.38632,
+      28.28593
+    ],
+    [
+      85.38511,
+      28.28511
+    ],
+    [
+      85.3839,
+      28.28401
+    ],
+    [
+      85.383,
+      28.28292
+    ],
+    [
+      85.38179,
+      28.28182
+    ],
+    [
+      85.38089,
+      28.28073
+    ],
+    [
+      85.37968,
+      28.28017
+    ],
+    [
+      85.37846,
+      28.27934
+    ],
+    [
+      85.37725,
+      28.27852
+    ],
+    [
+      85.37666,
+      28.27743
+    ],
+    [
+      85.37668,
+      28.27634
+    ],
+    [
+      85.37669,
+      28.27526
+    ],
+    [
+      85.37701,
+      28.27418
+    ],
+    [
+      85.37642,
+      28.27309
+    ],
+    [
+      85.37644,
+      28.27201
+    ],
+    [
+      85.37615,
+      28.27092
+    ],
+    [
+      85.37616,
+      28.26984
+    ],
+    [
+      85.37648,
+      28.26876
+    ],
+    [
+      85.37558,
+      28.26767
+    ],
+    [
+      85.37499,
+      28.26658
+    ],
+    [
+      85.37378,
+      28.26548
+    ],
+    [
+      85.37288,
+      28.26439
+    ],
+    [
+      85.37198,
+      28.26329
+    ],
+    [
+      85.37169,
+      28.26221
+    ],
+    [
+      85.37048,
+      28.26111
+    ],
+    [
+      85.36928,
+      28.26001
+    ],
+    [
+      85.36806,
+      28.25973
+    ],
+    [
+      85.36685,
+      28.25863
+    ],
+    [
+      85.36656,
+      28.25754
+    ],
+    [
+      85.36566,
+      28.25645
+    ],
+    [
+      85.36507,
+      28.25536
+    ],
+    [
+      85.36478,
+      28.25427
+    ],
+    [
+      85.36449,
+      28.25318
+    ],
+    [
+      85.36512,
+      28.25211
+    ],
+    [
+      85.36452,
+      28.25102
+    ],
+    [
+      85.36423,
+      28.24993
+    ],
+    [
+      85.36425,
+      28.24885
+    ],
+    [
+      85.36335,
+      28.24776
+    ],
+    [
+      85.36245,
+      28.24666
+    ],
+    [
+      85.36124,
+      28.24556
+    ],
+    [
+      85.36004,
+      28.24447
+    ],
+    [
+      85.35882,
+      28.24391
+    ],
+    [
+      85.35823,
+      28.24282
+    ],
+    [
+      85.35733,
+      28.24173
+    ],
+    [
+      85.35734,
+      28.24064
+    ],
+    [
+      85.35797,
+      28.23957
+    ],
+    [
+      85.35799,
+      28.23849
+    ],
+    [
+      85.3577,
+      28.2374
+    ],
+    [
+      85.35802,
+      28.23632
+    ],
+    [
+      85.35834,
+      28.23524
+    ],
+    [
+      85.35928,
+      28.23417
+    ],
+    [
+      85.3596,
+      28.23309
+    ],
+    [
+      85.36023,
+      28.23202
+    ],
+    [
+      85.36024,
+      28.23093
+    ],
+    [
+      85.36057,
+      28.22985
+    ],
+    [
+      85.36058,
+      28.22877
+    ],
+    [
+      85.3609,
+      28.22769
+    ],
+    [
+      85.36092,
+      28.22661
+    ],
+    [
+      85.36094,
+      28.22553
+    ],
+    [
+      85.36126,
+      28.22445
+    ],
+    [
+      85.36067,
+      28.22336
+    ],
+    [
+      85.36007,
+      28.22227
+    ],
+    [
+      85.35886,
+      28.22117
+    ],
+    [
+      85.35796,
+      28.22008
+    ],
+    [
+      85.35706,
+      28.21898
+    ],
+    [
+      85.35616,
+      28.21789
+    ],
+    [
+      85.35526,
+      28.21679
+    ],
+    [
+      85.35467,
+      28.2157
+    ],
+    [
+      85.35469,
+      28.21462
+    ],
+    [
+      85.3547,
+      28.21354
+    ],
+    [
+      85.35472,
+      28.21246
+    ],
+    [
+      85.35443,
+      28.21137
+    ],
+    [
+      85.35414,
+      28.21028
+    ],
+    [
+      85.35416,
+      28.2092
+    ],
+    [
+      85.35448,
+      28.20812
+    ],
+    [
+      85.3548,
+      28.20704
+    ],
+    [
+      85.35482,
+      28.20596
+    ],
+    [
+      85.35392,
+      28.20486
+    ],
+    [
+      85.35332,
+      28.20377
+    ],
+    [
+      85.35303,
+      28.20269
+    ],
+    [
+      85.35275,
+      28.2016
+    ],
+    [
+      85.35246,
+      28.20052
+    ],
+    [
+      85.35247,
+      28.19943
+    ],
+    [
+      85.35188,
+      28.19834
+    ],
+    [
+      85.35128,
+      28.19725
+    ],
+    [
+      85.35038,
+      28.19616
+    ],
+    [
+      85.3501,
+      28.19507
+    ],
+    [
+      85.3495,
+      28.19398
+    ],
+    [
+      85.34891,
+      28.19289
+    ],
+    [
+      85.34862,
+      28.1918
+    ],
+    [
+      85.34802,
+      28.19071
+    ],
+    [
+      85.34743,
+      28.18962
+    ],
+    [
+      85.34622,
+      28.18853
+    ],
+    [
+      85.34593,
+      28.18744
+    ],
+    [
+      85.34565,
+      28.18635
+    ],
+    [
+      85.34475,
+      28.18526
+    ],
+    [
+      85.34385,
+      28.18417
+    ],
+    [
+      85.34325,
+      28.18308
+    ],
+    [
+      85.34266,
+      28.18199
+    ],
+    [
+      85.34237,
+      28.1809
+    ],
+    [
+      85.34239,
+      28.17982
+    ],
+    [
+      85.34271,
+      28.17874
+    ],
+    [
+      85.34272,
+      28.17765
+    ],
+    [
+      85.34274,
+      28.17657
+    ],
+    [
+      85.34215,
+      28.17548
+    ],
+    [
+      85.34216,
+      28.1744
+    ],
+    [
+      85.34249,
+      28.17332
+    ],
+    [
+      85.34189,
+      28.17223
+    ],
+    [
+      85.34191,
+      28.17115
+    ],
+    [
+      85.34192,
+      28.17006
+    ],
+    [
+      85.34255,
+      28.16899
+    ],
+    [
+      85.34226,
+      28.1679
+    ],
+    [
+      85.34289,
+      28.16683
+    ],
+    [
+      85.3423,
+      28.16574
+    ],
+    [
+      85.3417,
+      28.16465
+    ],
+    [
+      85.34048,
+      28.16436
+    ],
+    [
+      85.33928,
+      28.16353
+    ],
+    [
+      85.33807,
+      28.16271
+    ],
+    [
+      85.33747,
+      28.16162
+    ],
+    [
+      85.33718,
+      28.16053
+    ],
+    [
+      85.33628,
+      28.15971
+    ],
+    [
+      85.33507,
+      28.15888
+    ],
+    [
+      85.33385,
+      28.15859
+    ],
+    [
+      85.33295,
+      28.15777
+    ],
+    [
+      85.33174,
+      28.15694
+    ],
+    [
+      85.33053,
+      28.15639
+    ],
+    [
+      85.32932,
+      28.15529
+    ],
+    [
+      85.32842,
+      28.1542
+    ],
+    [
+      85.32721,
+      28.15337
+    ],
+    [
+      85.32631,
+      28.15228
+    ],
+    [
+      85.3251,
+      28.15145
+    ],
+    [
+      85.32389,
+      28.15089
+    ],
+    [
+      85.32267,
+      28.15061
+    ],
+    [
+      85.32147,
+      28.14978
+    ],
+    [
+      85.32026,
+      28.14895
+    ],
+    [
+      85.31904,
+      28.1484
+    ],
+    [
+      85.31783,
+      28.14784
+    ],
+    [
+      85.31663,
+      28.14674
+    ],
+    [
+      85.31541,
+      28.14619
+    ],
+    [
+      85.3142,
+      28.14536
+    ],
+    [
+      85.313,
+      28.14426
+    ],
+    [
+      85.3124,
+      28.14317
+    ],
+    [
+      85.31181,
+      28.14208
+    ],
+    [
+      85.31058,
+      28.14261
+    ],
+    [
+      85.30936,
+      28.14232
+    ],
+    [
+      85.30816,
+      28.14122
+    ],
+    [
+      85.30695,
+      28.14012
+    ],
+    [
+      85.30575,
+      28.13903
+    ],
+    [
+      85.30485,
+      28.13793
+    ],
+    [
+      85.30456,
+      28.13685
+    ],
+    [
+      85.30366,
+      28.13575
+    ],
+    [
+      85.30307,
+      28.13466
+    ],
+    [
+      85.30248,
+      28.13357
+    ],
+    [
+      85.30127,
+      28.13274
+    ],
+    [
+      85.30067,
+      28.13165
+    ],
+    [
+      85.30039,
+      28.13057
+    ],
+    [
+      85.3001,
+      28.12948
+    ],
+    [
+      85.29889,
+      28.12838
+    ],
+    [
+      85.29799,
+      28.12729
+    ],
+    [
+      85.29709,
+      28.12647
+    ],
+    [
+      85.29588,
+      28.12591
+    ],
+    [
+      85.29467,
+      28.12508
+    ],
+    [
+      85.29347,
+      28.12398
+    ],
+    [
+      85.29226,
+      28.12316
+    ],
+    [
+      85.29105,
+      28.12206
+    ],
+    [
+      85.28985,
+      28.12096
+    ],
+    [
+      85.28864,
+      28.11986
+    ],
+    [
+      85.28775,
+      28.11877
+    ],
+    [
+      85.28653,
+      28.11821
+    ],
+    [
+      85.28532,
+      28.11765
+    ],
+    [
+      85.28411,
+      28.11683
+    ],
+    [
+      85.2829,
+      28.116
+    ],
+    [
+      85.28231,
+      28.11491
+    ],
+    [
+      85.28172,
+      28.11382
+    ],
+    [
+      85.28082,
+      28.11272
+    ],
+    [
+      85.27961,
+      28.11217
+    ],
+    [
+      85.2787,
+      28.11134
+    ],
+    [
+      85.27749,
+      28.11079
+    ],
+    [
+      85.27629,
+      28.10969
+    ],
+    [
+      85.27508,
+      28.10859
+    ],
+    [
+      85.27388,
+      28.10749
+    ],
+    [
+      85.27267,
+      28.10667
+    ],
+    [
+      85.27177,
+      28.10584
+    ],
+    [
+      85.27056,
+      28.10474
+    ],
+    [
+      85.26936,
+      28.10392
+    ],
+    [
+      85.26815,
+      28.10309
+    ],
+    [
+      85.26695,
+      28.10199
+    ],
+    [
+      85.26574,
+      28.10089
+    ],
+    [
+      85.26454,
+      28.09979
+    ],
+    [
+      85.26364,
+      28.0987
+    ],
+    [
+      85.26274,
+      28.09761
+    ],
+    [
+      85.26153,
+      28.09678
+    ],
+    [
+      85.26033,
+      28.09568
+    ],
+    [
+      85.25911,
+      28.09539
+    ],
+    [
+      85.2579,
+      28.09511
+    ],
+    [
+      85.25668,
+      28.09509
+    ],
+    [
+      85.25546,
+      28.09481
+    ],
+    [
+      85.25425,
+      28.09398
+    ],
+    [
+      85.25304,
+      28.09342
+    ],
+    [
+      85.25183,
+      28.09286
+    ],
+    [
+      85.25061,
+      28.09285
+    ],
+    [
+      85.24939,
+      28.09256
+    ],
+    [
+      85.24818,
+      28.09201
+    ],
+    [
+      85.24696,
+      28.09199
+    ],
+    [
+      85.24573,
+      28.09252
+    ],
+    [
+      85.24451,
+      28.0925
+    ],
+    [
+      85.24328,
+      28.09248
+    ],
+    [
+      85.24207,
+      28.0922
+    ],
+    [
+      85.24085,
+      28.09191
+    ],
+    [
+      85.23963,
+      28.0919
+    ],
+    [
+      85.23841,
+      28.09161
+    ],
+    [
+      85.2372,
+      28.09132
+    ],
+    [
+      85.23598,
+      28.09104
+    ],
+    [
+      85.23476,
+      28.09102
+    ],
+    [
+      85.23355,
+      28.09019
+    ],
+    [
+      85.23234,
+      28.08964
+    ],
+    [
+      85.23113,
+      28.08881
+    ],
+    [
+      85.22993,
+      28.08771
+    ],
+    [
+      85.22872,
+      28.08688
+    ],
+    [
+      85.22782,
+      28.08579
+    ],
+    [
+      85.22692,
+      28.08496
+    ],
+    [
+      85.22571,
+      28.08414
+    ],
+    [
+      85.2245,
+      28.08358
+    ],
+    [
+      85.22329,
+      28.08302
+    ],
+    [
+      85.22208,
+      28.08219
+    ],
+    [
+      85.22087,
+      28.08164
+    ],
+    [
+      85.21966,
+      28.08108
+    ],
+    [
+      85.21876,
+      28.08026
+    ],
+    [
+      85.21755,
+      28.07943
+    ],
+    [
+      85.21635,
+      28.07833
+    ],
+    [
+      85.21514,
+      28.07723
+    ],
+    [
+      85.21394,
+      28.0764
+    ],
+    [
+      85.21272,
+      28.07585
+    ],
+    [
+      85.21151,
+      28.07529
+    ],
+    [
+      85.2103,
+      28.075
+    ],
+    [
+      85.2094,
+      28.07391
+    ],
+    [
+      85.20881,
+      28.07282
+    ],
+    [
+      85.20791,
+      28.07172
+    ],
+    [
+      85.20762,
+      28.07063
+    ],
+    [
+      85.20672,
+      28.06954
+    ],
+    [
+      85.20552,
+      28.06844
+    ],
+    [
+      85.20523,
+      28.06735
+    ],
+    [
+      85.20495,
+      28.06627
+    ],
+    [
+      85.20588,
+      28.0652
+    ],
+    [
+      85.2062,
+      28.06412
+    ],
+    [
+      85.20683,
+      28.06304
+    ],
+    [
+      85.20716,
+      28.06196
+    ],
+    [
+      85.20717,
+      28.06088
+    ],
+    [
+      85.2078,
+      28.05981
+    ],
+    [
+      85.20751,
+      28.05872
+    ],
+    [
+      85.20814,
+      28.05765
+    ],
+    [
+      85.20847,
+      28.05657
+    ],
+    [
+      85.20787,
+      28.05548
+    ],
+    [
+      85.20759,
+      28.05439
+    ],
+    [
+      85.20699,
+      28.0533
+    ],
+    [
+      85.2061,
+      28.0522
+    ],
+    [
+      85.20489,
+      28.05138
+    ],
+    [
+      85.20369,
+      28.05028
+    ],
+    [
+      85.2031,
+      28.04919
+    ],
+    [
+      85.2022,
+      28.04809
+    ],
+    [
+      85.20191,
+      28.04701
+    ],
+    [
+      85.20101,
+      28.04591
+    ],
+    [
+      85.19981,
+      28.04508
+    ],
+    [
+      85.1986,
+      28.04398
+    ],
+    [
+      85.19739,
+      28.04343
+    ],
+    [
+      85.1965,
+      28.04233
+    ],
+    [
+      85.19529,
+      28.0415
+    ],
+    [
+      85.19439,
+      28.04041
+    ],
+    [
+      85.1938,
+      28.03932
+    ],
+    [
+      85.19382,
+      28.03824
+    ],
+    [
+      85.19384,
+      28.03715
+    ],
+    [
+      85.19355,
+      28.03607
+    ],
+    [
+      85.19357,
+      28.03498
+    ],
+    [
+      85.19328,
+      28.0339
+    ],
+    [
+      85.1936,
+      28.03282
+    ],
+    [
+      85.19362,
+      28.03174
+    ],
+    [
+      85.19364,
+      28.03065
+    ],
+    [
+      85.19305,
+      28.02956
+    ],
+    [
+      85.19215,
+      28.02847
+    ],
+    [
+      85.19156,
+      28.02738
+    ],
+    [
+      85.19097,
+      28.02629
+    ],
+    [
+      85.18976,
+      28.02573
+    ],
+    [
+      85.18854,
+      28.02571
+    ],
+    [
+      85.18732,
+      28.02515
+    ],
+    [
+      85.18611,
+      28.0246
+    ],
+    [
+      85.18522,
+      28.0235
+    ],
+    [
+      85.18493,
+      28.02242
+    ],
+    [
+      85.18556,
+      28.02134
+    ],
+    [
+      85.1868,
+      28.02027
+    ],
+    [
+      85.18742,
+      28.0192
+    ],
+    [
+      85.18714,
+      28.01811
+    ],
+    [
+      85.18746,
+      28.01703
+    ],
+    [
+      85.18656,
+      28.01594
+    ],
+    [
+      85.18536,
+      28.01484
+    ],
+    [
+      85.18446,
+      28.01375
+    ],
+    [
+      85.18418,
+      28.01266
+    ],
+    [
+      85.18389,
+      28.01157
+    ],
+    [
+      85.1836,
+      28.01049
+    ],
+    [
+      85.18362,
+      28.0094
+    ],
+    [
+      85.18364,
+      28.00832
+    ],
+    [
+      85.18366,
+      28.00724
+    ],
+    [
+      85.18368,
+      28.00615
+    ],
+    [
+      85.1843,
+      28.00508
+    ],
+    [
+      85.18432,
+      28.004
+    ],
+    [
+      85.18404,
+      28.00291
+    ],
+    [
+      85.18375,
+      28.00182
+    ],
+    [
+      85.18438,
+      28.00075
+    ],
+    [
+      85.18501,
+      27.99967
+    ],
+    [
+      85.18533,
+      27.9986
+    ],
+    [
+      85.18596,
+      27.99752
+    ],
+    [
+      85.18567,
+      27.99643
+    ],
+    [
+      85.18477,
+      27.99534
+    ],
+    [
+      85.18357,
+      27.99424
+    ],
+    [
+      85.18237,
+      27.99314
+    ],
+    [
+      85.18239,
+      27.99206
+    ],
+    [
+      85.18302,
+      27.99098
+    ],
+    [
+      85.18273,
+      27.9899
+    ],
+    [
+      85.18152,
+      27.98907
+    ],
+    [
+      85.18062,
+      27.98824
+    ],
+    [
+      85.18034,
+      27.98716
+    ],
+    [
+      85.18066,
+      27.98608
+    ],
+    [
+      85.18037,
+      27.98499
+    ],
+    [
+      85.18039,
+      27.98391
+    ],
+    [
+      85.18041,
+      27.98283
+    ],
+    [
+      85.18043,
+      27.98174
+    ],
+    [
+      85.18075,
+      27.98067
+    ],
+    [
+      85.18138,
+      27.97959
+    ],
+    [
+      85.1814,
+      27.97851
+    ],
+    [
+      85.18172,
+      27.97743
+    ],
+    [
+      85.18204,
+      27.97635
+    ],
+    [
+      85.18236,
+      27.97527
+    ],
+    [
+      85.18299,
+      27.9742
+    ],
+    [
+      85.18362,
+      27.97312
+    ],
+    [
+      85.18425,
+      27.97205
+    ],
+    [
+      85.18396,
+      27.97096
+    ],
+    [
+      85.18275,
+      27.9704
+    ],
+    [
+      85.18154,
+      27.97012
+    ],
+    [
+      85.18033,
+      27.96956
+    ],
+    [
+      85.17911,
+      27.96927
+    ],
+    [
+      85.17821,
+      27.96818
+    ],
+    [
+      85.17762,
+      27.96709
+    ],
+    [
+      85.17703,
+      27.966
+    ],
+    [
+      85.17613,
+      27.9649
+    ],
+    [
+      85.17492,
+      27.96434
+    ],
+    [
+      85.17371,
+      27.96406
+    ],
+    [
+      85.1725,
+      27.9635
+    ],
+    [
+      85.17128,
+      27.96321
+    ],
+    [
+      85.17008,
+      27.96238
+    ],
+    [
+      85.16888,
+      27.96129
+    ],
+    [
+      85.16859,
+      27.9602
+    ],
+    [
+      85.168,
+      27.95911
+    ],
+    [
+      85.16771,
+      27.95802
+    ],
+    [
+      85.16682,
+      27.95693
+    ],
+    [
+      85.16561,
+      27.95637
+    ],
+    [
+      85.1644,
+      27.95581
+    ],
+    [
+      85.16318,
+      27.95552
+    ],
+    [
+      85.16198,
+      27.95442
+    ],
+    [
+      85.1623,
+      27.95335
+    ],
+    [
+      85.16232,
+      27.95226
+    ],
+    [
+      85.16234,
+      27.95118
+    ],
+    [
+      85.16236,
+      27.9501
+    ],
+    [
+      85.16238,
+      27.94902
+    ],
+    [
+      85.1627,
+      27.94794
+    ],
+    [
+      85.16241,
+      27.94685
+    ],
+    [
+      85.16152,
+      27.94576
+    ],
+    [
+      85.16093,
+      27.94466
+    ],
+    [
+      85.16034,
+      27.94357
+    ],
+    [
+      85.15974,
+      27.94248
+    ],
+    [
+      85.15915,
+      27.94139
+    ],
+    [
+      85.15887,
+      27.9403
+    ],
+    [
+      85.15797,
+      27.93921
+    ],
+    [
+      85.15738,
+      27.93812
+    ],
+    [
+      85.15679,
+      27.93703
+    ],
+    [
+      85.1562,
+      27.93594
+    ],
+    [
+      85.15561,
+      27.93485
+    ],
+    [
+      85.15532,
+      27.93376
+    ],
+    [
+      85.15473,
+      27.93267
+    ],
+    [
+      85.15352,
+      27.93184
+    ],
+    [
+      85.15229,
+      27.93291
+    ],
+    [
+      85.15105,
+      27.9337
+    ],
+    [
+      85.15015,
+      27.93288
+    ],
+    [
+      85.14987,
+      27.93179
+    ],
+    [
+      85.14988,
+      27.93071
+    ],
+    [
+      85.14929,
+      27.92962
+    ],
+    [
+      85.14901,
+      27.92853
+    ],
+    [
+      85.14994,
+      27.92746
+    ],
+    [
+      85.15057,
+      27.92639
+    ],
+    [
+      85.15089,
+      27.92531
+    ],
+    [
+      85.15121,
+      27.92423
+    ],
+    [
+      85.15123,
+      27.92315
+    ],
+    [
+      85.15034,
+      27.92205
+    ],
+    [
+      85.14943,
+      27.92177
+    ]
+  ],
+  "panelRuntime": "function panelRuntime(config) {\n  const status = document.getElementById('status');\n  const open = document.getElementById('open');\n  const expand = document.getElementById('expand');\n  const say = (text) => {\n    if (status.isConnected) status.textContent = text;\n  };\n  let blocked = null;\n  document.addEventListener('securitypolicyviolation', (event) => {\n    blocked = `${event.effectiveDirective} blocked ${event.blockedURI || 'a resource'}`;\n  });\n\n  // JSON-RPC with the host.\n  let nextId = 1;\n  const pending = new Map();\n  const send = (message) =>\n    window.parent.postMessage({ jsonrpc: '2.0', ...message }, '*');\n  const request = (method, params) =>\n    new Promise((resolve, reject) => {\n      const id = nextId++;\n      pending.set(id, { resolve, reject });\n      send({ id, method, params });\n    });\n  const notify = (method, params) => send({ method, params });\n\n  // Requests to the app's server, through the MCP server.\n  const MAX_CALLS = 6;\n  let calls = 0;\n  const waiting = [];\n  async function callTool(args) {\n    if (calls >= MAX_CALLS) await new Promise((go) => waiting.push(go));\n    calls += 1;\n    try {\n      const result = await request('tools/call', {\n        name: config.toolName,\n        // The server refuses the panel's requests without its key.\n        arguments: { ...args, key: config.panelKey },\n      });\n      if (result?.isError || !result?.structuredContent)\n        throw new Error(result?.content?.[0]?.text || 'The request failed');\n      return result.structuredContent;\n    } finally {\n      calls -= 1;\n      waiting.shift()?.();\n    }\n  }\n  const toBase64 = (bytes) => {\n    let binary = '';\n    for (let start = 0; start < bytes.length; start += 0x8000)\n      binary += String.fromCharCode(...bytes.subarray(start, start + 0x8000));\n    return btoa(binary);\n  };\n  const fromBase64 = (text) =>\n    Uint8Array.from(atob(text), (char) => char.charCodeAt(0));\n  async function bodyBytes(body) {\n    if (body == null) return null;\n    if (typeof body === 'string') return new TextEncoder().encode(body);\n    if (body instanceof ArrayBuffer) return new Uint8Array(body);\n    if (ArrayBuffer.isView(body))\n      return new Uint8Array(body.buffer, body.byteOffset, body.byteLength);\n    return new Uint8Array(await new Response(body).arrayBuffer());\n  }\n  const NULL_BODY = new Set([101, 204, 205, 304]);\n  const held = new Map();\n\n  /** Request a path on the app's server; resolves to a Response. */\n  function appFetch(path, init = {}) {\n    const method = (init.method || 'GET').toUpperCase();\n    // Built files never change while the panel runs, so each loads once.\n    const shared = method === 'GET' && path.startsWith(config.panelBase);\n    if (shared && held.has(path)) return held.get(path).then(respond);\n    const loading = (async () => {\n      const headers = {};\n      new Headers(init.headers || {}).forEach((value, name) => {\n        headers[name] = value;\n      });\n      const bytes = await bodyBytes(init.body);\n      let part = await callTool({\n        path,\n        method,\n        headers,\n        ...(bytes ? { body: toBase64(bytes) } : {}),\n      });\n      const parts = [fromBase64(part.body)];\n      while (part.nextOffset !== undefined) {\n        if (init.signal?.aborted) break;\n        part = await callTool({ id: part.id, offset: part.nextOffset });\n        parts.push(fromBase64(part.body));\n      }\n      let body = new Blob(parts);\n      if (part.encoding === 'gzip')\n        body = await new Response(\n          body.stream().pipeThrough(new DecompressionStream('gzip')),\n        ).blob();\n      return {\n        body: await body.arrayBuffer(),\n        status: part.status,\n        statusText: part.statusText,\n        headers: part.headers,\n      };\n    })();\n    if (shared) {\n      held.set(path, loading);\n      loading.catch(() => held.delete(path));\n    }\n    const result = loading.then(respond);\n    if (!init.signal) return result;\n    return Promise.race([\n      result,\n      new Promise((_, reject) => {\n        const abort = () =>\n          reject(new DOMException('The request was aborted', 'AbortError'));\n        if (init.signal.aborted) abort();\n        init.signal.addEventListener('abort', abort, { once: true });\n      }),\n    ]);\n  }\n  function respond({ body, status, statusText, headers }) {\n    return new Response(NULL_BODY.has(status) ? null : body.slice(0), {\n      status,\n      statusText,\n      headers,\n    });\n  }\n\n  // The app's own paths: relative ones, absolute ones on this page's site\n  // (matched by scheme and host, since a host may use its own scheme), and\n  // ones under the app's address in the page, an https address for code\n  // that needs one (`config.appBaseUrl`).\n  const page = new URL(document.baseURI);\n  const appOrigin = new URL(config.appBaseUrl).origin;\n  function appPath(value) {\n    let url;\n    try {\n      url = new URL(String(value), document.baseURI);\n    } catch {\n      return null;\n    }\n    const own =\n      url.origin === appOrigin ||\n      (url.protocol === page.protocol && url.host === page.host);\n    return own ? url.pathname + url.search : null;\n  }\n  const fileUrls = new Map();\n  /**\n   * A data: URL holding an app file, for elements that load by URL. Hosts\n   * allow data: images where some refuse blob: ones. Files of the panel\n   * build never change and are kept; others, such as live camera frames\n   * that change address on every refresh, are not.\n   */\n  function appFileUrl(path) {\n    if (fileUrls.has(path)) return fileUrls.get(path);\n    const loading = appFetch(path)\n      .then((response) => response.blob())\n      .then(\n        (blob) =>\n          new Promise((resolve, reject) => {\n            const reader = new FileReader();\n            reader.onload = () => resolve(reader.result);\n            reader.onerror = () => reject(reader.error);\n            reader.readAsDataURL(blob);\n          }),\n      );\n    if (path.startsWith(config.panelBase)) {\n      fileUrls.set(path, loading);\n      loading.catch(() => fileUrls.delete(path));\n    }\n    return loading;\n  }\n\n  function installRequests() {\n    const nativeFetch = window.fetch.bind(window);\n    window.fetch = async (input, init = {}) => {\n      const isRequest = input instanceof Request;\n      const path = appPath(isRequest ? input.url : input);\n      if (path === null) return nativeFetch(input, init);\n      if (!isRequest) return appFetch(path, init);\n      return appFetch(path, {\n        method: init.method || input.method,\n        headers: init.headers || input.headers,\n        body:\n          init.body ??\n          (['GET', 'HEAD'].includes(input.method)\n            ? undefined\n            : await input.arrayBuffer()),\n        signal: init.signal || input.signal,\n      });\n    };\n\n    // XMLHttpRequest for app paths: answered from appFetch, with the\n    // instance's state replaced, and the usual events dispatched.\n    const xhr = XMLHttpRequest.prototype;\n    const nativeOpen = xhr.open;\n    const nativeSend = xhr.send;\n    const nativeHeader = xhr.setRequestHeader;\n    const nativeAbort = xhr.abort;\n    xhr.open = function (method, url, ...rest) {\n      const path = appPath(url);\n      if (path === null) {\n        this.__ce = null;\n        return nativeOpen.call(this, method, url, ...rest);\n      }\n      this.__ce = { method, path, headers: {}, controller: null };\n      setState(this, { readyState: 1 });\n      this.dispatchEvent(new Event('readystatechange'));\n    };\n    xhr.setRequestHeader = function (name, value) {\n      if (!this.__ce) return nativeHeader.call(this, name, value);\n      this.__ce.headers[name] = value;\n    };\n    xhr.abort = function () {\n      if (!this.__ce) return nativeAbort.call(this);\n      this.__ce.controller?.abort();\n    };\n    xhr.send = function (body) {\n      const state = this.__ce;\n      if (!state) return nativeSend.call(this, body);\n      state.controller = new AbortController();\n      appFetch(state.path, {\n        method: state.method,\n        headers: state.headers,\n        body,\n        signal: state.controller.signal,\n      })\n        .then(async (response) => {\n          const type = this.responseType;\n          const value =\n            type === 'arraybuffer'\n              ? await response.arrayBuffer()\n              : type === 'blob'\n                ? await response.blob()\n                : await response.text();\n          const text = typeof value === 'string' ? value : null;\n          let parsed = value;\n          if (type === 'json') {\n            try {\n              parsed = JSON.parse(text);\n            } catch {\n              parsed = null;\n            }\n          } else if (type === 'document')\n            parsed = new DOMParser().parseFromString(text, 'text/html');\n          const headers = [...response.headers]\n            .map(([name, val]) => `${name}: ${val}`)\n            .join('\\r\\n');\n          setState(this, {\n            readyState: 4,\n            status: response.status,\n            statusText: response.statusText,\n            response: parsed,\n            responseText: type === '' || type === 'text' ? text : '',\n            responseURL: new URL(state.path, document.baseURI).href,\n            getAllResponseHeaders: () => headers,\n            getResponseHeader: (name) => response.headers.get(name),\n          });\n          for (const name of ['readystatechange', 'load', 'loadend'])\n            this.dispatchEvent(\n              name === 'readystatechange'\n                ? new Event(name)\n                : new ProgressEvent(name),\n            );\n        })\n        .catch((error) => {\n          setState(this, { readyState: 4, status: 0 });\n          const name = error?.name === 'AbortError' ? 'abort' : 'error';\n          for (const event of ['readystatechange', name, 'loadend'])\n            this.dispatchEvent(\n              event === 'readystatechange'\n                ? new Event(event)\n                : new ProgressEvent(event),\n            );\n        });\n    };\n    function setState(target, values) {\n      for (const [name, value] of Object.entries(values))\n        Object.defineProperty(target, name, {\n          configurable: true,\n          ...(typeof value === 'function' ? { value } : { get: () => value }),\n        });\n    }\n\n    const nativeBeacon = navigator.sendBeacon?.bind(navigator);\n    if (nativeBeacon)\n      navigator.sendBeacon = (url, data) => {\n        const path = appPath(url);\n        if (path === null) return nativeBeacon(url, data);\n        appFetch(path, { method: 'POST', body: data }).catch(() => {});\n        return true;\n      };\n\n    // Images name app files by URL; give them the file as a data: URL.\n    const image = Object.getOwnPropertyDescriptor(\n      HTMLImageElement.prototype,\n      'src',\n    );\n    Object.defineProperty(HTMLImageElement.prototype, 'src', {\n      ...image,\n      set(value) {\n        const path = appPath(value);\n        if (path === null) return image.set.call(this, value);\n        appFileUrl(path).then(\n          (url) => image.set.call(this, url),\n          () => this.dispatchEvent(new Event('error')),\n        );\n      },\n    });\n\n    // Workers on the app's server start from a small worker here that is\n    // handed the script once it has loaded; messages wait until then.\n    const NativeWorker = window.Worker;\n    const BOOT =\n      'const early=[];let ready=false;' +\n      \"addEventListener('message',e=>{if(e.data&&e.data.__ceScript){\" +\n      'const go=()=>{ready=true;for(const d of early)dispatchEvent(new MessageEvent(\"message\",{data:d}))};' +\n      'if(e.data.module)import(e.data.__ceScript).then(go);else{importScripts(e.data.__ceScript);go()}' +\n      'e.stopImmediatePropagation();return}' +\n      'if(!ready){early.push(e.data);e.stopImmediatePropagation()}});';\n    window.Worker = function Worker(url, options) {\n      const path = appPath(url);\n      if (path === null || String(url).startsWith('blob:'))\n        return new NativeWorker(url, options);\n      const worker = new NativeWorker(\n        URL.createObjectURL(new Blob([BOOT], { type: 'text/javascript' })),\n        options,\n      );\n      appFetch(path)\n        .then((response) => response.blob())\n        .then((blob) => URL.createObjectURL(blob))\n        .then((script) =>\n          worker.postMessage({\n            __ceScript: script,\n            module: options?.type === 'module',\n          }),\n        );\n      return worker;\n    };\n    window.Worker.prototype = NativeWorker.prototype;\n\n    // Some hosts drop the GPU contents of a panel's 2D canvases while they\n    // consider the panel off screen, and the overlays then cover the globe\n    // in black. Keep 2D canvases in memory instead, which hosts do not drop.\n    const getContext = HTMLCanvasElement.prototype.getContext;\n    HTMLCanvasElement.prototype.getContext = function (type, options) {\n      return type === '2d'\n        ? getContext.call(this, type, { ...options, willReadFrequently: true })\n        : getContext.call(this, type, options);\n    };\n\n    // Markup the app adds as HTML text would request its images from this\n    // page's site at once; hold their addresses until the files are here.\n    const htmlWithHeldImages = (html) =>\n      String(html).replace(\n        /(<(?:img|source)\\b[^>]*?\\s)src=([\"'])([^\"']*)\\2/gi,\n        (tag, before, quote, value) =>\n          appPath(value) === null\n            ? tag\n            : `${before}data-ce-src=${quote}${value}${quote}`,\n      );\n    const fillHeldImages = (root) => {\n      for (const element of root?.querySelectorAll?.('[data-ce-src]') ?? []) {\n        const path = appPath(element.getAttribute('data-ce-src'));\n        element.removeAttribute('data-ce-src');\n        appFileUrl(path).then((url) => element.setAttribute('src', url));\n      }\n    };\n    const innerHtml = Object.getOwnPropertyDescriptor(\n      Element.prototype,\n      'innerHTML',\n    );\n    Object.defineProperty(Element.prototype, 'innerHTML', {\n      ...innerHtml,\n      set(value) {\n        innerHtml.set.call(this, htmlWithHeldImages(value));\n        fillHeldImages(this);\n      },\n    });\n    const insertHtml = Element.prototype.insertAdjacentHTML;\n    Element.prototype.insertAdjacentHTML = function (position, html) {\n      insertHtml.call(this, position, htmlWithHeldImages(html));\n      fillHeldImages(this.parentNode ?? this);\n    };\n\n    // Markup and styles the app adds later name app files too.\n    new MutationObserver((records) => {\n      for (const record of records)\n        for (const node of record.addedNodes) {\n          if (node.nodeType !== 1) continue;\n          if (node.nodeName === 'STYLE') void inlineStyleUrls(node);\n          for (const element of [node, ...node.querySelectorAll('img[src]')]) {\n            if (element.nodeName !== 'IMG') continue;\n            const path = appPath(element.getAttribute('src'));\n            if (path !== null)\n              appFileUrl(path).then((url) => element.setAttribute('src', url));\n          }\n        }\n    }).observe(document.documentElement, { childList: true, subtree: true });\n  }\n\n  /** Replace url() references to app files in CSS with data: URLs. */\n  async function cssWithFiles(text, baseUrl) {\n    const found = new Map();\n    for (const match of text.matchAll(/url\\(\\s*(['\"]?)([^'\")]+)\\1\\s*\\)/g)) {\n      const reference = match[2];\n      if (/^(data|blob):/.test(reference)) continue;\n      const path = appPath(new URL(reference, baseUrl).href);\n      if (path !== null && !found.has(reference))\n        found.set(\n          reference,\n          appFileUrl(path).catch(() => null),\n        );\n    }\n    let result = text;\n    for (const [reference, loading] of found) {\n      const url = await loading;\n      if (url) result = result.split(reference).join(url);\n    }\n    return result;\n  }\n  async function inlineStyleUrls(style) {\n    if (!/url\\(/.test(style.textContent)) return;\n    style.textContent = await cssWithFiles(style.textContent, document.baseURI);\n  }\n\n  async function addStylesheet(href) {\n    const path = appPath(href);\n    const style = document.createElement('style');\n    document.head.appendChild(style);\n    if (path === null) {\n      const link = document.createElement('link');\n      link.rel = 'stylesheet';\n      link.href = href;\n      style.replaceWith(link);\n      return;\n    }\n    const text = await (await appFetch(path)).text();\n    style.textContent = await cssWithFiles(\n      text,\n      new URL(path, document.baseURI).href,\n    );\n  }\n\n  function runScript(text, type) {\n    const script = document.createElement('script');\n    if (type) script.type = type;\n    script.textContent = text;\n    document.body.appendChild(script);\n  }\n\n  /**\n   * Load Camera Eye into this page from the app's panel build, in\n   * inline embed mode, starting at the first view as its link would.\n   */\n  async function startApp(url, view) {\n    window.CE_EMBED_INLINE = true;\n    window.CE_APP_BASE_URL = config.appBaseUrl;\n    try {\n      history.replaceState(\n        null,\n        '',\n        location.href.split('#')[0] + new URL(url).hash,\n      );\n      // The app restores this view from its link, following included, so\n      // it needs applying again only for what links cannot carry: cockpit.\n      if (queued === view && !view.follow?.cockpit) queued = null;\n    } catch {\n      // The view still arrives once the app is ready.\n    }\n    installRequests();\n    const response = await appFetch(config.panelBase);\n    if (!response.ok)\n      throw new Error(\n        response.status === 404\n          ? 'the app has no panel build (npm run build:panel)'\n          : `the app answered ${response.status}`,\n      );\n    const built = new DOMParser().parseFromString(\n      await response.text(),\n      'text/html',\n    );\n    window.CESIUM_BASE_URL = `${config.panelBase}cesium/`;\n    const [prelude] = await Promise.all([\n      appFetch(config.panelBase + config.workerPreludePath).then((r) =>\n        r.text(),\n      ),\n      ...[...built.head.querySelectorAll('link[rel=\"stylesheet\"]')].map(\n        (link) => addStylesheet(link.getAttribute('href')),\n      ),\n    ]);\n    // Cesium's script sets CESIUM_WORKERS, its workers as one script it\n    // starts from memory. Workers request files themselves, which this page\n    // cannot answer, so the prelude, holding those files, runs ahead of it.\n    let workers;\n    Object.defineProperty(window, 'CESIUM_WORKERS', {\n      configurable: true,\n      get: () => workers,\n      set: (script) => {\n        workers = prelude + script;\n      },\n    });\n    // Images in the markup load their files once added; give them the\n    // files instead of letting them request this page's site.\n    const images = [];\n    for (const image of built.body.querySelectorAll('img[src]')) {\n      const path = appPath(image.getAttribute('src'));\n      if (path === null) continue;\n      image.removeAttribute('src');\n      images.push([image, path]);\n    }\n    for (const node of [...built.body.childNodes]) {\n      if (node.nodeName !== 'SCRIPT')\n        document.body.insertBefore(document.adoptNode(node), status);\n    }\n    for (const [image, path] of images)\n      appFileUrl(path).then((url) => image.setAttribute('src', url));\n    const scripts = await Promise.all(\n      [...built.querySelectorAll('script')].map(async (script) => ({\n        type: script.type,\n        text: script.getAttribute('src')\n          ? await (await appFetch(appPath(script.getAttribute('src')))).text()\n          : script.textContent,\n      })),\n    );\n    for (const { type, text } of scripts) runScript(text, type);\n    // Browsers cap live 3D contexts across pages and take one back when\n    // there are too many; say so rather than show no map.\n    document.addEventListener(\n      'webglcontextlost',\n      () => {\n        const notice = document.createElement('div');\n        notice.id = 'status';\n        notice.textContent =\n          'This panel lost its 3D graphics, likely because other Camera Eye ' +\n          'panels in this conversation hold them. Use Open in Camera ' +\n          'Eye above, or show it in a new conversation.';\n        document.body.appendChild(notice);\n      },\n      { capture: true, once: true },\n    );\n  }\n\n  // Tool results: the first view starts the app, later ones move it.\n  let started = false;\n  let ready = false;\n  let queued = null;\n  let currentUrl = null;\n  const postView = (view) =>\n    window.postMessage({ type: 'ce:view', id: nextId++, view }, '*');\n  function show(result) {\n    const data = result?.structuredContent;\n    const view = data?.view;\n    const url = data?.url || view?.url;\n    if (!view || !url) return;\n    currentUrl = url;\n    open.hidden = false;\n    if (ready) return postView(view);\n    queued = view;\n    if (started) return;\n    started = true;\n    say('Loading Camera Eye…');\n    startApp(url, view).catch((error) =>\n      say(`Camera Eye could not load here: ${error?.message || error}.`),\n    );\n    setTimeout(() => {\n      if (!ready)\n        say(\n          'Camera Eye did not load here' +\n            (blocked ? ` (${blocked})` : '') +\n            '. Use Open in Camera Eye above.',\n        );\n    }, config.loadTimeoutMs);\n  }\n\n  window.addEventListener('message', (event) => {\n    const message = event.data;\n    if (event.source === window) {\n      if (message?.type === 'ce:ready') {\n        ready = true;\n        status.remove();\n        if (queued) postView(queued);\n        queued = null;\n      }\n      return;\n    }\n    if (event.source !== window.parent || message?.jsonrpc !== '2.0') return;\n    if (\n      message.id !== undefined &&\n      pending.has(message.id) &&\n      !message.method\n    ) {\n      const { resolve, reject } = pending.get(message.id);\n      pending.delete(message.id);\n      if (message.error) reject(message.error);\n      else resolve(message.result);\n      return;\n    }\n    if (message.method === 'ui/notifications/tool-result') show(message.params);\n    if (message.method === 'ui/notifications/host-context-changed')\n      showDisplayMode(message.params);\n  });\n\n  // Fullscreen, where the host offers it, gives the globe the room.\n  let displayMode = 'inline';\n  const showDisplayMode = (context) => {\n    if (context?.displayMode) displayMode = context.displayMode;\n    if (context?.availableDisplayModes)\n      expand.hidden = !context.availableDisplayModes.includes('fullscreen');\n    expand.textContent = displayMode === 'fullscreen' ? 'Collapse' : 'Expand';\n  };\n  expand.addEventListener('click', () => {\n    request('ui/request-display-mode', {\n      mode: displayMode === 'fullscreen' ? 'inline' : 'fullscreen',\n    }).then(\n      (result) => showDisplayMode({ displayMode: result?.mode }),\n      () => {},\n    );\n  });\n\n  open.addEventListener('click', () => {\n    if (!currentUrl) return;\n    request('ui/open-link', { url: currentUrl }).catch(() =>\n      window.open(currentUrl, '_blank', 'noopener'),\n    );\n  });\n\n  // The handshake the MCP Apps SDK's App.connect performs: hosts validate\n  // these parameters, and keep a view hidden until it is initialized.\n  request('ui/initialize', {\n    appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] },\n    appInfo: {\n      name: 'camera-eye',\n      title: 'Camera Eye',\n      version: '1.0.0',\n    },\n    protocolVersion: config.protocolVersion,\n  }).then(\n    (result) => {\n      showDisplayMode(result?.hostContext);\n      send({ method: 'ui/notifications/initialized' });\n      notify('ui/notifications/size-changed', {\n        width: document.body.clientWidth,\n        height: config.panelHeight,\n      });\n    },\n    (error) =>\n      say(\n        'This client did not accept the Camera Eye panel' +\n          (error?.message ? `: ${error.message}` : '.'),\n      ),\n  );\n}"
+}
