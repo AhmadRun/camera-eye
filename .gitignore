@@ -20,3 +20,4 @@ output/
 pinokio/ENVIRONMENT
 pinokio/.installed
 /server-rs/target
+/.claude/worktrees
