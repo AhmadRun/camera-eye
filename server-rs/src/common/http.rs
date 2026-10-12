@@ -44,10 +44,10 @@ pub async fn read_bytes_capped(
     response: Response,
     max_bytes: usize,
 ) -> Result<Bytes, UpstreamError> {
-    if let Some(declared) = response.content_length() {
-        if declared as usize > max_bytes {
-            return Err(UpstreamError::TooLarge);
-        }
+    if let Some(declared) = response.content_length()
+        && declared as usize > max_bytes
+    {
+        return Err(UpstreamError::TooLarge);
     }
     let mut stream = response.bytes_stream();
     let mut out = BytesMut::new();

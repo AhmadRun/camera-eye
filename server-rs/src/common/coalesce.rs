@@ -9,8 +9,10 @@ use std::sync::Arc;
 use futures_util::future::{BoxFuture, FutureExt, Shared};
 use parking_lot::Mutex;
 
+type InFlight<K, V> = Arc<Mutex<HashMap<K, (u64, Shared<BoxFuture<'static, V>>)>>>;
+
 pub struct Coalescer<K, V: Clone> {
-    in_flight: Arc<Mutex<HashMap<K, (u64, Shared<BoxFuture<'static, V>>)>>>,
+    in_flight: InFlight<K, V>,
     next_id: Mutex<u64>,
 }
 

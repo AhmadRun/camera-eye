@@ -44,10 +44,10 @@ impl RateLimiter {
         let window = self.window_ms;
         let mut state = self.state.lock();
         state.global.retain(|t| now - t < window);
-        if let Some(global_max) = self.global_max {
-            if state.global.len() >= global_max {
-                return false;
-            }
+        if let Some(global_max) = self.global_max
+            && state.global.len() >= global_max
+        {
+            return false;
         }
         let mut recent: Vec<i64> = state
             .hits
@@ -68,10 +68,10 @@ impl RateLimiter {
             state.order.push_back(key.to_string());
         }
         state.global.push(now);
-        if state.hits.len() > RATE_LIMITER_MAX_KEYS {
-            if let Some(oldest) = state.order.pop_front() {
-                state.hits.remove(&oldest);
-            }
+        if state.hits.len() > RATE_LIMITER_MAX_KEYS
+            && let Some(oldest) = state.order.pop_front()
+        {
+            state.hits.remove(&oldest);
         }
         if state.hits.len() > 256 {
             let stale: Vec<String> = state

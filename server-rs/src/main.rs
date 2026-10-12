@@ -1,11 +1,7 @@
 //! Camera Eye server: serves the built browser app and its `/api` provider
 //! routes. Replaces the Vite preview server and its Node middleware.
 
-mod common;
-mod env;
-mod providers;
-mod state;
-mod web;
+use camera_eye_server::{common, mcp, providers, state, web};
 
 use std::net::SocketAddr;
 use std::path::PathBuf;
@@ -52,6 +48,7 @@ async fn main() -> anyhow::Result<()> {
     };
     let listener = tokio::net::TcpListener::bind((bind_host.as_str(), port)).await?;
     tracing::info!("Camera Eye listening on http://{}", listener.local_addr()?);
+    mcp::set_local_port(listener.local_addr()?.port());
     axum::serve(
         listener,
         app.into_make_service_with_connect_info::<SocketAddr>(),
@@ -67,6 +64,7 @@ pub fn app(state: AppState) -> Router {
         .route("/api", any(web::api_not_found))
         .route("/api/{*rest}", any(web::api_not_found))
         .merge(web::static_files(&state))
+        .layer(middleware::from_fn_with_state(state.clone(), mcp::mount))
         .layer(middleware::from_fn_with_state(
             state.clone(),
             web::browser_headers,

@@ -11,13 +11,8 @@ RUN npm run build && node scripts/export-voice-tools.mjs
 
 FROM rust:1-bookworm AS server
 WORKDIR /app/server-rs
-COPY server-rs/Cargo.toml server-rs/Cargo.lock ./
-# Cache dependencies separately from the server's own code.
-RUN mkdir src && echo 'fn main() {}' > src/main.rs \
-    && cargo build --release --locked \
-    && rm -rf src
 COPY server-rs/ ./
-RUN touch src/main.rs && cargo build --release --locked
+RUN cargo build --release --locked --bins
 
 FROM debian:bookworm-slim
 RUN apt-get update \
@@ -25,11 +20,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 # Bundled data the provider routes read at runtime.
+COPY --from=web /app/package.json ./package.json
 COPY --from=web /app/public ./public
 COPY --from=web /app/src ./src
 COPY --from=web /app/dist ./dist
 COPY --from=web /app/server-rs/generated ./server-rs/generated
-COPY --from=server /app/server-rs/target/release/camera-eye-server /usr/local/bin/camera-eye-server
+COPY --from=server /app/server-rs/target/release/camera-eye-server /app/server-rs/target/release/camera-eye-mcp /usr/local/bin/
 ENV HOST=0.0.0.0 PORT=4173 CE_ROOT=/app
 EXPOSE 4173
 CMD ["camera-eye-server"]

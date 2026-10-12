@@ -98,6 +98,7 @@ fn simplify_geometry(holder: &mut Value, options: &SimplifyOptions) -> Result<()
 }
 
 /// `simplifyOverpassPayloadBody`: `Err` where the JS would throw.
+#[allow(clippy::result_unit_err)]
 pub fn simplify_overpass_payload_body(body: &str, options: &SimplifyOptions) -> Result<String, ()> {
     if utf16_len(body) < options.min_bytes {
         return Ok(body.to_string());

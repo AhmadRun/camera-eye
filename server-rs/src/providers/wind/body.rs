@@ -42,6 +42,12 @@ pub type DecodeFn = Arc<dyn Fn(Bytes) -> BoxFut<Result<Decoded, WindError>> + Se
 /// The real upstream: a client that refuses redirects like `redirect: 'error'`.
 pub struct HttpFetch(reqwest::Client);
 
+impl Default for HttpFetch {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HttpFetch {
     pub fn new() -> Self {
         let client = reqwest::Client::builder()

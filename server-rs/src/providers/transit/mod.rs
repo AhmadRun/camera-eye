@@ -62,6 +62,12 @@ pub struct ReqwestTransit {
     client: reqwest::Client,
 }
 
+impl Default for ReqwestTransit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ReqwestTransit {
     pub fn new() -> Self {
         Self {
