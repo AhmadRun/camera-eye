@@ -5,7 +5,17 @@ use axum::Router;
 
 use crate::state::AppState;
 
+mod mapdata_support;
+mod military_installations;
+mod overpass;
+mod regional;
+mod transit;
+
 /// Every provider route, in the order `localProviderPlugins` installed them.
-pub fn router(_state: &AppState) -> Router<AppState> {
+pub fn router(state: &AppState) -> Router<AppState> {
     Router::new()
+        .merge(overpass::router(state))
+        .merge(military_installations::router(state))
+        .merge(transit::router(state))
+        .merge(regional::router(state))
 }
