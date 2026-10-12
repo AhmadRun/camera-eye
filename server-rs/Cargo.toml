@@ -11,6 +11,7 @@ chrono = { version = "0.4.45", features = ["serde"] }
 csv = "1.4.0"
 dotenvy = "0.15.7"
 futures-util = "0.3.34"
+grib = { version = "0.19.1", default-features = false, features = ["ccsds-unpack-with-rust-aec", "jpeg2000-unpack-with-hayro", "png-unpack-with-png-crate"] }
 http = "1.5.0"
 moka = { version = "0.12.16", features = ["future"] }
 once_cell = "1.21.4"
