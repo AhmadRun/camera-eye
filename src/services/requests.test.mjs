@@ -53,7 +53,17 @@ function probeTransport(status) {
   };
   return { seen, fetchImpl };
 }
-const stalled = (init) => new Promise((_, reject) => init.signal.addEventListener('abort', () => reject(init.signal.reason)));
+// A real pending request holds a socket that keeps the event loop alive;
+// Node unrefs AbortSignal.timeout, so without this handle the test runner
+// sees nothing left to wait on and cancels the test before the probe times out.
+const stalled = (init) =>
+  new Promise((_, reject) => {
+    const socket = setInterval(() => {}, 1000);
+    init.signal.addEventListener('abort', () => {
+      clearInterval(socket);
+      reject(init.signal.reason);
+    });
+  });
 
 test('a stalled capability probe times out and queries proceed; no re-probe during backoff', async () => {
   const { seen, fetchImpl } = probeTransport(stalled);
