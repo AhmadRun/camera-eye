@@ -68,9 +68,15 @@ test('a shared lookup outlives one cancelled caller, and times out on its own', 
     fetchImpl: (url, { signal }) => {
       signals.push(signal);
       if (url.includes('Slow'))
-        return new Promise((resolve, reject) =>
-          signal.addEventListener('abort', () => reject(signal.reason)),
-        );
+        return new Promise((resolve, reject) => {
+          // Stands in for the open socket of a real stalled request, which
+          // keeps Node's event loop alive until the unref'd timeout fires.
+          const socket = setInterval(() => {}, 1000);
+          signal.addEventListener('abort', () => {
+            clearInterval(socket);
+            reject(signal.reason);
+          });
+        });
       return new Promise((resolve) => {
         release = () => resolve(Response.json(answer));
       });

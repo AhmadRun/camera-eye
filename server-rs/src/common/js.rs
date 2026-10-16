@@ -12,6 +12,11 @@ pub fn number(value: &str) -> f64 {
         b'+' => (1.0, &s[1..]),
         _ => (1.0, s),
     };
+    // A second sign ("--5", "+-5") is NaN in JS, but Rust's parser would
+    // accept the remaining "-5".
+    if body.starts_with(['+', '-']) {
+        return f64::NAN;
+    }
     if body == "Infinity" {
         return sign * f64::INFINITY;
     }
@@ -128,6 +133,9 @@ mod tests {
         assert!(number("12px").is_nan());
         assert!(number("inf").is_nan());
         assert_eq!(number("-Infinity"), f64::NEG_INFINITY);
+        assert!(number("--5").is_nan());
+        assert!(number("+-5").is_nan());
+        assert_eq!(number("+5"), 5.0);
     }
 
     #[test]

@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+- Update dependencies: Vite 8, Puppeteer 25.14, sharp 0.35.5 (librsvg
+  advisory), ws 8.22, mgrs 2.2, Prettier 3.9.10, and patched transitive
+  DOMPurify and source-map-js; `npm audit` is clean. Cesium is now pinned
+  to exactly 1.138.0, the version the Sonar GPU adapter is validated
+  against: the old `^1.124.0` range let a fresh install pick a newer Cesium
+  that silently turns Sonar off. satellite.js stays on 6.x, because 7.x
+  pulls a WASM worker build into the browser bundle that Vite cannot build.
+- Server crates: reqwest 0.13, tokio-tungstenite 0.30, sha1 0.11 and the
+  latest compatible patch releases.
+- The Rust server's `Number()` port read a doubled sign such as `--5` as
+  `5` (JS gives NaN), so a malformed coordinate could come through with its
+  sign flipped instead of being refused.
+- Tests that wait out a stalled request's timeout no longer get cancelled
+  by Node's test runner before the timeout fires.
+
 ## [0.2.1] — 2026-10-02 — Camera Eye through Your Agent (with security fixes and other features)
 
 - Ship each bundled data pack once. The region, marine, admin-boundary,
