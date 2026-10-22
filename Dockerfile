@@ -1,7 +1,7 @@
 # Build the browser app with Node, the server with Rust, and run only the
 # Rust server: it serves dist/ and every /api route on $PORT.
 
-FROM node:24-bookworm-slim AS web
+FROM node:26-trixie-slim AS web
 WORKDIR /app
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 COPY package.json package-lock.json ./
@@ -9,12 +9,12 @@ RUN npm ci --ignore-scripts
 COPY . .
 RUN npm run build && node scripts/export-voice-tools.mjs
 
-FROM rust:1-bookworm AS server
+FROM rust:1-trixie AS server
 WORKDIR /app/server-rs
 COPY server-rs/ ./
 RUN cargo build --release --locked --bins
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*

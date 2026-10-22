@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+- Second dependency pass: Vite 8.3.5, Puppeteer 25.15, @jtarrio/signals
+  0.10.2 and webrtlsdr 3.0.7; server crates base64 0.23, grib 0.20,
+  icu_collator 2.4, parking_lot 0.13, tokio 1.54 and fresh patch releases;
+  CI actions checkout v7 and setup-node v7; the Docker image builds on
+  Node 26 and Debian trixie. Cesium (pinned for the Sonar GPU adapter) and
+  satellite.js 6.x stay where they are for the reasons below.
 - Update dependencies: Vite 8, Puppeteer 25.14, sharp 0.35.5 (librsvg
   advisory), ws 8.22, mgrs 2.2, Prettier 3.9.10, and patched transitive
   DOMPurify and source-map-js; `npm audit` is clean. Cesium is now pinned
